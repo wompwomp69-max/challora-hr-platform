@@ -1,12 +1,20 @@
-<h1>Daftar Lowongan</h1>
+<h1 class="mb-4">Daftar Lowongan</h1>
 <?php if (empty($jobs)): ?>
-    <div class="card">Belum ada lowongan.</div>
+    <div class="card">
+        <div class="card-body">Belum ada lowongan.</div>
+    </div>
 <?php else: ?>
-    <?php foreach ($jobs as $j): ?>
-        <div class="card">
-            <h3 style="margin-top: 0;"><a href="<?= BASE_URL ?>/jobs/show?id=<?= (int)$j['id'] ?>"><?= e($j['title']) ?></a></h3>
-            <p><?= e(mb_substr($j['description'], 0, 200)) ?><?= mb_strlen($j['description']) > 200 ? '…' : '' ?></p>
-            <p><small>Lokasi: <?= e($j['location'] ?? '-') ?> | Gaji: <?= e($j['salary_range'] ?? '-') ?></small></p>
-        </div>
-    <?php endforeach; ?>
+    <div class="row g-3">
+        <?php foreach ($jobs as $j): ?>
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title"><a href="<?= BASE_URL ?>/jobs/show?id=<?= (int)$j['id'] ?>" class="text-decoration-none"><?= e($j['title']) ?></a></h5>
+                        <p class="card-text text-muted"><?= e(mb_substr($j['description'], 0, 200)) ?><?= mb_strlen($j['description']) > 200 ? '…' : '' ?></p>
+                        <p class="card-text small text-muted">Lokasi: <?= e($j['location'] ?? '-') ?> | Gaji: <?= e($j['salary_range'] ?? '-') ?></p>
+                    </div>
+                </div>
+            </div>
+        <?php endforeach; ?>
+    </div>
 <?php endif; ?>

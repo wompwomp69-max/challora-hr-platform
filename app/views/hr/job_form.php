@@ -2,21 +2,31 @@
 $isEdit = !empty($job);
 $action = $isEdit ? (BASE_URL . '/index.php?url=hr/jobs/edit&id=' . (int)$job['id']) : (BASE_URL . '/index.php?url=hr/jobs/create');
 ?>
-<div class="card" style="max-width: 600px;">
-    <h1><?= $isEdit ? 'Edit Lowongan' : 'Buat Lowongan' ?></h1>
-    <form method="post" action="<?= e($action) ?>">
-        <label>Judul</label>
-        <input type="text" name="title" required value="<?= e($old['title']) ?>">
-        <label>Deskripsi</label>
-        <textarea name="description" required><?= e($old['description']) ?></textarea>
-        <label>Lokasi</label>
-        <input type="text" name="location" value="<?= e($old['location']) ?>">
-        <label>Kisaran Gaji</label>
-        <input type="text" name="salary_range" value="<?= e($old['salary_range']) ?>" placeholder="Contoh: 5-8 jt">
-        <?php if (!empty($error)): ?><p class="error"><?= e($error) ?></p><?php endif; ?>
-        <p style="margin-top: 1rem;">
-            <button type="submit" class="btn"><?= $isEdit ? 'Simpan Perubahan' : 'Simpan' ?></button>
-            <a href="<?= BASE_URL ?>/hr/jobs">Batal</a>
-        </p>
-    </form>
+<div class="card mx-auto" style="max-width: 600px;">
+    <div class="card-body">
+        <h1 class="card-title h4 mb-4"><?= $isEdit ? 'Edit Lowongan' : 'Buat Lowongan' ?></h1>
+        <form method="post" action="<?= e($action) ?>">
+            <div class="mb-3">
+                <label class="form-label" for="title">Judul</label>
+                <input type="text" class="form-control" id="title" name="title" required value="<?= e($old['title']) ?>">
+            </div>
+            <div class="mb-3">
+                <label class="form-label" for="description">Deskripsi</label>
+                <textarea class="form-control" id="description" name="description" rows="5" required><?= e($old['description']) ?></textarea>
+            </div>
+            <div class="mb-3">
+                <label class="form-label" for="location">Lokasi</label>
+                <input type="text" class="form-control" id="location" name="location" value="<?= e($old['location']) ?>">
+            </div>
+            <div class="mb-3">
+                <label class="form-label" for="salary_range">Kisaran Gaji</label>
+                <input type="text" class="form-control" id="salary_range" name="salary_range" value="<?= e($old['salary_range']) ?>" placeholder="Contoh: 5-8 jt">
+            </div>
+            <?php if (!empty($error)): ?><p class="text-danger"><?= e($error) ?></p><?php endif; ?>
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-primary"><?= $isEdit ? 'Simpan Perubahan' : 'Simpan' ?></button>
+                <a href="<?= BASE_URL ?>/hr/jobs" class="btn btn-outline-secondary">Batal</a>
+            </div>
+        </form>
+    </div>
 </div>
