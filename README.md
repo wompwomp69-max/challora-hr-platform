@@ -1,76 +1,87 @@
 # HR Recruitment App
 
-Aplikasi rekrutmen dengan 2 role: **HR** dan **User (kandidat)**. MVC, PHP native, MySQL, session-based auth, role-based access control.
+Aplikasi rekrutmen dengan 2 role: **HR** dan **User (kandidat)**. Satu app, satu MVC, pisah di controller, view, route prefix.
 
 ## Struktur
 
 ```
-app/
-├── controllers/   AuthController, JobController, ApplicationController, UserController, HrController, DownloadController
-├── models/        User, Job, Application
-├── views/         auth/, user/, hr/, jobs/, applications/
-└── helpers.php
-config/            database.php, app.php
-database/          schema.sql, migration_cv_and_status.sql (jika DB sudah ada)
-storage/cv/        Upload CV (writable)
-public/            index.php (front controller), .htaccess
+project-root/
+├── app/
+│   ├── controllers/
+│   │   ├── AuthController.php
+│   │   ├── JobController.php
+│   │   ├── ApplicationController.php
+│   │   ├── HrJobController.php
+│   │   ├── HrApplicationController.php
+│   │   ├── UserController.php
+│   │   └── DownloadController.php
+│   ├── models/
+│   │   ├── User.php
+│   │   ├── Job.php
+│   │   └── Application.php
+│   └── views/
+│       ├── layouts/
+│       │   ├── header.php
+│       │   ├── footer.php
+│       │   ├── user.php    (layout clean, navbar)
+│       │   └── hr.php      (layout admin, sidebar)
+│       ├── auth/
+│       │   ├── login.php
+│       │   └── register.php
+│       ├── user/
+│       │   ├── jobs/index.php, show.php
+│       │   ├── applications/index.php
+│       │   └── settings/index.php, edit.php
+│       └── hr/
+│           ├── jobs/index.php, create.php, edit.php
+│           └── applications/index.php
+├── core/
+│   ├── Database.php
+│   ├── Controller.php
+│   └── helpers.php
+├── config/
+│   ├── database.php
+│   └── app.php
+├── database/       schema.sql, migration_cv_and_status.sql
+├── storage/cv/
+├── public/
+│   ├── index.php
+│   ├── .htaccess
+│   └── assets/css/, assets/js/
+└── .htaccess (optional)
 ```
+
+## Routing
+
+| Method | URL | Controller |
+|--------|-----|------------|
+| GET | /jobs | JobController@index |
+| GET | /jobs/show?id= | JobController@show |
+| POST | /jobs/apply | ApplicationController@store |
+| GET | /applications | ApplicationController@index |
+| GET | /user/settings | UserController@profile |
+| GET/POST | /user/settings/edit | UserController@profileEdit |
+| GET | /hr/jobs | HrJobController@index |
+| GET/POST | /hr/jobs/create | HrJobController@create |
+| GET/POST | /hr/jobs/edit?id= | HrJobController@edit |
+| POST | /hr/jobs/delete | HrJobController@delete |
+| GET | /hr/jobs/applicants?id= | HrApplicationController@index |
+| POST | /hr/applications/update-status | HrApplicationController@updateStatus |
+| GET | /download/cv?id= | DownloadController@cv |
+
+## Layout
+
+- **user layout**: auth, jobs, applications, settings → navbar clean
+- **hr layout**: hr/* → sidebar admin
+- `render_view()` otomatis pilih layout berdasarkan path view (hr/* → hr, lain → user)
 
 ## Setup
 
-1. **Database**
-   - Buat database dan tabel: import `database/schema.sql` lewat phpMyAdmin atau CLI:
-     ```bash
-     mysql -u root -p < database/schema.sql
-     ```
-   - Atau jalankan isi file tersebut di MySQL. Schema sudah include pembuatan DB `challora_recruitment` dan satu user HR.
-
-2. **Config**
-   - Edit `config/database.php` jika perlu (host, user, password, nama DB).
-   - Jika app tidak di subfolder `challorav2`, ubah `BASE_URL` di `config/app.php`.
-
-3. **Storage**
-   - Folder `storage/cv/` harus writable (untuk upload CV). Di Linux: `chmod 755 storage storage/cv` atau `chmod 777 storage/cv` jika perlu.
-
-4. **Web server**
-   - Akses lewat **public**: `http://localhost/challorav2/public/`
-   - Pastikan mod_rewrite aktif (Apache) agar URL bersih. Jika tidak, pakai: `http://localhost/challorav2/public/index.php?url=jobs`
+1. Import `database/schema.sql`
+2. Edit `config/database.php` dan `config/app.php` (BASE_URL)
+3. Pastikan `storage/cv/` writable
+4. Akses `http://localhost/challorav2/public/`
 
 ## Akun default
 
-- **HR:** email `hr@example.com`, password `password123`
-- **User:** daftar lewat menu Daftar (role kandidat)
-
-## Alur
-
-- **Login** → role `hr` → redirect ke `/hr/jobs`; role `user` → redirect ke `/jobs`
-- **User:** Login → List Jobs → Detail Job → Apply (upload CV) → Status Lamaran (pending / accepted / rejected) → Edit profil.
-- **HR:** Login → Buat/Edit/Hapus lowongan → Lihat pelamar per job → Unduh CV → Update status (pending / accepted / rejected).
-
-Semua route selain `/auth/*` wajib login; cek di controller, bukan cuma sembunyiin tombol.
-
-## Keamanan
-
-- Password: `password_hash()` / `password_verify()`
-- Query: PDO prepared statements
-- Setiap akses: cek session + role di controller
-- Output di view: escape pakai `e()` (htmlspecialchars)
-- Apply: UNIQUE(user_id, job_id) di DB + cek di PHP; upload CV: validasi MIME (PDF/DOCX), extension, max 2MB, rename file (no .php)
-
-## Route (konsep)
-
-| Method | URL | Keterangan |
-|--------|-----|------------|
-| GET | /jobs | List lowongan (wajib login) |
-| GET | /jobs/show?id= | Detail lowongan |
-| POST | /jobs/apply | Apply + upload CV (user, multipart) |
-| GET | /applications | Status lamaran (Job Title \| Status) |
-| GET | /user/profile | Profil kandidat |
-| GET/POST | /user/profile/edit | Edit profil |
-| GET | /download/cv?id= | Unduh CV (HR/user punya akses) |
-| GET | /hr/jobs | Dashboard HR |
-| GET/POST | /hr/jobs/create | Form buat lowongan |
-| GET/POST | /hr/jobs/edit?id= | Form edit lowongan |
-| POST | /hr/jobs/delete | Hapus lowongan |
-| GET | /hr/jobs/applicants?id= | Daftar pelamar per job |
-| POST | /hr/applications/update-status | Update status lamaran |
+- HR: `hr@example.com` / `password123`

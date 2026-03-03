@@ -51,6 +51,6 @@ function render_view(string $view, array $data = []): void {
     ob_start();
     require APP_PATH . '/views/' . $view . '.php';
     $content = ob_get_clean();
-    $layout = (strpos($view, 'hr/') === 0) ? 'hr' : 'user';
+    $layout = (strpos($view, 'hr/') === 0) ? 'hr' : 'user'; // auth/*, user/* => user layout
     require APP_PATH . '/views/layouts/' . $layout . '.php';
 }

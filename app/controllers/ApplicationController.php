@@ -23,7 +23,7 @@ class ApplicationController {
     public function index(): void {
         requireRole('user');
         $applications = $this->appModel->getByUserId(currentUserId());
-        render_view('applications/index', [
+        render_view('user/applications/index', [
             'applications' => $applications,
             'pageTitle' => 'Status Lamaran',
         ]);

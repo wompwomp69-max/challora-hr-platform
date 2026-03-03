@@ -8,8 +8,9 @@ require $baseDir . '/config/app.php';
 $url = trim($_GET['url'] ?? 'jobs', '/');
 $url = $url === '' ? 'jobs' : $url;
 $parts = array_filter(explode('/', $url));
+$key = implode('/', $parts);
+$method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
 
-// Route table: method + path pattern => [Controller, action]
 $routes = [
     'GET' => [
         'auth/login' => [AuthController::class, 'login'],
@@ -18,29 +19,27 @@ $routes = [
         'jobs' => [JobController::class, 'index'],
         'jobs/show' => [JobController::class, 'show'],
         'applications' => [ApplicationController::class, 'index'],
-        'user/profile' => [UserController::class, 'profile'],
-        'user/profile/edit' => [UserController::class, 'profileEdit'],
-        'hr/jobs' => [HrController::class, 'jobs'],
-        'hr/jobs/create' => [HrController::class, 'jobCreate'],
-        'hr/jobs/edit' => [HrController::class, 'jobEdit'],
-        'hr/jobs/applicants' => [HrController::class, 'jobApplicants'],
+        'user/settings' => [UserController::class, 'profile'],
+        'user/settings/edit' => [UserController::class, 'profileEdit'],
+        'hr/jobs' => [HrJobController::class, 'index'],
+        'hr/jobs/create' => [HrJobController::class, 'create'],
+        'hr/jobs/edit' => [HrJobController::class, 'edit'],
+        'hr/jobs/applicants' => [HrApplicationController::class, 'index'],
         'download/cv' => [DownloadController::class, 'cv'],
     ],
     'POST' => [
         'auth/login' => [AuthController::class, 'login'],
         'auth/register' => [AuthController::class, 'register'],
         'jobs/apply' => [ApplicationController::class, 'apply'],
-        'user/profile/edit' => [UserController::class, 'profileEdit'],
-        'hr/jobs/create' => [HrController::class, 'jobCreate'],
-        'hr/jobs/store' => [HrController::class, 'jobCreate'],
-        'hr/jobs/edit' => [HrController::class, 'jobEdit'],
-        'hr/jobs/delete' => [HrController::class, 'jobDelete'],
-        'hr/applications/update-status' => [HrController::class, 'applicationUpdateStatus'],
+        'user/settings/edit' => [UserController::class, 'profileEdit'],
+        'hr/jobs/create' => [HrJobController::class, 'create'],
+        'hr/jobs/store' => [HrJobController::class, 'create'],
+        'hr/jobs/edit' => [HrJobController::class, 'edit'],
+        'hr/jobs/delete' => [HrJobController::class, 'delete'],
+        'hr/applications/update-status' => [HrApplicationController::class, 'updateStatus'],
     ],
 ];
 
-$method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
-$key = implode('/', $parts);
 $routeList = $routes[$method] ?? [];
 
 if (isset($routeList[$key])) {
@@ -50,6 +49,5 @@ if (isset($routeList[$key])) {
     exit;
 }
 
-// 404
 http_response_code(404);
 echo '<h1>404 Not Found</h1><p><a href="' . BASE_URL . '/jobs">Ke beranda</a></p>';

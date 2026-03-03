@@ -5,7 +5,7 @@
         <p><strong>Email:</strong> <?= e($user['email']) ?></p>
         <p><strong>No. HP:</strong> <?= e($user['phone'] ?? '-') ?></p>
         <p><strong>Alamat:</strong> <?= e($user['address'] ?? '-') ?></p>
-        <a href="<?= BASE_URL ?>/user/profile/edit" class="btn btn-primary">Edit Profil</a>
+        <a href="<?= BASE_URL ?>/user/settings/edit" class="btn btn-primary">Edit Profil</a>
     </div>
 </div>
 <div class="card">
@@ -25,9 +25,7 @@
                                 <td><?= e($a['job_title']) ?></td>
                                 <td><?= e($a['location'] ?? '-') ?></td>
                                 <td>
-                                    <?php
-                                    $badgeClass = $a['status'] === 'pending' ? 'bg-primary' : ($a['status'] === 'accepted' ? 'bg-success' : ($a['status'] === 'rejected' ? 'bg-danger' : 'bg-secondary'));
-                                    ?>
+                                    <?php $badgeClass = $a['status'] === 'pending' ? 'bg-primary' : ($a['status'] === 'accepted' ? 'bg-success' : ($a['status'] === 'rejected' ? 'bg-danger' : 'bg-secondary')); ?>
                                     <span class="badge <?= $badgeClass ?>"><?= e($a['status']) ?></span>
                                 </td>
                                 <td><?= e($a['created_at']) ?></td>

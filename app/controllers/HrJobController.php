@@ -1,8 +1,8 @@
 <?php
 /**
- * HR only: CRUD jobs, list applicants, update application status
+ * HR: CRUD jobs
  */
-class HrController {
+class HrJobController {
     private Job $jobModel;
     private Application $appModel;
 
@@ -15,17 +15,17 @@ class HrController {
         requireRole('hr');
     }
 
-    public function jobs(): void {
+    public function index(): void {
         $this->requireHr();
         $list = $this->jobModel->findByCreator(currentUserId());
         foreach ($list as &$j) {
             $j['applicant_count'] = count($this->appModel->getByJobId((int)$j['id']));
         }
         unset($j);
-        render_view('hr/jobs', ['jobs' => $list, 'pageTitle' => 'Dashboard HR']);
+        render_view('hr/jobs/index', ['jobs' => $list, 'pageTitle' => 'Dashboard HR']);
     }
 
-    public function jobCreate(): void {
+    public function create(): void {
         $this->requireHr();
         $error = '';
         $old = ['title' => '', 'description' => '', 'location' => '', 'salary_range' => ''];
@@ -48,10 +48,10 @@ class HrController {
                 redirect('/hr/jobs');
             }
         }
-        render_view('hr/job_form', ['error' => $error, 'old' => $old, 'job' => null, 'pageTitle' => 'Buat Lowongan']);
+        render_view('hr/jobs/create', ['error' => $error, 'old' => $old, 'pageTitle' => 'Buat Lowongan']);
     }
 
-    public function jobEdit(): void {
+    public function edit(): void {
         $this->requireHr();
         $id = (int) ($_GET['id'] ?? 0);
         if ($id < 1 || !$this->jobModel->isCreatedBy($id, currentUserId())) {
@@ -74,10 +74,10 @@ class HrController {
                 redirect('/hr/jobs');
             }
         }
-        render_view('hr/job_form', ['error' => $error, 'old' => $old, 'job' => $job, 'pageTitle' => 'Edit Lowongan']);
+        render_view('hr/jobs/edit', ['error' => $error, 'old' => $old, 'job' => $job, 'pageTitle' => 'Edit Lowongan']);
     }
 
-    public function jobDelete(): void {
+    public function delete(): void {
         $this->requireHr();
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             redirect('/hr/jobs');
@@ -91,35 +91,4 @@ class HrController {
         $_SESSION['flash'] = 'Lowongan telah dihapus.';
         redirect('/hr/jobs');
     }
-
-    public function jobApplicants(): void {
-        $this->requireHr();
-        $jobId = (int) ($_GET['id'] ?? 0);
-        if ($jobId < 1 || !$this->jobModel->isCreatedBy($jobId, currentUserId())) {
-            $_SESSION['flash_error'] = 'Lowongan tidak ditemukan.';
-            redirect('/hr/jobs');
-        }
-        $job = $this->jobModel->findById($jobId);
-        $applicants = $this->appModel->getByJobId($jobId);
-        render_view('hr/applicants', ['job' => $job, 'applicants' => $applicants, 'pageTitle' => 'Pelamar - ' . e($job['title'])]);
-    }
-
-    public function applicationUpdateStatus(): void {
-        $this->requireHr();
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            redirect('/hr/jobs');
-        }
-        $appId = (int) ($_POST['application_id'] ?? 0);
-        $status = trim($_POST['status'] ?? '');
-        $app = $this->appModel->getApplicationForHrJob($appId, currentUserId());
-        if (!$app) {
-            $_SESSION['flash_error'] = 'Data lamaran tidak ditemukan.';
-            redirect('/hr/jobs');
-        }
-        if ($this->appModel->updateStatus($appId, $status)) {
-            $_SESSION['flash'] = 'Status lamaran diperbarui.';
-        }
-        redirect('/hr/jobs/applicants?id=' . $app['job_id']);
-    }
-
 }

@@ -28,9 +28,7 @@
                                     <?php else: ?>—<?php endif; ?>
                                 </td>
                                 <td>
-                                    <?php
-                                    $badgeClass = $a['status'] === 'pending' ? 'bg-primary' : ($a['status'] === 'accepted' ? 'bg-success' : ($a['status'] === 'rejected' ? 'bg-danger' : 'bg-secondary'));
-                                    ?>
+                                    <?php $badgeClass = $a['status'] === 'pending' ? 'bg-primary' : ($a['status'] === 'accepted' ? 'bg-success' : ($a['status'] === 'rejected' ? 'bg-danger' : 'bg-secondary')); ?>
                                     <span class="badge <?= $badgeClass ?>"><?= e($a['status']) ?></span>
                                 </td>
                                 <td>

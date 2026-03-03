@@ -1,11 +1,7 @@
-<?php
-$isEdit = !empty($job);
-$action = $isEdit ? (BASE_URL . '/index.php?url=hr/jobs/edit&id=' . (int)$job['id']) : (BASE_URL . '/index.php?url=hr/jobs/create');
-?>
 <div class="card mx-auto" style="max-width: 600px;">
     <div class="card-body">
-        <h1 class="card-title h4 mb-4"><?= $isEdit ? 'Edit Lowongan' : 'Buat Lowongan' ?></h1>
-        <form method="post" action="<?= e($action) ?>">
+        <h1 class="card-title h4 mb-4">Buat Lowongan</h1>
+        <form method="post" action="<?= BASE_URL ?>/index.php?url=hr/jobs/create">
             <div class="mb-3">
                 <label class="form-label" for="title">Judul</label>
                 <input type="text" class="form-control" id="title" name="title" required value="<?= e($old['title']) ?>">
@@ -24,7 +20,7 @@ $action = $isEdit ? (BASE_URL . '/index.php?url=hr/jobs/edit&id=' . (int)$job['i
             </div>
             <?php if (!empty($error)): ?><p class="text-danger"><?= e($error) ?></p><?php endif; ?>
             <div class="d-flex gap-2">
-                <button type="submit" class="btn btn-primary"><?= $isEdit ? 'Simpan Perubahan' : 'Simpan' ?></button>
+                <button type="submit" class="btn btn-primary">Simpan</button>
                 <a href="<?= BASE_URL ?>/hr/jobs" class="btn btn-outline-secondary">Batal</a>
             </div>
         </form>

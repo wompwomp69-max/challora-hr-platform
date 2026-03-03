@@ -12,7 +12,7 @@ class JobController {
     public function index(): void {
         requireLogin();
         $jobs = $this->jobModel->all();
-        render_view('jobs/index', ['jobs' => $jobs, 'pageTitle' => 'Lowongan']);
+        render_view('user/jobs/index', ['jobs' => $jobs, 'pageTitle' => 'Lowongan']);
     }
 
     public function show(): void {
@@ -33,7 +33,7 @@ class JobController {
             $alreadyApplied = $appModel->hasApplied(currentUserId(), $id);
             $canApply = !$alreadyApplied;
         }
-        render_view('jobs/show', [
+        render_view('user/jobs/show', [
             'job' => $job,
             'canApply' => $canApply,
             'alreadyApplied' => $alreadyApplied,

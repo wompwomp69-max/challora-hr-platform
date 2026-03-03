@@ -19,7 +19,7 @@ class UserController {
         }
         unset($user['password']);
         $applications = $this->appModel->getByUserId(currentUserId());
-        render_view('user/profile', ['user' => $user, 'applications' => $applications, 'pageTitle' => 'Profil']);
+        render_view('user/settings/index', ['user' => $user, 'applications' => $applications, 'pageTitle' => 'Profil']);
     }
 
     public function profileEdit(): void {
@@ -38,9 +38,9 @@ class UserController {
                 $this->userModel->update(currentUserId(), ['name' => $name, 'phone' => $phone, 'address' => $address]);
                 $_SESSION['flash'] = 'Profil berhasil diperbarui.';
                 $_SESSION['user_name'] = $name;
-                redirect('/user/profile');
+                redirect('/user/settings');
             }
         }
-        render_view('user/profile_edit', ['user' => $user, 'error' => $error, 'pageTitle' => 'Edit Profil']);
+        render_view('user/settings/edit', ['user' => $user, 'error' => $error, 'pageTitle' => 'Edit Profil']);
     }
 }
