@@ -1,0 +1,117 @@
+<?php
+/**
+ * User: Apply job (upload CV), list my applications
+ * Security: validasi MIME, extension, size, rename file
+ */
+class ApplicationController {
+    private const MAX_CV_SIZE = 2 * 1024 * 1024; // 2MB
+    private const ALLOWED_MIMES = [
+        'application/pdf',
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    ];
+    private const ALLOWED_EXT = ['pdf', 'docx'];
+
+    private Application $appModel;
+    private Job $jobModel;
+
+    public function __construct() {
+        $this->appModel = new Application();
+        $this->jobModel = new Job();
+    }
+
+    /** GET /applications — Status tracking (Job Title | Status) */
+    public function index(): void {
+        requireRole('user');
+        $applications = $this->appModel->getByUserId(currentUserId());
+        render_view('applications/index', [
+            'applications' => $applications,
+            'pageTitle' => 'Status Lamaran',
+        ]);
+    }
+
+    /** POST /jobs/apply — Apply + upload CV */
+    public function apply(): void {
+        requireRole('user');
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            redirect('/jobs');
+        }
+        $jobId = (int) ($_POST['job_id'] ?? 0);
+        if ($jobId < 1) {
+            $_SESSION['flash_error'] = 'Job tidak valid.';
+            redirect('/jobs');
+        }
+        $job = $this->jobModel->findById($jobId);
+        if (!$job) {
+            $_SESSION['flash_error'] = 'Lowongan tidak ditemukan.';
+            redirect('/jobs');
+        }
+        $userId = currentUserId();
+        if ($this->appModel->hasApplied($userId, $jobId)) {
+            $_SESSION['flash_error'] = 'Anda sudah melamar lowongan ini.';
+            redirect('/jobs/show?id=' . $jobId);
+        }
+
+        // Validasi file CV (wajib)
+        $error = $this->validateCv();
+        if ($error !== null) {
+            $_SESSION['flash_error'] = $error;
+            redirect('/jobs/show?id=' . $jobId);
+        }
+
+        $cvPath = $this->saveCv();
+        if ($cvPath === null) {
+            $_SESSION['flash_error'] = 'Gagal menyimpan file CV.';
+            redirect('/jobs/show?id=' . $jobId);
+        }
+
+        $this->appModel->create($userId, $jobId, $cvPath);
+        $_SESSION['flash'] = 'Lamaran beserta CV berhasil dikirim.';
+        redirect('/jobs/show?id=' . $jobId);
+    }
+
+    private function validateCv(): ?string {
+        if (empty($_FILES['cv']['tmp_name']) || !is_uploaded_file($_FILES['cv']['tmp_name'])) {
+            return 'File CV wajib diunggah.';
+        }
+        $file = $_FILES['cv'];
+        if ($file['error'] !== UPLOAD_ERR_OK) {
+            return 'Terjadi kesalahan saat upload. Coba lagi.';
+        }
+        if ($file['size'] > self::MAX_CV_SIZE) {
+            return 'Ukuran file maksimal 2 MB.';
+        }
+        $finfo = finfo_open(FILEINFO_MIME_TYPE);
+        $mime = finfo_file($finfo, $file['tmp_name']);
+        finfo_close($finfo);
+        if (!in_array($mime, self::ALLOWED_MIMES, true)) {
+            return 'Hanya file PDF atau DOCX yang diizinkan.';
+        }
+        $ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+        if (!in_array($ext, self::ALLOWED_EXT, true)) {
+            return 'Ekstensi file harus .pdf atau .docx.';
+        }
+        // Jangan izinkan .php atau ekstensi berbahaya
+        if (in_array($ext, ['php', 'phtml', 'php3', 'php4', 'php5', 'exe'], true)) {
+            return 'Jenis file tidak diizinkan.';
+        }
+        return null;
+    }
+
+    private function saveCv(): ?string {
+        $file = $_FILES['cv'];
+        $ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+        if (!in_array($ext, self::ALLOWED_EXT, true)) {
+            return null;
+        }
+        $dir = STORAGE_CV;
+        if (!is_dir($dir)) {
+            mkdir($dir, 0755, true);
+        }
+        $filename = time() . '_' . bin2hex(random_bytes(4)) . '.' . $ext;
+        $fullPath = $dir . DIRECTORY_SEPARATOR . $filename;
+        if (!move_uploaded_file($file['tmp_name'], $fullPath)) {
+            return null;
+        }
+        return 'storage/cv/' . $filename;
+    }
+}

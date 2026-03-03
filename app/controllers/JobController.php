@@ -1,0 +1,43 @@
+<?php
+/**
+ * List & detail job — wajib login (selain /auth/*)
+ */
+class JobController {
+    private Job $jobModel;
+
+    public function __construct() {
+        $this->jobModel = new Job();
+    }
+
+    public function index(): void {
+        requireLogin();
+        $jobs = $this->jobModel->all();
+        render_view('jobs/index', ['jobs' => $jobs, 'pageTitle' => 'Lowongan']);
+    }
+
+    public function show(): void {
+        requireLogin();
+        $id = (int) ($_GET['id'] ?? 0);
+        if ($id < 1) {
+            redirect('/jobs');
+        }
+        $job = $this->jobModel->findById($id);
+        if (!$job) {
+            $_SESSION['flash_error'] = 'Lowongan tidak ditemukan.';
+            redirect('/jobs');
+        }
+        $canApply = false;
+        $alreadyApplied = false;
+        if (isLoggedIn() && currentRole() === 'user') {
+            $appModel = new Application();
+            $alreadyApplied = $appModel->hasApplied(currentUserId(), $id);
+            $canApply = !$alreadyApplied;
+        }
+        render_view('jobs/show', [
+            'job' => $job,
+            'canApply' => $canApply,
+            'alreadyApplied' => $alreadyApplied,
+            'pageTitle' => e($job['title']),
+        ]);
+    }
+}
