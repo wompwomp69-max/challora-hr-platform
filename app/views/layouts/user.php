@@ -11,6 +11,7 @@
                     <li class="nav-item"><a class="nav-link" href="<?= BASE_URL ?>/hr/jobs">Dashboard HR</a></li>
                 <?php elseif (isLoggedIn() && currentRole() === 'user'): ?>
                     <li class="nav-item"><a class="nav-link" href="<?= BASE_URL ?>/jobs">Lowongan</a></li>
+                    <li class="nav-item" ><a class="nav-link" href="<?= BASE_URL ?>/applications">Yang sudah dilamar</a></li>
                 <?php endif; ?>
             </ul>
             <ul class="navbar-nav">
@@ -19,7 +20,6 @@
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false"><?= e($_SESSION['user_name'] ?? 'User') ?></a>
                         <ul class="dropdown-menu dropdown-menu-end">
-                            <li><a class="dropdown-item" href="<?= BASE_URL ?>/applications">Telah dilamar</a></li>
                             <li><a class="dropdown-item" href="<?= BASE_URL ?>/user/settings">Pengaturan</a></li>
                             <li><hr class="dropdown-divider"></li>
                             <li><a class="dropdown-item" href="<?= BASE_URL ?>/auth/logout">Log out</a></li>

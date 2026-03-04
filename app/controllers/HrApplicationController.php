@@ -27,10 +27,13 @@ class HrApplicationController {
         $job = $this->jobModel->findById($jobId);
         $applicants = $this->appModel->getByJobId($jobId);
         $workExpByUser = [];
+        $achievementsByUser = [];
         foreach ($applicants as $a) {
-            $workExpByUser[(int)$a['user_id']] = $this->userModel->getWorkExperiences((int)$a['user_id']);
+            $uid = (int) $a['user_id'];
+            $workExpByUser[$uid] = $this->userModel->getWorkExperiences($uid);
+            $achievementsByUser[$uid] = $this->userModel->getAchievements($uid);
         }
-        render_view('hr/applications/index', ['job' => $job, 'applicants' => $applicants, 'workExpByUser' => $workExpByUser, 'pageTitle' => 'Pelamar - ' . e($job['title'])]);
+        render_view('hr/applications/index', ['job' => $job, 'applicants' => $applicants, 'workExpByUser' => $workExpByUser, 'achievementsByUser' => $achievementsByUser, 'pageTitle' => 'Pelamar - ' . e($job['title'])]);
     }
 
     public function updateStatus(): void {

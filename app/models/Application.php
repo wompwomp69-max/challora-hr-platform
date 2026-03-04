@@ -23,7 +23,11 @@ class Application {
     public function getByJobId(int $jobId): array {
         $stmt = $this->db->prepare('
             SELECT a.*, u.name, u.email, u.phone, u.address,
+                u.gender, u.religion, u.social_media, u.birth_place, u.birth_date,
                 u.father_name, u.mother_name, u.marital_status,
+                u.father_job, u.mother_job, u.father_education, u.mother_education,
+                u.father_phone, u.mother_phone, u.address_type, u.address_family,
+                u.emergency_name, u.emergency_phone, u.job_description,
                 u.education_level, u.graduation_year, u.education_major, u.education_university
             FROM applications a
             JOIN users u ON u.id = a.user_id

@@ -32,8 +32,17 @@ class User {
     }
 
     public function update(int $id, array $data): bool {
-        $allowed = ['name', 'phone', 'address', 'father_name', 'mother_name', 'marital_status',
-            'education_level', 'graduation_year', 'education_major', 'education_university'];
+        $allowed = [
+            'name', 'phone', 'address',
+            'father_name', 'mother_name', 'marital_status',
+            'education_level', 'graduation_year', 'education_major', 'education_university',
+            'gender', 'religion', 'social_media', 'birth_place', 'birth_date',
+            'father_job', 'mother_job', 'father_education', 'mother_education',
+            'father_phone', 'mother_phone',
+            'address_type', 'address_family',
+            'emergency_name', 'emergency_phone',
+            'job_description',
+        ];
         $set = [];
         $params = [];
         foreach ($allowed as $k) {
@@ -54,6 +63,41 @@ class User {
         $stmt = $this->db->prepare('SELECT * FROM user_work_experiences WHERE user_id = ? ORDER BY sort_order, year_start DESC');
         $stmt->execute([$userId]);
         return $stmt->fetchAll();
+    }
+
+    /** Achievements (returns [] if table does not exist) */
+    public function getAchievements(int $userId): array {
+        try {
+            $stmt = $this->db->prepare('SELECT * FROM user_achievements WHERE user_id = ? ORDER BY year DESC, id ASC');
+            $stmt->execute([$userId]);
+            return $stmt->fetchAll();
+        } catch (PDOException $e) {
+            return [];
+        }
+    }
+
+    public function setAchievements(int $userId, array $items): void {
+        try {
+            $this->db->prepare('DELETE FROM user_achievements WHERE user_id = ?')->execute([$userId]);
+            $stmt = $this->db->prepare('INSERT INTO user_achievements (user_id, type, title, description, organizer, year, rank, level, certificate_link) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)');
+            foreach ($items as $row) {
+                if (!empty(trim($row['title'] ?? ''))) {
+                    $stmt->execute([
+                        $userId,
+                        trim($row['type'] ?? ''),
+                        trim($row['title']),
+                        trim($row['description'] ?? ''),
+                        trim($row['organizer'] ?? ''),
+                        trim($row['year'] ?? ''),
+                        trim($row['rank'] ?? ''),
+                        trim($row['level'] ?? ''),
+                        trim($row['certificate_link'] ?? ''),
+                    ]);
+                }
+            }
+        } catch (PDOException $e) {
+            // table does not exist yet - ignore
+        }
     }
 
     public function setWorkExperiences(int $userId, array $items): void {
