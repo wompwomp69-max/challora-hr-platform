@@ -4,20 +4,7 @@
     box-sizing: border-box;
 }
 
-:root {
-    --primary: #2563eb;
-    --secondary: #7c3aed;
-    --accent: #06b6d4;
-    --text: #0f172a;
-    --muted: #64748b;
-    --white: #ffffff;
-    --input-border: #dbe2ea;
-    --danger-bg: #fee2e2;
-    --danger-text: #b91c1c;
-    --success-bg: #dcfce7;
-    --success-text: #166534;
-    --shadow: 0 20px 50px rgba(15, 23, 42, 0.18);
-}
+/* Variabel tema: public/assets/css/design-tokens.css (harus dimuat sebelum file ini) */
 
 html,
 body {
@@ -25,11 +12,11 @@ body {
 }
 
 body.auth-body {
-    font-family: 'Poppins', sans-serif;
+    font-family: var(--font-sans);
     background:
-        radial-gradient(circle at top left, rgba(124, 58, 237, 0.35), transparent 28%),
-        radial-gradient(circle at bottom right, rgba(6, 182, 212, 0.28), transparent 30%),
-        linear-gradient(135deg, #0f172a 0%, #1d4ed8 45%, #06b6d4 100%);
+        radial-gradient(circle at top left, color-mix(in srgb, var(--color-secondary) 40%, transparent), transparent 28%),
+        radial-gradient(circle at bottom right, color-mix(in srgb, var(--color-accent) 35%, transparent), transparent 30%),
+        linear-gradient(135deg, var(--color-secondary-hover) 0%, var(--color-secondary) 42%, var(--color-accent) 100%);
     color: var(--text);
 }
 
@@ -76,7 +63,7 @@ body.auth-body {
     width: 52px;
     height: 52px;
     border-radius: 16px;
-    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    background: linear-gradient(135deg, var(--secondary), var(--accent));
     color: var(--white);
     display: flex;
     align-items: center;
@@ -206,7 +193,7 @@ body.auth-body {
 .forgot-link {
     font-size: 14px;
     font-weight: 600;
-    color: var(--primary);
+    color: var(--accent);
     text-decoration: none;
 }
 
@@ -219,7 +206,7 @@ body.auth-body {
     height: 56px;
     border: none;
     border-radius: 16px;
-    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    background: linear-gradient(135deg, var(--secondary), var(--accent));
     color: var(--white);
     font-size: 15px;
     font-weight: 600;
@@ -241,11 +228,11 @@ body.auth-body {
 
 .extra-links p {
     font-size: 14px;
-    color: var(--muted);
+    color: var(--accent);
 }
 
 .extra-links a {
-    color: var(--primary);
+    color: var(--accent);
     font-weight: 600;
     text-decoration: none;
 }
@@ -257,7 +244,10 @@ body.auth-body {
 .login-right {
     position: relative;
     background:
-        linear-gradient(rgba(15, 23, 42, 0.30), rgba(15, 23, 42, 0.55)),
+        linear-gradient(
+            color-mix(in srgb, var(--color-secondary) 30%, transparent),
+            color-mix(in srgb, var(--color-accent) 35%, var(--color-secondary))
+        ),
         url('../images/login-side.jpg') center/cover no-repeat;
     display: flex;
     align-items: flex-end;
@@ -267,7 +257,11 @@ body.auth-body {
 .overlay {
     position: absolute;
     inset: 0;
-    background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(15,23,42,0.35));
+    background: linear-gradient(
+        180deg,
+        color-mix(in srgb, var(--color-accent) 10%, transparent),
+        color-mix(in srgb, var(--color-secondary) 35%, transparent)
+    );
 }
 
 .right-content {

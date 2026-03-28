@@ -1,107 +1,246 @@
 <?php
 $maritalLabels = ['single' => 'Belum menikah', 'married' => 'Menikah', 'divorced' => 'Cerai', 'widowed' => 'Duda/Janda'];
 $religionLabels = ['islam' => 'Islam', 'katolik' => 'Katolik', 'kristen' => 'Kristen', 'hindu' => 'Hindu', 'buddha' => 'Buddha', 'konghucu' => 'Konghucu', 'lainnya' => 'Lainnya'];
-$achTypeLabels = ['kompetisi' => 'Kompetisi', 'webinar_seminar' => 'Webinar/Seminar', 'workshop' => 'Workshop', 'pelatihan_kursus' => 'Pelatihan/Kursus', 'sertifikasi' => 'Sertifikasi', 'lainnya' => 'Lainnya'];
-$achLevelLabels = ['kota' => 'Kota', 'provinsi' => 'Provinsi', 'nasional' => 'Nasional', 'internasional' => 'Internasional'];
+$genderLabel = $user['gender'] === 'male' ? 'Laki-laki' : ($user['gender'] === 'female' ? 'Perempuan' : '-');
+$profileAvatarSrc = currentUserAvatarImgSrc();
+$profileInitial = mb_strtoupper(mb_substr($user['name'] ?? 'U', 0, 1));
+$formatDocUploadedAt = static function (?string $relativePath): string {
+    if (empty($relativePath)) {
+        return '-';
+    }
+    $fullPath = BASE_PATH . '/' . ltrim($relativePath, '/');
+    if (!is_file($fullPath)) {
+        return '-';
+    }
+    $ts = @filemtime($fullPath);
+    if ($ts === false) {
+        return '-';
+    }
+    return date('d/m/Y H:i', $ts);
+};
 ?>
-<div class="card mb-4">
-    <div class="card-body">
-        <h1 class="card-title h4 mb-4">Profil Saya</h1>
-        <div class="row">
-            <div class="col-md-6">
-                <p><strong>Nama:</strong> <?= e($user['name']) ?></p>
-                <p><strong>Email:</strong> <?= e($user['email']) ?></p>
-                <p><strong>No. HP:</strong> <?= e($user['phone'] ?? '-') ?></p>
-                <p><strong>Alamat:</strong> <?= e($user['address'] ?? '-') ?></p>
-                <p><strong>Jenis Kelamin:</strong> <?= e($user['gender'] === 'male' ? 'Laki-laki' : ($user['gender'] === 'female' ? 'Perempuan' : '-')) ?></p>
-                <p><strong>Agama:</strong> <?= e(!empty($user['religion']) ? ($religionLabels[$user['religion']] ?? $user['religion']) : '-') ?></p>
-                <p><strong>Akun Media Sosial:</strong> <?= e($user['social_media'] ?? '-') ?></p>
+
+<div class="max-w-5xl mx-auto">
+    <div class="bg-surface rounded-2xl shadow-sm border border-muted p-5 md:p-8">
+        <!-- Header profil -->
+        <div class="flex flex-col md:flex-row gap-5">
+            <div class="flex-shrink-0">
+                <form
+                    method="post"
+                    action="<?= BASE_URL ?>/index.php?url=user/settings/avatar"
+                    enctype="multipart/form-data"
+                    class="group relative inline-block"
+                >
+                    <label
+                        for="settings-avatar-input"
+                        class="block cursor-pointer relative w-24 h-24 md:w-28 md:h-28 rounded-full overflow-hidden shadow-sm ring-2 ring-transparent hover:ring-primary/50 focus-within:ring-2 focus-within:ring-primary transition"
+                        title="Klik untuk mengganti foto profil"
+                    >
+                        <?php if ($profileAvatarSrc): ?>
+                            <img src="<?= e($profileAvatarSrc) ?>" alt="" class="w-full h-full object-cover" width="112" height="112">
+                        <?php else: ?>
+                            <div class="w-full h-full bg-primary flex items-center justify-center text-white text-3xl font-semibold"><?= e($profileInitial) ?></div>
+                        <?php endif; ?>
+                        <span class="absolute inset-0 flex items-center justify-center bg-black/50 text-white text-[11px] font-semibold opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none text-center px-1 leading-tight">Ganti foto</span>
+                    </label>
+                    <input
+                        type="file"
+                        id="settings-avatar-input"
+                        name="avatar"
+                        accept=".jpg,.jpeg,.png,image/jpeg,image/png"
+                        class="sr-only"
+                        onchange="if (this.files.length) this.form.submit()"
+                    >
+                </form>
+                <p class="text-[10px] text-muted mt-1.5 max-w-[7rem] md:max-w-[8.75rem] text-center">JPG/PNG, maks. 1 MB</p>
             </div>
-            <div class="col-md-6">
-                <p><strong>Tempat, Tanggal Lahir:</strong>
-                    <?= e($user['birth_place'] ?? '-') ?><?= !empty($user['birth_date']) ? ', ' . e($user['birth_date']) : '' ?>
-                </p>
-                <p><strong>Nama Ayah:</strong> <?= e($user['father_name'] ?? '-') ?></p>
-                <p><strong>Pekerjaan Ayah:</strong> <?= e($user['father_job'] ?? '-') ?></p>
-                <p><strong>Pendidikan Ayah:</strong> <?= e($user['father_education'] ?? '-') ?></p>
-                <p><strong>No. HP Ayah:</strong> <?= e($user['father_phone'] ?? '-') ?></p>
-                <p><strong>Nama Ibu:</strong> <?= e($user['mother_name'] ?? '-') ?></p>
-                <p><strong>Pekerjaan Ibu:</strong> <?= e($user['mother_job'] ?? '-') ?></p>
-                <p><strong>Pendidikan Ibu:</strong> <?= e($user['mother_education'] ?? '-') ?></p>
-                <p><strong>No. HP Ibu:</strong> <?= e($user['mother_phone'] ?? '-') ?></p>
-                <p><strong>Status Pernikahan:</strong> <?= e(!empty($user['marital_status']) ? ($maritalLabels[$user['marital_status']] ?? $user['marital_status']) : '-') ?></p>
-                <p><strong>Alamat Orang Tua:</strong>
-                    <?= ($user['address_type'] ?? '') === 'same'
-                        ? 'Sama dengan saya'
-                        : (!empty($user['address_family']) ? e($user['address_family']) : '-') ?>
-                </p>
-                <p><strong>Kontak Darurat:</strong>
-                    <?= e($user['emergency_name'] ?? '-') ?><?= !empty($user['emergency_phone']) ? ' (' . e($user['emergency_phone']) . ')' : '' ?>
-                </p>
+            <div class="flex-1 flex flex-col gap-2 min-w-0">
+                <div class="flex flex-wrap items-start gap-2 justify-between">
+                    <div class="min-w-0">
+                        <h1 class="text-xl md:text-2xl font-semibold text-default"><?= e($user['name']) ?></h1>
+                        <?php if (!empty($user['user_summary'])): ?>
+                            <p class="text-sm text-muted mt-1 leading-relaxed"><?= nl2br(e($user['user_summary'])) ?></p>
+                        <?php else: ?>
+                            <p class="text-sm text-muted mt-1">Belum ada perkenalan singkat. <a href="<?= BASE_URL ?>/user/settings/edit" class="text-primary hover:underline">Tambahkan di pengaturan</a>.</p>
+                        <?php endif; ?>
+                    </div>
+                    <a href="<?= BASE_URL ?>/user/settings/edit" class="text-xs font-medium text-accent hover:underline shrink-0">Ubah data diri</a>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mt-3 text-xs md:text-sm text-default">
+                    <div class="space-y-1">
+                        <div><span class="font-semibold text-default">WhatsApp:</span> <?= e($user['phone'] ?? '-') ?></div>
+                        <div><span class="font-semibold text-default">Lokasi:</span> <?= e($user['address'] ?? '-') ?></div>
+                        <div><span class="font-semibold text-default">Agama:</span> <?= e(!empty($user['religion']) ? ($religionLabels[$user['religion']] ?? $user['religion']) : '-') ?></div>
+                    </div>
+                    <div class="space-y-1">
+                        <div><span class="font-semibold text-default">Email:</span> <?= e($user['email']) ?></div>
+                        <div><span class="font-semibold text-default">Usia, Jenis kelamin:</span>
+                            <?php
+                            $age = '-';
+                            if (!empty($user['birth_date'])) {
+                                $b = new DateTime($user['birth_date']);
+                                $age = $b->diff(new DateTime())->y . ' tahun';
+                            }
+                            ?>
+                            <?= e($age) ?>, <?= e($genderLabel) ?>
+                        </div>
+                        <div><span class="font-semibold text-default">Status pernikahan:</span> <?= e(!empty($user['marital_status']) ? ($maritalLabels[$user['marital_status']] ?? $user['marital_status']) : '-') ?></div>
+                    </div>
+                </div>
             </div>
         </div>
-        <?php if (!empty($user['education_level']) || !empty($user['education_university'])): ?>
-        <h6 class="mt-3">Pendidikan Terakhir</h6>
-        <p><?= e($user['education_level'] ?? '') ?> - <?= e($user['education_major'] ?? '') ?> (<?= e($user['graduation_year'] ?? '') ?>)<br><?= e($user['education_university'] ?? '') ?></p>
-        <?php endif; ?>
-        <?php if (!empty($user['job_description'])): ?>
-        <h6 class="mt-3">Deskripsi Pekerjaan / Jobdesk</h6>
-        <p><?= nl2br(e($user['job_description'])) ?></p>
-        <?php endif; ?>
-        <?php if (!empty($achievements)): ?>
-        <h6 class="mt-3">Pencapaian / Achievement</h6>
-        <ul class="list-unstyled">
-            <?php foreach ($achievements as $a): ?>
-            <li class="mb-2">
-                <strong><?= e($a['title']) ?></strong>
-                (<?= e($achTypeLabels[$a['type']] ?? $a['type']) ?>)
-                <?= !empty($a['organizer']) ? ' — ' . e($a['organizer']) : '' ?>
-                <?= !empty($a['year']) ? ' (' . e($a['year']) . ')' : '' ?>
-                <?= !empty($a['rank']) ? ' — Peringkat: ' . e($a['rank']) : '' ?>
-                <?= !empty($a['level']) ? ' — ' . e($achLevelLabels[$a['level']] ?? $a['level']) : '' ?>
-                <?= !empty($a['certificate_link']) ? ' <a href="' . e($a['certificate_link']) . '" target="_blank" rel="noopener">Sertifikat</a>' : '' ?>
-                <?= !empty($a['description']) ? '<br><small class="text-muted">' . e($a['description']) . '</small>' : '' ?>
-            </li>
-            <?php endforeach; ?>
-        </ul>
-        <?php endif; ?>
-        <?php if (!empty($workExperiences)): ?>
-        <h6 class="mt-3">Pengalaman Kerja</h6>
-        <ul class="list-unstyled">
-            <?php foreach ($workExperiences as $we): ?>
-            <li class="mb-2"><?= e($we['title']) ?><?= !empty($we['company_name']) ? ' di ' . e($we['company_name']) : '' ?> (<?= e($we['year_start']) ?> - <?= e($we['year_end']) ?>)<br><small class="text-muted"><?= e($we['description']) ?></small></li>
-            <?php endforeach; ?>
-        </ul>
-        <?php endif; ?>
-        <a href="<?= BASE_URL ?>/user/settings/edit" class="btn btn-primary">Edit Profil</a>
-    </div>
-</div>
-<div class="card">
-    <div class="card-body">
-        <h2 class="card-title h5 mb-4">Lamaran Saya</h2>
-        <?php if (empty($applications)): ?>
-            <p class="text-muted">Belum ada lamaran.</p>
-        <?php else: ?>
-            <div class="table-responsive">
-                <table class="table table-striped">
-                    <thead>
-                        <tr><th>Lowongan</th><th>Lokasi</th><th>Status</th><th>Tanggal</th></tr>
-                    </thead>
-                    <tbody>
-                        <?php foreach ($applications as $a): ?>
-                            <tr>
-                                <td><?= e($a['job_title']) ?></td>
-                                <td><?= e($a['location'] ?? '-') ?></td>
-                                <td>
-                                    <?php $badgeClass = $a['status'] === 'pending' ? 'bg-primary' : ($a['status'] === 'accepted' ? 'bg-success' : ($a['status'] === 'rejected' ? 'bg-danger' : 'bg-secondary')); ?>
-                                    <span class="badge <?= $badgeClass ?>"><?= e($a['status']) ?></span>
-                                </td>
-                                <td><?= e($a['created_at']) ?></td>
-                            </tr>
-                        <?php endforeach; ?>
-                    </tbody>
-                </table>
+
+        <!-- Pengalaman kerja -->
+        <div class="border-t border-muted pt-6 mt-6">
+            <div class="flex items-center justify-between gap-2 mb-3">
+                <h2 class="text-sm font-semibold tracking-wide text-default">PENGALAMAN KERJA</h2>
+                <a href="<?= BASE_URL ?>/user/settings/edit#work-experiences" class="text-xs font-medium text-primary hover:underline uppercase shrink-0">Tambah</a>
             </div>
-        <?php endif; ?>
+            <?php if (empty($workExperiences)): ?>
+                <p class="text-sm text-muted">Belum ada pengalaman kerja.</p>
+            <?php else: ?>
+                <div class="space-y-4">
+                    <?php foreach ($workExperiences as $we): ?>
+                        <div class="flex gap-3">
+                            <div class="flex flex-col items-center pt-1 shrink-0">
+                                <div class="w-2 h-2 rounded-full bg-accent"></div>
+                                <div class="flex-1 w-px bg-accent min-h-[1rem] mt-1"></div>
+                            </div>
+                            <div class="flex-1 min-w-0 pb-1">
+                                <div class="font-semibold text-sm text-default"><?= e($we['title']) ?></div>
+                                <div class="text-xs text-muted"><?= e($we['company_name'] ?? '') ?></div>
+                                <div class="text-xs text-muted"><?= e($we['year_start']) ?> – <?= e($we['year_end']) ?></div>
+                                <?php if (!empty($we['description'])): ?>
+                                    <div class="text-xs text-default mt-1"><?= nl2br(e($we['description'])) ?></div>
+                                <?php endif; ?>
+                            </div>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+            <?php endif; ?>
+        </div>
+
+        <!-- Pendidikan -->
+        <div class="border-t border-muted pt-6 mt-6">
+            <div class="flex items-center justify-between gap-2 mb-3">
+                <h2 class="text-sm font-semibold tracking-wide text-default">PENDIDIKAN</h2>
+                <a href="<?= BASE_URL ?>/user/settings/edit#education" class="text-xs font-medium text-primary hover:underline uppercase shrink-0">Ubah</a>
+            </div>
+            <?php if (empty($user['education_level']) && empty($user['education_university'])): ?>
+                <p class="text-sm text-muted">Belum ada data pendidikan.</p>
+            <?php else: ?>
+                <div class="flex gap-3">
+                    <div class="flex flex-col items-center pt-1 shrink-0">
+                        <div class="w-2 h-2 rounded-full bg-accent"></div>
+                    </div>
+                    <div class="min-w-0">
+                        <div class="font-semibold text-sm text-default"><?= e($user['education_university'] ?? '-') ?></div>
+                        <div class="text-xs text-muted"><?= e($user['education_major'] ?? '') ?></div>
+                        <div class="text-xs text-muted">
+                            <?= e($user['education_level'] ?? '') ?><?= !empty($user['graduation_year']) ? ' • Lulus ' . e($user['graduation_year']) : '' ?>
+                        </div>
+                    </div>
+                </div>
+            <?php endif; ?>
+        </div>
+
+        <!-- Dokumen lamaran -->
+        <div class="border-t border-muted pt-6 mt-6">
+            <div class="flex items-center justify-between gap-2 mb-3">
+                <h2 class="text-sm font-semibold tracking-wide text-default">DOKUMEN LAMARAN</h2>
+                <span class="text-xs text-muted">Dipakai otomatis saat melamar</span>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                <form method="post" action="<?= BASE_URL ?>/index.php?url=user/settings/cv" enctype="multipart/form-data" class="rounded-xl border border-muted p-3">
+                    <div class="text-xs font-semibold text-default mb-2">CV (PDF/DOCX)</div>
+                    <div class="text-[11px] text-muted mb-2">
+                        <?php if (!empty($user['cv_path'])): ?>
+                            <span class="block text-[10px] uppercase tracking-wide text-muted/80">Terakhir ditambahkan</span>
+                            <?= e($formatDocUploadedAt((string) $user['cv_path'])) ?>
+                        <?php else: ?>
+                            Belum diunggah
+                        <?php endif; ?>
+                    </div>
+                    <input type="file" name="cv" accept=".pdf,.docx" class="block w-full text-xs border border-default rounded-md px-2 py-1.5 mb-2" required>
+                    <div class="flex items-center gap-2">
+                        <button type="submit" class="flex-1 px-3 py-1.5 rounded-full bg-primary text-secondary text-xs font-semibold hover:bg-primary-hover">Upload CV</button>
+                        <?php if (!empty($user['cv_path'])): ?>
+                            <a href="<?= BASE_URL ?>/index.php?url=download/user-file&type=cv" target="_blank" rel="noopener noreferrer" class="px-3 py-1.5 rounded-full border border-default text-xs font-semibold text-default hover:bg-muted">Preview</a>
+                        <?php endif; ?>
+                    </div>
+                </form>
+                <form method="post" action="<?= BASE_URL ?>/index.php?url=user/settings/diploma" enctype="multipart/form-data" class="rounded-xl border border-muted p-3">
+                    <div class="text-xs font-semibold text-default mb-2">Ijazah (PDF/DOCX)</div>
+                    <div class="text-[11px] text-muted mb-2">
+                        <?php if (!empty($user['diploma_path'])): ?>
+                            <span class="block text-[10px] uppercase tracking-wide text-muted/80">Terakhir ditambahkan</span>
+                            <?= e($formatDocUploadedAt((string) $user['diploma_path'])) ?>
+                        <?php else: ?>
+                            Belum diunggah
+                        <?php endif; ?>
+                    </div>
+                    <input type="file" name="diploma" accept=".pdf,.docx" class="block w-full text-xs border border-default rounded-md px-2 py-1.5 mb-2" required>
+                    <div class="flex items-center gap-2">
+                        <button type="submit" class="flex-1 px-3 py-1.5 rounded-full bg-primary text-secondary text-xs font-semibold hover:bg-primary-hover">Upload Ijazah</button>
+                        <?php if (!empty($user['diploma_path'])): ?>
+                            <a href="<?= BASE_URL ?>/index.php?url=download/user-file&type=diploma" target="_blank" rel="noopener noreferrer" class="px-3 py-1.5 rounded-full border border-default text-xs font-semibold text-default hover:bg-muted">Preview</a>
+                        <?php endif; ?>
+                    </div>
+                </form>
+                <form method="post" action="<?= BASE_URL ?>/index.php?url=user/settings/photo" enctype="multipart/form-data" class="rounded-xl border border-muted p-3">
+                    <div class="text-xs font-semibold text-default mb-2">Pas Foto (JPG/PNG)</div>
+                    <div class="text-[11px] text-muted mb-2">
+                        <?php if (!empty($user['photo_path'])): ?>
+                            <span class="block text-[10px] uppercase tracking-wide text-muted/80">Terakhir ditambahkan</span>
+                            <?= e($formatDocUploadedAt((string) $user['photo_path'])) ?>
+                        <?php else: ?>
+                            Belum diunggah
+                        <?php endif; ?>
+                    </div>
+                    <input type="file" name="photo" accept=".jpg,.jpeg,.png" class="block w-full text-xs border border-default rounded-md px-2 py-1.5 mb-2" required>
+                    <div class="flex items-center gap-2">
+                        <button type="submit" class="flex-1 px-3 py-1.5 rounded-full bg-primary text-secondary text-xs font-semibold hover:bg-primary-hover">Upload Pas Foto</button>
+                        <?php if (!empty($user['photo_path'])): ?>
+                            <a href="<?= BASE_URL ?>/index.php?url=download/user-file&type=photo" target="_blank" rel="noopener noreferrer" class="px-3 py-1.5 rounded-full border border-default text-xs font-semibold text-default hover:bg-muted">Preview</a>
+                        <?php endif; ?>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Lamaran saya -->
+        <div class="border-t border-muted pt-6 mt-6">
+            <h2 class="text-sm font-semibold tracking-wide text-default mb-3">LAMARAN SAYA</h2>
+            <?php if (empty($applications)): ?>
+                <p class="text-sm text-muted">Belum ada lamaran.</p>
+            <?php else: ?>
+                <div class="space-y-3">
+                    <?php foreach ($applications as $a): ?>
+                        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-1 border-b border-muted last:border-0 last:pb-0 pb-3">
+                            <div class="min-w-0">
+                                <div class="text-sm font-semibold text-default"><?= e($a['job_title']) ?></div>
+                                <div class="text-xs text-muted"><?= e($a['location'] ?? '-') ?></div>
+                            </div>
+                            <div class="flex items-center gap-3 text-xs shrink-0">
+                                <?php
+                                $status = $a['status'] ?? 'pending';
+                                $badgeClass = $status === 'pending'
+                                    ? 'bg-warning-soft text-warning'
+                                    : ($status === 'accepted'
+                                        ? 'bg-success-soft text-success'
+                                        : ($status === 'rejected'
+                                            ? 'bg-danger-soft text-danger'
+                                            : 'bg-muted text-default'));
+                                ?>
+                                <span class="inline-flex items-center px-2 py-0.5 rounded-full <?= $badgeClass ?> font-medium">
+                                    <?= e($status) ?>
+                                </span>
+                                <span class="text-muted"><?= e($a['created_at']) ?></span>
+                            </div>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+            <?php endif; ?>
+        </div>
     </div>
 </div>

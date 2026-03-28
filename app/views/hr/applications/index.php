@@ -105,8 +105,8 @@ $achLevelLabels = ['kota' => 'Kota', 'provinsi' => 'Provinsi', 'nasional' => 'Na
                                             <div class="col-md-6">
                                                 <p class="mb-1"><strong>Pendidikan:</strong> <?= e($a['education_level'] ?? '-') ?> - <?= e($a['education_major'] ?? '') ?> (<?= e($a['graduation_year'] ?? '') ?>)</p>
                                                 <p class="mb-1"><strong>Universitas:</strong> <?= e($a['education_university'] ?? '-') ?></p>
-                                                <?php if (!empty($a['job_description'])): ?>
-                                                    <p class="mb-1"><strong>Deskripsi Pekerjaan/Jobdesk:</strong><br><?= nl2br(e($a['job_description'])) ?></p>
+                                                <?php if (!empty($a['user_summary'])): ?>
+                                                    <p class="mb-1"><strong>Deskripsi Pekerjaan/Jobdesk:</strong><br><?= nl2br(e($a['user_summary'])) ?></p>
                                                 <?php endif; ?>
                                             </div>
                                             <?php

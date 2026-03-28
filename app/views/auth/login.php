@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - Challora</title>
 
+    <link rel="stylesheet" href="<?= BASE_URL ?>/assets/css/design-tokens.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/assets/css/login-modern.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>

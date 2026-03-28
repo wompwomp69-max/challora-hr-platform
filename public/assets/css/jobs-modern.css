@@ -1,8 +1,6 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
-
 .user-layout-main {
-    font-family: 'Poppins', sans-serif;
-    background: #ffffff;
+    font-family: var(--font-sans);
+    background: var(--color-surface);
     min-height: calc(100vh - 56px);
 }
 
@@ -12,28 +10,28 @@
 
 .navbar,
 .bg-dark {
-    background: linear-gradient(90deg, #111827, #1f2937) !important;
+    background: linear-gradient(90deg, var(--color-secondary-hover), var(--color-secondary)) !important;
 }
 
 .navbar-brand,
 .nav-link,
 .btn,
 .dropdown-item {
-    font-family: 'Poppins', sans-serif !important;
+    font-family: var(--font-sans) !important;
 }
 
 .user-avatar {
     width: 34px;
     height: 34px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #2563eb, #7c3aed);
-    color: #fff;
+    background: linear-gradient(135deg, var(--color-secondary), var(--color-primary));
+    color: var(--color-surface);
     display: inline-flex;
     align-items: center;
     justify-content: center;
     font-size: 13px;
     font-weight: 700;
-    box-shadow: 0 8px 18px rgba(37, 99, 235, 0.18);
+    box-shadow: var(--shadow-md);
 }
 
 .dropdown-menu .dropdown-item {
@@ -42,7 +40,7 @@
 }
 
 .dropdown-menu .dropdown-item:hover {
-    background: #f8fafc;
+    background: var(--gray-100);
 }
 
 .jobs-page {
@@ -53,25 +51,25 @@
 .jobs-page h1,
 .user-layout-main h1.mb-4 {
     font-weight: 600;
-    color: #111827;
+    color: var(--color-text);
     margin-bottom: 25px;
 }
 
 .user-layout-main .card {
-    background: #ffffff;
-    border-radius: 12px;
-    border: 1px solid #e5e7eb;
-    box-shadow: 0 6px 16px rgba(0,0,0,0.05);
+    background: var(--color-surface);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--gray-200);
+    box-shadow: var(--shadow-sm);
     transition: all .2s ease;
 }
 
 .user-layout-main .card:hover {
     transform: translateY(-2px);
-    box-shadow: 0 10px 24px rgba(0,0,0,0.08);
+    box-shadow: var(--shadow-md);
 }
 
 .user-layout-main .card-title a {
-    color: #2563eb;
+    color: var(--color-primary);
     font-weight: 600;
     text-decoration: none;
 }
@@ -81,21 +79,21 @@
 }
 
 .user-layout-main .card-text {
-    color: #4b5563;
+    color: var(--color-text-muted);
     font-size: 14px;
 }
 
 .user-layout-main .card-text.small {
-    color: #6b7280;
+    color: var(--gray-500);
     font-size: 13px;
 }
 
 .user-layout-main .badge {
     font-size: 12px;
     padding: 6px 10px;
-    border-radius: 6px;
+    border-radius: var(--radius-sm);
 }
 
 .user-layout-main .alert {
-    border-radius: 10px;
+    border-radius: var(--radius-md);
 }

@@ -1,8 +1,10 @@
+<div class="mx-4 md:mx-[200px]">
 <div class="card">
     <div class="card-body">
         <h1 class="card-title h4 mb-4">Pengaturan Profil</h1>
         <form method="post" action="<?= BASE_URL ?>/index.php?url=user/settings/edit">
             <h5 class="mb-3">Data Pribadi</h5>
+
             <div class="row mb-3">
                 <div class="col-md-6">
                     <label class="form-label" for="name">Nama</label>
@@ -13,13 +15,17 @@
                     <input type="email" class="form-control" id="email" value="<?= e($user['email']) ?>" readonly disabled>
                     <small class="text-muted">Email tidak dapat diubah</small>
                 </div>
+            <div class="mb-3">
+                <label class="form-label" for="user_summary">Perkenalan diri singkat / Tentang saya (opsional)</label>
+                <textarea class="form-control" id="user_summary" name="user_summary" rows="2" placeholder="Ceritakan secara singkat tentang dirimu, pengalaman, atau minat karier."><?= e($user['user_summary'] ?? '') ?></textarea>
+            </div>
             </div>
             <div class="row mb-3">
-                <div class="col-md-4">
+                <div class="col-md-3">
                     <label class="form-label" for="phone">Nomor Telepon</label>
                     <input type="text" class="form-control" id="phone" name="phone" value="<?= e($user['phone'] ?? '') ?>">
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-3">
                     <label class="form-label" for="gender">Jenis Kelamin</label>
                     <select class="form-select" id="gender" name="gender">
                         <option value="">— Pilih —</option>
@@ -28,7 +34,7 @@
                         <option value="other" <?= ($user['gender'] ?? '') === 'other' ? 'selected' : '' ?>>Lainnya</option>
                     </select>
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-3">
                     <label class="form-label" for="religion">Agama</label>
                     <select class="form-select" id="religion" name="religion">
                         <option value="">— Pilih —</option>
@@ -37,6 +43,23 @@
                         foreach ($religions as $key => $label):
                         ?>
                         <option value="<?= $key ?>" <?= ($user['religion'] ?? '') === $key ? 'selected' : '' ?>><?= $label ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label" for="marital_status">Status Pernikahan</label>
+                    <select class="form-select" id="marital_status" name="marital_status">
+                        <option value="">— Pilih —</option>
+                        <?php
+                        $maritalOptions = [
+                            'single' => 'Belum menikah',
+                            'married' => 'Menikah',
+                            'divorced' => 'Cerai',
+                            'widowed' => 'Duda/Janda',
+                        ];
+                        foreach ($maritalOptions as $key => $label):
+                        ?>
+                        <option value="<?= $key ?>" <?= ($user['marital_status'] ?? '') === $key ? 'selected' : '' ?>><?= $label ?></option>
                         <?php endforeach; ?>
                     </select>
                 </div>
@@ -242,6 +265,7 @@
             </div>
         </form>
     </div>
+</div>
 </div>
 <script>
 document.getElementById('add-work-exp').addEventListener('click', function() {

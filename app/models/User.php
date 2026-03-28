@@ -1,6 +1,7 @@
 <?php
 class User {
     private PDO $db;
+    private ?array $usersTableColumns = null;
 
     public function __construct() {
         $this->db = getDB();
@@ -41,12 +42,20 @@ class User {
             'father_phone', 'mother_phone',
             'address_type', 'address_family',
             'emergency_name', 'emergency_phone',
-            'job_description',
+            'user_summary',
+            'avatar_path',
+            'cv_path',
+            'diploma_path',
+            'photo_path',
         ];
+        $existingColumns = $this->getUsersTableColumns();
         $set = [];
         $params = [];
         foreach ($allowed as $k) {
-            if (array_key_exists($k, $data)) {
+            if (
+                array_key_exists($k, $data) &&
+                (empty($existingColumns) || in_array($k, $existingColumns, true))
+            ) {
                 $set[] = "`$k` = ?";
                 $params[] = $data[$k];
             }
@@ -56,6 +65,25 @@ class User {
         $sql = 'UPDATE users SET ' . implode(', ', $set) . ' WHERE id = ?';
         $stmt = $this->db->prepare($sql);
         return $stmt->execute($params);
+    }
+
+    private function getUsersTableColumns(): array {
+        if (is_array($this->usersTableColumns)) {
+            return $this->usersTableColumns;
+        }
+        try {
+            $stmt = $this->db->query('SHOW COLUMNS FROM users');
+            $rows = $stmt ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
+            $this->usersTableColumns = array_values(array_filter(array_map(
+                static fn(array $row): string => (string) ($row['Field'] ?? ''),
+                $rows
+            )));
+            return $this->usersTableColumns;
+        } catch (Throwable $e) {
+            // Fallback: don't block update flow if schema inspection fails.
+            $this->usersTableColumns = [];
+            return $this->usersTableColumns;
+        }
     }
 
     /** Work experiences */

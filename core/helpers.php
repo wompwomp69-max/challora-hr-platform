@@ -43,6 +43,18 @@ function currentRole(): string {
     return $_SESSION['role'] ?? '';
 }
 
+/** URL img avatar untuk user yang login; null jika tidak ada foto profil */
+function currentUserAvatarImgSrc(): ?string {
+    if (!isLoggedIn() || currentRole() !== 'user') {
+        return null;
+    }
+    if (empty($_SESSION['user_avatar_path'])) {
+        return null;
+    }
+    $v = rawurlencode((string) ($_SESSION['user_avatar_ver'] ?? '0'));
+    return BASE_URL . '/index.php?url=download/avatar&v=' . $v;
+}
+
 /**
  * Cek apakah profil user sudah lengkap (field wajib saja, tidak termasuk opsional)
  */
@@ -52,8 +64,7 @@ function isProfileComplete(): bool {
     }
     $user = (new User())->findById(currentUserId());
     if (!$user) return true;
-    $required = ['name', 'phone', 'address', 'gender', 'religion', 'birth_place', 'birth_date',
-        'father_name', 'mother_name', 'marital_status',
+    $required = ['name', 'phone', 'address', 'gender', 'religion', 'birth_place', 'birth_date', 'marital_status',
         'education_level', 'graduation_year', 'education_major', 'education_university'];
     foreach ($required as $field) {
         $v = trim((string) ($user[$field] ?? ''));

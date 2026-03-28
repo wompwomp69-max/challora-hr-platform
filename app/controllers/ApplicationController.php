@@ -1,6 +1,6 @@
 <?php
 /**
- * User: Apply job (upload CV, ijazah, pas foto), list my applications
+ * User: Apply job using documents saved in profile
  */
 class ApplicationController {
     private const MAX_CV_SIZE = 2 * 1024 * 1024; // 2MB
@@ -18,10 +18,12 @@ class ApplicationController {
 
     private Application $appModel;
     private Job $jobModel;
+    private User $userModel;
 
     public function __construct() {
         $this->appModel = new Application();
         $this->jobModel = new Job();
+        $this->userModel = new User();
     }
 
     public function index(): void {
@@ -65,39 +67,21 @@ class ApplicationController {
             }
         }
 
-        if ($err = $this->validateCv()) {
-            $_SESSION['flash_error'] = $err;
-            redirect('/jobs/show?id=' . $jobId);
+        $user = $this->userModel->findById($userId);
+        if (!$user) {
+            redirect('/auth/logout');
         }
-        $cvPath = $this->saveCv();
-        if ($cvPath === null) {
-            $_SESSION['flash_error'] = 'Gagal menyimpan file CV.';
-            redirect('/jobs/show?id=' . $jobId);
-        }
+        $cvPath = trim((string) ($user['cv_path'] ?? ''));
+        $diplomaPath = trim((string) ($user['diploma_path'] ?? ''));
+        $photoPath = trim((string) ($user['photo_path'] ?? ''));
 
-        $diplomaPath = null;
-        $photoPath = null;
-        if (defined('STORAGE_DIPLOMA')) {
-            if ($err = $this->validateDiploma()) {
-                $_SESSION['flash_error'] = $err;
-                redirect('/jobs/show?id=' . $jobId);
-            }
-            $diplomaPath = $this->saveDiploma();
-            if ($diplomaPath === null && !empty($_FILES['diploma']['tmp_name'])) {
-                $_SESSION['flash_error'] = 'Gagal menyimpan file ijazah.';
-                redirect('/jobs/show?id=' . $jobId);
-            }
-        }
-        if (defined('STORAGE_PHOTO')) {
-            if ($err = $this->validatePhoto()) {
-                $_SESSION['flash_error'] = $err;
-                redirect('/jobs/show?id=' . $jobId);
-            }
-            $photoPath = $this->savePhoto();
-            if ($photoPath === null && !empty($_FILES['photo']['tmp_name'])) {
-                $_SESSION['flash_error'] = 'Gagal menyimpan pas foto.';
-                redirect('/jobs/show?id=' . $jobId);
-            }
+        $missingDocs = [];
+        if ($cvPath === '') $missingDocs[] = 'CV';
+        if ($diplomaPath === '') $missingDocs[] = 'ijazah';
+        if ($photoPath === '') $missingDocs[] = 'pas foto';
+        if (!empty($missingDocs)) {
+            $_SESSION['flash_error'] = 'Lengkapi dokumen di Pengaturan terlebih dahulu: ' . implode(', ', $missingDocs) . '.';
+            redirect('/user/settings');
         }
 
         $this->appModel->create($userId, $jobId, $cvPath, $diplomaPath, $photoPath);
@@ -138,7 +122,7 @@ class ApplicationController {
 
     private function validatePhoto(): ?string {
         if (empty($_FILES['photo']['tmp_name']) || !is_uploaded_file($_FILES['photo']['tmp_name'])) {
-            return null;
+            return 'Pas foto wajib diunggah.';
         }
         $file = $_FILES['photo'];
         if ($file['error'] !== UPLOAD_ERR_OK) return 'Terjadi kesalahan saat upload pas foto.';

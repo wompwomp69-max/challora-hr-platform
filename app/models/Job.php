@@ -19,7 +19,16 @@ class Job {
     /**
      * Search & filter jobs (user-side)
      * salary: cari lowongan yang range gajinya mencakup nilai ini (misal job 8-10 jt, cari 9 → muncul)
-     * @param array{q?: string, location?: string, salary?: string|int} $params
+     * Params yang didukung (semua opsional):
+     * - q: keyword judul/deskripsi/lokasi
+     * - location: lokasi (lokasi/provinsi/kota/kecamatan)
+     * - salary: angka tunggal (legacy) → cari job yang mencakup nilai ini
+     * - min_salary, max_salary: filter dengan range gaji minimum/maksimum
+     * - job_type: jenis pekerjaan (full_time, part_time, freelance, remote, hybrid, onsite, dll)
+     * - min_education: minimal pendidikan (sma, d3, s1, s2, s3)
+     * - experience_level: level pengalaman (fresh_grad, junior_1_3, senior_5_10, dll)
+     * - updated: rentang pembaruan (month, week, day, any)
+     * @param array<string,mixed> $params
      */
     public function searchAndFilter(array $params): array {
         $conditions = [];
@@ -43,10 +52,42 @@ class Job {
         }
         $salary = (int) ($params['salary'] ?? 0);
         if ($salary > 0) {
-            // Job muncul jika range gajinya mencakup nilai yang dicari (min <= X <= max)
+            // Legacy: job muncul jika range gajinya mencakup nilai yang dicari (min <= X <= max)
             $conditions[] = '(j.min_salary IS NULL OR j.min_salary <= ?) AND (j.max_salary IS NULL OR j.max_salary >= ?)';
             $bind[] = $salary;
             $bind[] = $salary;
+        }
+        $minSalary = (int) ($params['min_salary'] ?? 0);
+        if ($minSalary > 0) {
+            $conditions[] = '(j.min_salary IS NULL OR j.min_salary >= ?)';
+            $bind[] = $minSalary;
+        }
+        $maxSalary = (int) ($params['max_salary'] ?? 0);
+        if ($maxSalary > 0) {
+            $conditions[] = '(j.max_salary IS NULL OR j.max_salary <= ?)';
+            $bind[] = $maxSalary;
+        }
+        if (!empty(trim($params['job_type'] ?? ''))) {
+            $conditions[] = 'j.job_type = ?';
+            $bind[] = trim($params['job_type']);
+        }
+        if (!empty(trim($params['min_education'] ?? ''))) {
+            $conditions[] = 'j.min_education = ?';
+            $bind[] = trim($params['min_education']);
+        }
+        if (!empty(trim($params['experience_level'] ?? ''))) {
+            $conditions[] = 'j.experience_level = ?';
+            $bind[] = trim($params['experience_level']);
+        }
+        $updated = trim($params['updated'] ?? '');
+        if (in_array($updated, ['day', 'week', 'month'], true)) {
+            if ($updated === 'day') {
+                $conditions[] = 'j.created_at >= DATE_SUB(NOW(), INTERVAL 1 DAY)';
+            } elseif ($updated === 'week') {
+                $conditions[] = 'j.created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)';
+            } else {
+                $conditions[] = 'j.created_at >= DATE_SUB(NOW(), INTERVAL 1 MONTH)';
+            }
         }
 
         $where = empty($conditions) ? '' : 'WHERE ' . implode(' AND ', $conditions);
@@ -80,6 +121,38 @@ class Job {
             $conditions[] = '(j.min_salary IS NULL OR j.min_salary <= ?) AND (j.max_salary IS NULL OR j.max_salary >= ?)';
             $bind[] = $salary; $bind[] = $salary;
         }
+        $minSalary = (int) ($params['min_salary'] ?? 0);
+        if ($minSalary > 0) {
+            $conditions[] = '(j.min_salary IS NULL OR j.min_salary >= ?)';
+            $bind[] = $minSalary;
+        }
+        $maxSalary = (int) ($params['max_salary'] ?? 0);
+        if ($maxSalary > 0) {
+            $conditions[] = '(j.max_salary IS NULL OR j.max_salary <= ?)';
+            $bind[] = $maxSalary;
+        }
+        if (!empty(trim($params['job_type'] ?? ''))) {
+            $conditions[] = 'j.job_type = ?';
+            $bind[] = trim($params['job_type']);
+        }
+        if (!empty(trim($params['min_education'] ?? ''))) {
+            $conditions[] = 'j.min_education = ?';
+            $bind[] = trim($params['min_education']);
+        }
+        if (!empty(trim($params['experience_level'] ?? ''))) {
+            $conditions[] = 'j.experience_level = ?';
+            $bind[] = trim($params['experience_level']);
+        }
+        $updated = trim($params['updated'] ?? '');
+        if (in_array($updated, ['day', 'week', 'month'], true)) {
+            if ($updated === 'day') {
+                $conditions[] = 'j.created_at >= DATE_SUB(NOW(), INTERVAL 1 DAY)';
+            } elseif ($updated === 'week') {
+                $conditions[] = 'j.created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)';
+            } else {
+                $conditions[] = 'j.created_at >= DATE_SUB(NOW(), INTERVAL 1 MONTH)';
+            }
+        }
         $where = empty($conditions) ? '' : 'WHERE ' . implode(' AND ', $conditions);
         $stmt = $this->db->prepare("SELECT COUNT(*) FROM jobs j $where");
         $stmt->execute($bind);
@@ -105,11 +178,207 @@ class Job {
             $conditions[] = '(j.min_salary IS NULL OR j.min_salary <= ?) AND (j.max_salary IS NULL OR j.max_salary >= ?)';
             $bind[] = $salary; $bind[] = $salary;
         }
+        $minSalary = (int) ($params['min_salary'] ?? 0);
+        if ($minSalary > 0) {
+            $conditions[] = '(j.min_salary IS NULL OR j.min_salary >= ?)';
+            $bind[] = $minSalary;
+        }
+        $maxSalary = (int) ($params['max_salary'] ?? 0);
+        if ($maxSalary > 0) {
+            $conditions[] = '(j.max_salary IS NULL OR j.max_salary <= ?)';
+            $bind[] = $maxSalary;
+        }
+        if (!empty(trim($params['job_type'] ?? ''))) {
+            $conditions[] = 'j.job_type = ?';
+            $bind[] = trim($params['job_type']);
+        }
+        if (!empty(trim($params['min_education'] ?? ''))) {
+            $conditions[] = 'j.min_education = ?';
+            $bind[] = trim($params['min_education']);
+        }
+        if (!empty(trim($params['experience_level'] ?? ''))) {
+            $conditions[] = 'j.experience_level = ?';
+            $bind[] = trim($params['experience_level']);
+        }
+        $updated = trim($params['updated'] ?? '');
+        if (in_array($updated, ['day', 'week', 'month'], true)) {
+            if ($updated === 'day') {
+                $conditions[] = 'j.created_at >= DATE_SUB(NOW(), INTERVAL 1 DAY)';
+            } elseif ($updated === 'week') {
+                $conditions[] = 'j.created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)';
+            } else {
+                $conditions[] = 'j.created_at >= DATE_SUB(NOW(), INTERVAL 1 MONTH)';
+            }
+        }
         $where = empty($conditions) ? '' : 'WHERE ' . implode(' AND ', $conditions);
         $offset = max(0, ($page - 1) * $perPage);
         $sql = "SELECT j.*, u.name AS created_by_name FROM jobs j
             LEFT JOIN users u ON u.id = j.created_by $where
             ORDER BY j.created_at DESC LIMIT " . (int) $perPage . " OFFSET " . (int) $offset;
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute($bind);
+        return $stmt->fetchAll();
+    }
+
+    /**
+     * Count jobs matching search/filter for a specific user view:
+     * - saved: only jobs saved by user
+     * - applied: only jobs applied by user
+     * @param array<string,mixed> $params
+     */
+    public function countSearchAndFilterByUserView(array $params, int $userId, string $jobView): int {
+        $jobView = in_array($jobView, ['saved', 'applied'], true) ? $jobView : 'saved';
+
+        $conditions = [];
+        $bind = [];
+        if (!empty(trim($params['q'] ?? ''))) {
+            $q = '%' . trim($params['q']) . '%';
+            $conditions[] = '(j.title LIKE ? OR j.description LIKE ? OR j.short_description LIKE ? OR j.location LIKE ?)';
+            $bind[] = $q; $bind[] = $q; $bind[] = $q; $bind[] = $q;
+        }
+        if (!empty(trim($params['location'] ?? ''))) {
+            $loc = '%' . trim($params['location']) . '%';
+            $conditions[] = '(j.location LIKE ? OR j.provinsi LIKE ? OR j.kota LIKE ? OR j.kecamatan LIKE ?)';
+            $bind[] = $loc; $bind[] = $loc; $bind[] = $loc; $bind[] = $loc;
+        }
+        $salary = (int) ($params['salary'] ?? 0);
+        if ($salary > 0) {
+            $conditions[] = '(j.min_salary IS NULL OR j.min_salary <= ?) AND (j.max_salary IS NULL OR j.max_salary >= ?)';
+            $bind[] = $salary; $bind[] = $salary;
+        }
+        $minSalary = (int) ($params['min_salary'] ?? 0);
+        if ($minSalary > 0) {
+            $conditions[] = '(j.min_salary IS NULL OR j.min_salary >= ?)';
+            $bind[] = $minSalary;
+        }
+        $maxSalary = (int) ($params['max_salary'] ?? 0);
+        if ($maxSalary > 0) {
+            $conditions[] = '(j.max_salary IS NULL OR j.max_salary <= ?)';
+            $bind[] = $maxSalary;
+        }
+        if (!empty(trim($params['job_type'] ?? ''))) {
+            $conditions[] = 'j.job_type = ?';
+            $bind[] = trim($params['job_type']);
+        }
+        if (!empty(trim($params['min_education'] ?? ''))) {
+            $conditions[] = 'j.min_education = ?';
+            $bind[] = trim($params['min_education']);
+        }
+        if (!empty(trim($params['experience_level'] ?? ''))) {
+            $conditions[] = 'j.experience_level = ?';
+            $bind[] = trim($params['experience_level']);
+        }
+        $updated = trim($params['updated'] ?? '');
+        if (in_array($updated, ['day', 'week', 'month'], true)) {
+            if ($updated === 'day') {
+                $conditions[] = 'j.created_at >= DATE_SUB(NOW(), INTERVAL 1 DAY)';
+            } elseif ($updated === 'week') {
+                $conditions[] = 'j.created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)';
+            } else {
+                $conditions[] = 'j.created_at >= DATE_SUB(NOW(), INTERVAL 1 MONTH)';
+            }
+        }
+
+        $where = empty($conditions) ? '' : ' AND ' . implode(' AND ', $conditions);
+        if ($jobView === 'saved') {
+            $sql = "SELECT COUNT(*)
+                FROM jobs j
+                INNER JOIN saved_jobs sj ON sj.job_id = j.id AND sj.user_id = ?
+                WHERE 1=1 $where";
+        } else {
+            $sql = "SELECT COUNT(DISTINCT j.id)
+                FROM jobs j
+                INNER JOIN applications a ON a.job_id = j.id AND a.user_id = ?
+                WHERE 1=1 $where";
+        }
+
+        array_unshift($bind, $userId);
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute($bind);
+        return (int) $stmt->fetchColumn();
+    }
+
+    /**
+     * Search & filter with pagination for a specific user view (saved/applied)
+     * @param array<string,mixed> $params
+     */
+    public function searchAndFilterPaginatedByUserView(array $params, int $userId, string $jobView, int $page = 1, int $perPage = 20): array {
+        $jobView = in_array($jobView, ['saved', 'applied'], true) ? $jobView : 'saved';
+
+        $conditions = [];
+        $bind = [];
+        if (!empty(trim($params['q'] ?? ''))) {
+            $q = '%' . trim($params['q']) . '%';
+            $conditions[] = '(j.title LIKE ? OR j.description LIKE ? OR j.short_description LIKE ? OR j.location LIKE ?)';
+            $bind[] = $q; $bind[] = $q; $bind[] = $q; $bind[] = $q;
+        }
+        if (!empty(trim($params['location'] ?? ''))) {
+            $loc = '%' . trim($params['location']) . '%';
+            $conditions[] = '(j.location LIKE ? OR j.provinsi LIKE ? OR j.kota LIKE ? OR j.kecamatan LIKE ?)';
+            $bind[] = $loc; $bind[] = $loc; $bind[] = $loc; $bind[] = $loc;
+        }
+        $salary = (int) ($params['salary'] ?? 0);
+        if ($salary > 0) {
+            $conditions[] = '(j.min_salary IS NULL OR j.min_salary <= ?) AND (j.max_salary IS NULL OR j.max_salary >= ?)';
+            $bind[] = $salary; $bind[] = $salary;
+        }
+        $minSalary = (int) ($params['min_salary'] ?? 0);
+        if ($minSalary > 0) {
+            $conditions[] = '(j.min_salary IS NULL OR j.min_salary >= ?)';
+            $bind[] = $minSalary;
+        }
+        $maxSalary = (int) ($params['max_salary'] ?? 0);
+        if ($maxSalary > 0) {
+            $conditions[] = '(j.max_salary IS NULL OR j.max_salary <= ?)';
+            $bind[] = $maxSalary;
+        }
+        if (!empty(trim($params['job_type'] ?? ''))) {
+            $conditions[] = 'j.job_type = ?';
+            $bind[] = trim($params['job_type']);
+        }
+        if (!empty(trim($params['min_education'] ?? ''))) {
+            $conditions[] = 'j.min_education = ?';
+            $bind[] = trim($params['min_education']);
+        }
+        if (!empty(trim($params['experience_level'] ?? ''))) {
+            $conditions[] = 'j.experience_level = ?';
+            $bind[] = trim($params['experience_level']);
+        }
+        $updated = trim($params['updated'] ?? '');
+        if (in_array($updated, ['day', 'week', 'month'], true)) {
+            if ($updated === 'day') {
+                $conditions[] = 'j.created_at >= DATE_SUB(NOW(), INTERVAL 1 DAY)';
+            } elseif ($updated === 'week') {
+                $conditions[] = 'j.created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)';
+            } else {
+                $conditions[] = 'j.created_at >= DATE_SUB(NOW(), INTERVAL 1 MONTH)';
+            }
+        }
+
+        $where = empty($conditions) ? '' : ' AND ' . implode(' AND ', $conditions);
+        $offset = max(0, ($page - 1) * $perPage);
+        $perPage = (int) $perPage;
+        $offset = (int) $offset;
+
+        if ($jobView === 'saved') {
+            $sql = "SELECT j.*, u.name AS created_by_name
+                FROM jobs j
+                LEFT JOIN users u ON u.id = j.created_by
+                INNER JOIN saved_jobs sj ON sj.job_id = j.id AND sj.user_id = ?
+                WHERE 1=1 $where
+                ORDER BY j.created_at DESC
+                LIMIT $perPage OFFSET $offset";
+        } else {
+            $sql = "SELECT DISTINCT j.*, u.name AS created_by_name
+                FROM jobs j
+                LEFT JOIN users u ON u.id = j.created_by
+                INNER JOIN applications a ON a.job_id = j.id AND a.user_id = ?
+                WHERE 1=1 $where
+                ORDER BY j.created_at DESC
+                LIMIT $perPage OFFSET $offset";
+        }
+
+        array_unshift($bind, $userId);
         $stmt = $this->db->prepare($sql);
         $stmt->execute($bind);
         return $stmt->fetchAll();
