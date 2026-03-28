@@ -396,6 +396,75 @@ class Job {
         return $row ?: null;
     }
 
+    /**
+     * Ambil lowongan serupa berdasarkan prioritas:
+     * 1) nama pekerjaan, 2) tempat pekerjaan, 3) jenis pekerjaan, 4) gaji
+     */
+    public function findRelatedJobs(array $job, int $limit = 6): array {
+        $jobId = (int) ($job['id'] ?? 0);
+        if ($jobId < 1) {
+            return [];
+        }
+
+        $title = trim((string) ($job['title'] ?? ''));
+        $titleKeyword = '';
+        if ($title !== '') {
+            $titleParts = preg_split('/\s+/u', $title) ?: [];
+            $titleKeyword = (string) ($titleParts[0] ?? '');
+        }
+        $location = trim((string) ($job['location'] ?? ''));
+        $jobType = trim((string) ($job['job_type'] ?? ''));
+        $minSalary = (int) ($job['min_salary'] ?? 0);
+        $maxSalary = (int) ($job['max_salary'] ?? 0);
+        $salaryPoint = $minSalary > 0 ? $minSalary : $maxSalary;
+
+        $limit = max(1, min(20, $limit));
+        $sql = "SELECT j.*, u.name AS created_by_name,
+                (
+                    CASE
+                        WHEN ? <> '' AND LOWER(j.title) = LOWER(?) THEN 400
+                        WHEN ? <> '' AND LOWER(j.title) LIKE LOWER(?) THEN 300
+                        WHEN ? <> '' AND LOWER(j.title) LIKE LOWER(?) THEN 200
+                        ELSE 0
+                    END
+                    +
+                    CASE
+                        WHEN ? <> '' AND LOWER(j.location) = LOWER(?) THEN 120
+                        WHEN ? <> '' AND LOWER(j.location) LIKE LOWER(?) THEN 80
+                        ELSE 0
+                    END
+                    +
+                    CASE
+                        WHEN ? <> '' AND j.job_type = ? THEN 60
+                        ELSE 0
+                    END
+                    +
+                    CASE
+                        WHEN ? > 0 AND j.min_salary IS NOT NULL AND j.max_salary IS NOT NULL
+                            AND j.min_salary <= ? AND j.max_salary >= ? THEN 40
+                        ELSE 0
+                    END
+                ) AS similarity_score
+            FROM jobs j
+            LEFT JOIN users u ON u.id = j.created_by
+            WHERE j.id <> ?
+            ORDER BY similarity_score DESC, j.created_at DESC
+            LIMIT $limit";
+
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([
+            $title, $title,
+            $title, '%' . $title . '%',
+            $titleKeyword, '%' . $titleKeyword . '%',
+            $location, $location,
+            $location, '%' . $location . '%',
+            $jobType, $jobType,
+            $salaryPoint, $salaryPoint, $salaryPoint,
+            $jobId,
+        ]);
+        return $stmt->fetchAll();
+    }
+
     public function findByCreator(int $createdBy): array {
         $stmt = $this->db->prepare('SELECT * FROM jobs WHERE created_by = ? ORDER BY created_at DESC');
         $stmt->execute([$createdBy]);

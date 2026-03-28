@@ -8,7 +8,7 @@
 <?php else: ?>
     <div class="row g-3">
         <?php foreach ($applications as $a): ?>
-        <?php $badgeClass = $a['status'] === 'pending' ? 'bg-primary' : ($a['status'] === 'accepted' ? 'bg-success' : ($a['status'] === 'rejected' ? 'bg-danger' : 'bg-secondary')); ?>
+        <?php $badgeClass = $a['status'] === 'pending' ? 'bg-primary text-secondary' : ($a['status'] === 'accepted' ? 'bg-success' : ($a['status'] === 'rejected' ? 'bg-danger' : 'bg-secondary text-accent')); ?>
         <div class="col-12 col-md-6 col-lg-4">
             <a href="<?= BASE_URL ?>/jobs/show?id=<?= (int)($a['job_id'] ?? 0) ?>" class="text-decoration-none text-dark">
             <div class="card h-100 card-hover">

@@ -1,25 +1,50 @@
 <?php require APP_PATH . '/views/layouts/header.php'; ?>
-<div class="d-flex" style="height: 100vh; overflow: hidden;">
-    <nav class="navbar navbar-dark bg-dark flex-column align-items-stretch p-3" style="width: 220px; min-height: 100vh; flex-shrink: 0;">
-        <a class="navbar-brand mb-4" href="<?= BASE_URL ?>/hr/jobs">HR Recruitment</a>
-        <ul class="nav nav-pills flex-column">
-            <li class="nav-item"><a class="nav-link text-white" href="<?= BASE_URL ?>/hr/jobs">Dashboard & Lowongan</a></li>
-            <li class="nav-item"><a class="nav-link text-white" href="<?= BASE_URL ?>/hr/applications/accepted">Pelamar Diterima</a></li>
-            <li class="nav-item"><a class="nav-link text-white" href="<?= BASE_URL ?>/hr/jobs/create">Buat Lowongan</a></li>
-            <li class="nav-item mt-4"><a class="btn btn-primary fw-bold " href="<?= BASE_URL ?>/jobs">User Account Mode</a></li>
-            <li class="nav-item mt-4"><a class="btn btn-outline-danger fw-bold" href="<?= BASE_URL ?>/auth/logout">Logout</a></li>
-        </ul>
-    </nav>
-    <main class="flex-grow-1 p-4 d-flex flex-column overflow-auto" style="min-height: 0;">
-        <?php if (!empty($_SESSION['flash'])): ?>
-            <div class="alert alert-success"><?= e($_SESSION['flash']) ?></div>
-            <?php unset($_SESSION['flash']); ?>
-        <?php endif; ?>
-        <?php if (!empty($_SESSION['flash_error'])): ?>
-            <div class="alert alert-danger"><?= e($_SESSION['flash_error']) ?></div>
-            <?php unset($_SESSION['flash_error']); ?>
-        <?php endif; ?>
-        <?= $content ?? '' ?>
-    </main>
+<?php $activeHrMenu = trim((string) ($_GET['url'] ?? 'hr/jobs'), '/'); ?>
+<style>
+.hr-body-override{background:var(--color-secondary) !important;color:var(--color-on-secondary);}
+.hr-shell{padding:0;height:100vh;width:100vw;}
+.hr-sidebar{width:230px;background:var(--color-primary);color:var(--color-on-primary);border-radius:0;padding:14px;display:flex;flex-direction:column;gap:12px;box-shadow:var(--shadow-md);}
+.hr-brand{font-weight:700;font-size:1.6rem;letter-spacing:.2px;color:var(--color-on-primary);}
+.hr-nav-link{display:flex;align-items:center;gap:8px;padding:10px 12px;border-radius:10px;color:var(--color-on-primary);text-decoration:none;font-size:13px;font-weight:500;opacity:.92;}
+.hr-nav-link:hover{background:var(--color-primary-hover);opacity:1;}
+.hr-nav-link.active{background:rgba(255,255,255,.09);font-weight:600;}
+.hr-main-wrap{background:var(--color-primary);border-radius:0;padding:10px 12px;display:flex;flex-direction:column;gap:10px;box-shadow:var(--shadow-md);}
+.hr-topbar{background:var(--color-primary-hover);border-radius:12px;padding:10px 14px;color:var(--color-on-primary);display:flex;align-items:center;justify-content:space-between;}
+.hr-content{background:var(--color-secondary-muted);border-radius:12px;padding:14px;overflow:auto;min-height:0;flex:1;}
+</style>
+<script>document.body.classList.add('hr-body-override');</script>
+<div class="hr-shell">
+    <div class="d-flex h-100">
+        <aside class="hr-sidebar flex-shrink-0">
+            <a class="hr-brand text-decoration-none" href="<?= BASE_URL ?>/hr/jobs">MyRecruit</a>
+            <nav class="d-flex flex-column gap-1">
+                <a class="hr-nav-link <?= str_starts_with($activeHrMenu, 'hr/jobs') && !str_contains($activeHrMenu, 'accepted') ? 'active' : '' ?>" href="<?= BASE_URL ?>/hr/jobs">Dashboard</a>
+                <a class="hr-nav-link <?= str_contains($activeHrMenu, 'hr/jobs/create') ? 'active' : '' ?>" href="<?= BASE_URL ?>/hr/jobs/create">Recruitment</a>
+                <a class="hr-nav-link <?= str_contains($activeHrMenu, 'hr/jobs/applicants') ? 'active' : '' ?>" href="<?= BASE_URL ?>/hr/jobs">Applicant Database</a>
+                <a class="hr-nav-link <?= str_contains($activeHrMenu, 'hr/applications/accepted') ? 'active' : '' ?>" href="<?= BASE_URL ?>/hr/applications/accepted">Pelamar Diterima</a>
+            </nav>
+            <div class="mt-auto d-grid gap-2">
+                <a class="btn btn-sm btn-light fw-semibold" href="<?= BASE_URL ?>/jobs">User Account Mode</a>
+                <a class="btn btn-sm bg-accent text-secondary hover:bg-accent-hover fw-semibold" href="<?= BASE_URL ?>/auth/logout">Logout</a>
+            </div>
+        </aside>
+        <main class="hr-main-wrap flex-grow-1 h-100">
+            <div class="hr-topbar">
+                <strong>Dashboard</strong>
+                <span class="small opacity-75">HR Panel</span>
+            </div>
+            <div class="hr-content d-flex flex-column">
+                <?php if (!empty($_SESSION['flash'])): ?>
+                    <div class="alert alert-success"><?= e($_SESSION['flash']) ?></div>
+                    <?php unset($_SESSION['flash']); ?>
+                <?php endif; ?>
+                <?php if (!empty($_SESSION['flash_error'])): ?>
+                    <div class="alert alert-danger"><?= e($_SESSION['flash_error']) ?></div>
+                    <?php unset($_SESSION['flash_error']); ?>
+                <?php endif; ?>
+                <?= $content ?? '' ?>
+            </div>
+        </main>
+    </div>
 </div>
 <?php require APP_PATH . '/views/layouts/footer.php'; ?>

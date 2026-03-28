@@ -1,10 +1,26 @@
 <?php require APP_PATH . '/views/layouts/header.php'; ?>
-
-<header class="bg-transparent py-4">
-    <div class="flex items-center justify-between mx-4 md:mx-[150px]">
-        <a href="<?= BASE_URL ?>/jobs" class="text-base md:text-lg font-semibold tracking-wide hover:opacity-80">
-            CHALLORA
-        </a>
+<?php $activeUserPath = trim((string) ($_GET['url'] ?? 'jobs'), '/'); ?>
+<style>
+.user-shell{min-height:100vh;background:var(--color-primary);--user-content-pad-x:10vw;--user-bar-pad-x:3.5vw;}
+.user-topnav{background:var(--color-secondary);color:var(--color-on-secondary);border-bottom:1px solid rgba(255,255,255,.28);}
+.user-topnav-inner{width:100%;padding:0 var(--user-bar-pad-x);min-height:84px;display:flex;align-items:stretch;justify-content:space-between;gap:22px;}
+.user-brand{display:flex;align-items:center;font-size:42px;font-weight:700;line-height:1;color:var(--color-primary);text-decoration:none;letter-spacing:.4px;}
+.user-mainnav{display:flex;align-items:stretch;gap:8px;flex-grow:1;}
+.user-mainnav-link{display:flex;align-items:center;padding:0 22px;color:#edf3f8;text-decoration:none;font-weight:400;font-size:18px;border-bottom:5px solid transparent;}
+.user-mainnav-link.active{border-bottom-color:#fff;font-weight:600;}
+.user-mainnav-link:hover{color:#fff;background:rgba(255,255,255,.04);}
+.user-avatar-btn{width:40px;height:40px;border-radius:999px;background:#fff;color:var(--color-secondary);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;border:none;}
+.user-main-wrap{width:100%;padding:16px var(--user-content-pad-x) 24px;}
+</style>
+<div class="user-shell">
+<header class="user-topnav">
+    <div class="user-topnav-inner">
+        <a href="<?= BASE_URL ?>/jobs" class="user-brand">CHALLORA</a>
+        <nav class="user-mainnav flex-grow-1">
+            <a class="user-mainnav-link <?= str_starts_with($activeUserPath, 'jobs') && !str_contains($activeUserPath, 'saved') ? 'active' : '' ?>" href="<?= BASE_URL ?>/jobs">Lowongan</a>
+            <a class="user-mainnav-link <?= str_contains($activeUserPath, 'applications') ? 'active' : '' ?>" href="<?= BASE_URL ?>/applications">Sudah Dilamar</a>
+            <a class="user-mainnav-link <?= str_contains($activeUserPath, 'jobs/saved') ? 'active' : '' ?>" href="<?= BASE_URL ?>/jobs/saved">Lowongan Tersimpan</a>
+        </nav>
         <div class="flex items-center gap-3">
             <?php if (isLoggedIn() && currentRole() === 'user'): ?>
                 <?php
@@ -12,21 +28,12 @@
                 $headerAvatarSrc = currentUserAvatarImgSrc();
                 ?>
                 <div class="relative" id="user-menu-root">
-                    <button
-                        type="button"
-                        id="user-menu-toggle"
-                        class="flex items-center gap-2 focus:outline-none"
-                    >
-                        <span class="hidden md:inline-block text-xs text-muted hover:text-default">
-                            <?= e($_SESSION['user_name'] ?? 'User') ?>
-                        </span>
-                        <span class="w-9 h-9 rounded-full overflow-hidden bg-primary flex items-center justify-center text-white text-xs font-semibold shrink-0 ring-2 ring-white shadow-sm">
-                            <?php if ($headerAvatarSrc): ?>
-                                <img src="<?= e($headerAvatarSrc) ?>" alt="" class="w-full h-full object-cover" width="36" height="36">
-                            <?php else: ?>
-                                <?= e($initial) ?>
-                            <?php endif; ?>
-                        </span>
+                    <button type="button" id="user-menu-toggle" class="user-avatar-btn">
+                        <?php if ($headerAvatarSrc): ?>
+                            <img src="<?= e($headerAvatarSrc) ?>" alt="" class="w-full h-full rounded-full object-cover" width="40" height="40">
+                        <?php else: ?>
+                            <?= e($initial) ?>
+                        <?php endif; ?>
                     </button>
                     <div
                         id="user-menu-dropdown"
@@ -46,8 +53,8 @@
         </div>
     </div>
 </header>
+<main class="user-main-wrap">
 
-<main class="py-4 mx-4 md:mx-[150px]">
     <?php if (!empty($_SESSION['flash']) && empty($_SESSION['flash_toast'])): ?>
         <div class="alert alert-success"><?= e($_SESSION['flash']) ?></div>
         <?php unset($_SESSION['flash']); ?>
@@ -64,6 +71,7 @@
     <?php endif; ?>
     <?= $content ?? '' ?>
 </main>
+</div>
 <?php if (isLoggedIn() && currentRole() === 'user' && !empty($_SESSION['flash_toast'])): ?>
 <?php
 $toast = $_SESSION['flash_toast'];

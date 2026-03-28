@@ -19,15 +19,20 @@
     --font-display: var(--font-sans);
 
     /* --- Brand (ubah di sini untuk tema baru) --- */
-    --color-primary: #f1ffe7;
-    --color-primary-hover: #e3f5d7;
-    --color-primary-muted: #f8fff2;
+    --color-primary: #ECE5F0;
+    --color-primary-hover: #DCD2E3;
+    --color-primary-muted: #F6F2F8;
 
-    --color-secondary: #2B2D42;
-    --color-secondary-hover: #202233;
+    --color-secondary: #011627;
+    --color-secondary-hover: #00101b;
+    --color-secondary-muted: #334454;
 
-    --color-accent: #1098F7;
-    --color-accent-hover: #0c7fd2;
+    --color-accent: #FFD166;
+    --color-accent-hover: #E6BC5C;
+    --color-accent-muted: #FFF1C7;
+    --color-on-primary: #011627;
+    --color-on-secondary: #FFD166;
+    --color-on-accent: #ECE5F0;
 
     /* --- Semantic / surface --- */
     --color-text: #0f172a;
@@ -116,12 +121,19 @@ body {
 .border-muted { border-color: var(--gray-200) !important; }
 
 .bg-secondary { background-color: var(--color-secondary) !important; }
+.bg-secondary-hover { background-color: var(--color-secondary-hover) !important; }
+.bg-secondary-muted { background-color: var(--color-secondary-muted) !important; }
 .text-secondary { color: var(--color-secondary) !important; }
 .border-secondary { border-color: var(--color-secondary) !important; }
 
 .bg-accent { background-color: var(--color-accent) !important; }
+.bg-accent-hover { background-color: var(--color-accent-hover) !important; }
+.bg-accent-muted { background-color: var(--color-accent-muted) !important; }
 .text-accent { color: var(--color-accent) !important; }
 .border-accent { border-color: var(--color-accent) !important; }
+.text-on-primary { color: var(--color-on-primary) !important; }
+.text-on-secondary { color: var(--color-on-secondary) !important; }
+.text-on-accent { color: var(--color-on-accent) !important; }
 .bg-danger-soft { background-color: var(--color-danger-bg) !important; }
 .text-danger { color: var(--color-danger-text) !important; }
 .bg-success-soft { background-color: var(--color-success-bg) !important; }
@@ -134,6 +146,8 @@ body {
 .text-sky { color: var(--color-sky-text) !important; }
 
 .hover\:bg-primary-hover:hover { background-color: var(--color-primary-hover) !important; }
+.hover\:bg-secondary-hover:hover { background-color: var(--color-secondary-hover) !important; }
+.hover\:bg-accent-hover:hover { background-color: var(--color-accent-hover) !important; }
 .hover\:text-primary:hover { color: var(--color-primary) !important; }
 .hover\:text-muted:hover { color: var(--color-text-muted) !important; }
 .hover\:bg-muted:hover { background-color: var(--gray-100) !important; }
@@ -145,7 +159,7 @@ body {
 .sem-bg-muted { background-color: var(--gray-100) !important; }
 .sem-text-default { color: var(--color-text) !important; }
 .sem-text-muted { color: var(--color-text-muted) !important; }
-.sem-text-on-primary { color: var(--color-secondary) !important; }
+.sem-text-on-primary { color: var(--color-on-primary) !important; }
 .sem-border-default { border-color: var(--color-border) !important; }
 .sem-border-muted { border-color: var(--gray-200) !important; }
 .sem-border-primary { border-color: var(--color-primary) !important; }

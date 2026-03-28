@@ -87,11 +87,25 @@ class JobController {
         $isSaved = false;
         $hasRequiredDocs = true;
         $missingDocs = [];
+        $relatedJobs = $this->jobModel->findRelatedJobs($job, 6);
+        $relatedAppliedJobIds = [];
+        $relatedSavedJobIds = [];
         if (isLoggedIn() && currentRole() === 'user') {
             $appModel = new Application();
             $alreadyApplied = $appModel->hasApplied(currentUserId(), $id);
             $canApply = !$alreadyApplied;
             $isSaved = $this->savedJobModel->isSaved(currentUserId(), $id);
+            $savedJobIds = $this->savedJobModel->getSavedJobIds(currentUserId());
+            foreach ($relatedJobs as $rj) {
+                $rid = (int) ($rj['id'] ?? 0);
+                if ($rid < 1) continue;
+                if ($appModel->hasApplied(currentUserId(), $rid)) {
+                    $relatedAppliedJobIds[] = $rid;
+                }
+                if (in_array($rid, $savedJobIds, true)) {
+                    $relatedSavedJobIds[] = $rid;
+                }
+            }
             $user = (new User())->findById(currentUserId());
             if ($user) {
                 if (empty($user['cv_path'])) $missingDocs[] = 'CV';
@@ -109,6 +123,9 @@ class JobController {
             'isSaved' => $isSaved,
             'hasRequiredDocs' => $hasRequiredDocs,
             'missingDocs' => $missingDocs,
+            'relatedJobs' => $relatedJobs,
+            'relatedAppliedJobIds' => $relatedAppliedJobIds,
+            'relatedSavedJobIds' => $relatedSavedJobIds,
             'pageTitle' => e($job['title']),
         ]);
     }

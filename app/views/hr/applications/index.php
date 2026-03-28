@@ -52,7 +52,7 @@ $achLevelLabels = ['kota' => 'Kota', 'provinsi' => 'Provinsi', 'nasional' => 'Na
                                 <td>
                                     <?php
                                     if (($a['status'] ?? '') === 'pending') {
-                                        $badgeClass = 'bg-primary';
+                                        $badgeClass = 'bg-primary text-secondary';
                                         $statusLabel = 'Pending';
                                     } elseif (($a['status'] ?? '') === 'reviewed') {
                                         $badgeClass = 'bg-warning';
@@ -64,7 +64,7 @@ $achLevelLabels = ['kota' => 'Kota', 'provinsi' => 'Provinsi', 'nasional' => 'Na
                                         $badgeClass = 'bg-danger';
                                         $statusLabel = 'Rejected';
                                     } else {
-                                        $badgeClass = 'bg-secondary';
+                                        $badgeClass = 'bg-secondary text-accent';
                                         $statusLabel = e($a['status'] ?? '-');
                                     }
                                     ?>

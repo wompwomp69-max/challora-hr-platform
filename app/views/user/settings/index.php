@@ -39,7 +39,7 @@ $formatDocUploadedAt = static function (?string $relativePath): string {
                         <?php if ($profileAvatarSrc): ?>
                             <img src="<?= e($profileAvatarSrc) ?>" alt="" class="w-full h-full object-cover" width="112" height="112">
                         <?php else: ?>
-                            <div class="w-full h-full bg-primary flex items-center justify-center text-white text-3xl font-semibold"><?= e($profileInitial) ?></div>
+                            <div class="w-full h-full bg-primary flex items-center justify-center text-secondary text-3xl font-semibold"><?= e($profileInitial) ?></div>
                         <?php endif; ?>
                         <span class="absolute inset-0 flex items-center justify-center bg-black/50 text-white text-[11px] font-semibold opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none text-center px-1 leading-tight">Ganti foto</span>
                     </label>
@@ -144,6 +144,42 @@ $formatDocUploadedAt = static function (?string $relativePath): string {
             <?php endif; ?>
         </div>
 
+        <!-- Pencapaian -->
+        <div class="border-t border-muted pt-6 mt-6">
+            <div class="flex items-center justify-between gap-2 mb-3">
+                <h2 class="text-sm font-semibold tracking-wide text-default">PENCAPAIAN</h2>
+                <a href="<?= BASE_URL ?>/user/settings/edit#data-pencapaian" class="text-xs font-medium text-primary hover:underline uppercase shrink-0">Ubah</a>
+            </div>
+            <?php if (empty($achievements)): ?>
+                <p class="text-sm text-muted">Belum ada pencapaian.</p>
+            <?php else: ?>
+                <div class="space-y-4">
+                    <?php foreach ($achievements as $ach): ?>
+                        <div class="flex gap-3">
+                            <div class="flex flex-col items-center pt-1 shrink-0">
+                                <div class="w-2 h-2 rounded-full bg-accent"></div>
+                                <div class="flex-1 w-px bg-accent min-h-[1rem] mt-1"></div>
+                            </div>
+                            <div class="flex-1 min-w-0 pb-1">
+                                <div class="font-semibold text-sm text-default"><?= e($ach['title'] ?? '-') ?></div>
+                                <div class="text-xs text-muted">
+                                    <?= e($ach['type'] ?? '-') ?>
+                                    <?= !empty($ach['year']) ? ' • ' . e($ach['year']) : '' ?>
+                                    <?= !empty($ach['level']) ? ' • ' . e($ach['level']) : '' ?>
+                                </div>
+                                <?php if (!empty($ach['organizer'])): ?>
+                                    <div class="text-xs text-muted"><?= e($ach['organizer']) ?></div>
+                                <?php endif; ?>
+                                <?php if (!empty($ach['description'])): ?>
+                                    <div class="text-xs text-default mt-1"><?= nl2br(e($ach['description'])) ?></div>
+                                <?php endif; ?>
+                            </div>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+            <?php endif; ?>
+        </div>
+
         <!-- Dokumen lamaran -->
         <div class="border-t border-muted pt-6 mt-6">
             <div class="flex items-center justify-between gap-2 mb-3">
@@ -163,7 +199,7 @@ $formatDocUploadedAt = static function (?string $relativePath): string {
                     </div>
                     <input type="file" name="cv" accept=".pdf,.docx" class="block w-full text-xs border border-default rounded-md px-2 py-1.5 mb-2" required>
                     <div class="flex items-center gap-2">
-                        <button type="submit" class="flex-1 px-3 py-1.5 rounded-full bg-primary text-secondary text-xs font-semibold hover:bg-primary-hover">Upload CV</button>
+                        <button type="submit" class="flex-1 px-3 py-1.5 rounded-full bg-accent text-primary text-xs font-semibold">Upload CV</button>
                         <?php if (!empty($user['cv_path'])): ?>
                             <a href="<?= BASE_URL ?>/index.php?url=download/user-file&type=cv" target="_blank" rel="noopener noreferrer" class="px-3 py-1.5 rounded-full border border-default text-xs font-semibold text-default hover:bg-muted">Preview</a>
                         <?php endif; ?>
@@ -181,7 +217,7 @@ $formatDocUploadedAt = static function (?string $relativePath): string {
                     </div>
                     <input type="file" name="diploma" accept=".pdf,.docx" class="block w-full text-xs border border-default rounded-md px-2 py-1.5 mb-2" required>
                     <div class="flex items-center gap-2">
-                        <button type="submit" class="flex-1 px-3 py-1.5 rounded-full bg-primary text-secondary text-xs font-semibold hover:bg-primary-hover">Upload Ijazah</button>
+                        <button type="submit" class="flex-1 px-3 py-1.5 rounded-full bg-accent text-primary text-xs font-semibold">Upload Ijazah</button>
                         <?php if (!empty($user['diploma_path'])): ?>
                             <a href="<?= BASE_URL ?>/index.php?url=download/user-file&type=diploma" target="_blank" rel="noopener noreferrer" class="px-3 py-1.5 rounded-full border border-default text-xs font-semibold text-default hover:bg-muted">Preview</a>
                         <?php endif; ?>
@@ -199,7 +235,7 @@ $formatDocUploadedAt = static function (?string $relativePath): string {
                     </div>
                     <input type="file" name="photo" accept=".jpg,.jpeg,.png" class="block w-full text-xs border border-default rounded-md px-2 py-1.5 mb-2" required>
                     <div class="flex items-center gap-2">
-                        <button type="submit" class="flex-1 px-3 py-1.5 rounded-full bg-primary text-secondary text-xs font-semibold hover:bg-primary-hover">Upload Pas Foto</button>
+                        <button type="submit" class="flex-1 px-3 py-1.5 rounded-full bg-accent text-primary text-xs font-semibold">Upload Pas Foto</button>
                         <?php if (!empty($user['photo_path'])): ?>
                             <a href="<?= BASE_URL ?>/index.php?url=download/user-file&type=photo" target="_blank" rel="noopener noreferrer" class="px-3 py-1.5 rounded-full border border-default text-xs font-semibold text-default hover:bg-muted">Preview</a>
                         <?php endif; ?>
@@ -208,39 +244,5 @@ $formatDocUploadedAt = static function (?string $relativePath): string {
             </div>
         </div>
 
-        <!-- Lamaran saya -->
-        <div class="border-t border-muted pt-6 mt-6">
-            <h2 class="text-sm font-semibold tracking-wide text-default mb-3">LAMARAN SAYA</h2>
-            <?php if (empty($applications)): ?>
-                <p class="text-sm text-muted">Belum ada lamaran.</p>
-            <?php else: ?>
-                <div class="space-y-3">
-                    <?php foreach ($applications as $a): ?>
-                        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-1 border-b border-muted last:border-0 last:pb-0 pb-3">
-                            <div class="min-w-0">
-                                <div class="text-sm font-semibold text-default"><?= e($a['job_title']) ?></div>
-                                <div class="text-xs text-muted"><?= e($a['location'] ?? '-') ?></div>
-                            </div>
-                            <div class="flex items-center gap-3 text-xs shrink-0">
-                                <?php
-                                $status = $a['status'] ?? 'pending';
-                                $badgeClass = $status === 'pending'
-                                    ? 'bg-warning-soft text-warning'
-                                    : ($status === 'accepted'
-                                        ? 'bg-success-soft text-success'
-                                        : ($status === 'rejected'
-                                            ? 'bg-danger-soft text-danger'
-                                            : 'bg-muted text-default'));
-                                ?>
-                                <span class="inline-flex items-center px-2 py-0.5 rounded-full <?= $badgeClass ?> font-medium">
-                                    <?= e($status) ?>
-                                </span>
-                                <span class="text-muted"><?= e($a['created_at']) ?></span>
-                            </div>
-                        </div>
-                    <?php endforeach; ?>
-                </div>
-            <?php endif; ?>
-        </div>
     </div>
 </div>

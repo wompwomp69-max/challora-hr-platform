@@ -71,13 +71,13 @@
                 </div>
                 <?php if (($hasRequiredDocs ?? true)): ?>
                     <div id="apply-confirm-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/50 px-4">
-                        <div class="w-full max-w-md rounded-2xl border border-muted bg-surface p-5 shadow-lg">
+                        <div class="w-full max-w-md rounded-2xl border border-muted bg-surface p-4 shadow-lg">
                             <p class="text-sm text-default mb-4">
                                 Kamu akan melamar <span class="font-semibold"><?= e($job['title']) ?></span>
                             </p>
-                            <div class="flex justify-end gap-2">
+                            <div class="flex justify-end gap-1">
                                 <button type="button" id="close-apply-confirm" class="px-4 py-2 rounded-full border border-default text-sm text-default hover:bg-muted">Batal</button>
-                                <button type="submit" form="apply-job-form" class="px-4 py-2 rounded-full bg-primary text-white text-sm font-semibold hover:bg-primary-hover">Ya, kirim lamaran</button>
+                                <button type="submit" form="apply-job-form" class="px-4 py-2 rounded-full bg-accent text-primary text-sm font-semibold">Ya, kirim lamaran</button>
                             </div>
                         </div>
                     </div>
@@ -126,3 +126,41 @@
         <a href="<?= BASE_URL ?>/jobs" class="inline-flex items-center px-3 py-1.5 rounded-full border border-default text-xs text-muted hover:bg-muted">← Kembali ke daftar lowongan</a>
     </div>
 </div>
+
+<?php if (!empty($relatedJobs ?? [])): ?>
+<div class="max-w-5xl mx-auto mt-5">
+    <div class="bg-surface rounded-2xl shadow-sm p-5 md:p-6">
+        <h2 class="text-lg font-semibold text-default mb-1">Pekerjaan Serupa</h2>
+        <p class="text-xs text-muted mb-4">Diprioritaskan berdasarkan: nama pekerjaan, tempat pekerjaan, jenis pekerjaan, dan gaji.</p>
+        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
+            <?php foreach (($relatedJobs ?? []) as $rj): ?>
+                <?php
+                $rApplied = in_array((int)($rj['id'] ?? 0), $relatedAppliedJobIds ?? [], true);
+                $rSaved = in_array((int)($rj['id'] ?? 0), $relatedSavedJobIds ?? [], true);
+                $jobTypeLabel = !empty($rj['job_type']) ? ucwords(str_replace('_', ' ', (string) $rj['job_type'])) : '-';
+                ?>
+                <a href="<?= BASE_URL ?>/jobs/show?id=<?= (int)$rj['id'] ?>" class="block rounded-xl border <?= ($rApplied || $rSaved) ? 'border-accent' : 'border-muted' ?> bg-surface p-3 hover:shadow-md transition-shadow">
+                    <div class="flex items-start justify-between gap-2 mb-1">
+                        <h3 class="text-sm font-semibold text-default leading-snug"><?= e($rj['title']) ?></h3>
+                        <?php if (!empty($rj['is_urgent'])): ?>
+                            <span class="inline-flex items-center px-2 py-0.5 rounded-full bg-danger-soft text-danger text-[10px] font-medium">Urgent</span>
+                        <?php endif; ?>
+                    </div>
+                    <p class="text-xs text-muted line-clamp-2 min-h-[2rem]"><?= e(!empty($rj['short_description']) ? $rj['short_description'] : mb_substr((string)($rj['description'] ?? ''), 0, 80) . (mb_strlen((string)($rj['description'] ?? '')) > 80 ? '…' : '')) ?></p>
+                    <div class="mt-2 space-y-0.5 text-[11px] text-muted">
+                        <div><span class="font-medium text-default">Tempat:</span> <?= e($rj['location'] ?? '-') ?></div>
+                        <div><span class="font-medium text-default">Jenis:</span> <?= e($jobTypeLabel) ?></div>
+                        <div><span class="font-medium text-default">Gaji:</span> <?= e($rj['salary_range'] ?? '-') ?></div>
+                    </div>
+                    <?php if ($rApplied || $rSaved): ?>
+                        <div class="mt-2 flex flex-wrap gap-1 text-[10px]">
+                            <?php if ($rApplied): ?><span class="inline-flex items-center px-2 py-0.5 rounded-full bg-info-soft text-info font-medium">Sudah dilamar</span><?php endif; ?>
+                            <?php if ($rSaved): ?><span class="inline-flex items-center px-2 py-0.5 rounded-full bg-success-soft text-success font-medium">Tersimpan</span><?php endif; ?>
+                        </div>
+                    <?php endif; ?>
+                </a>
+            <?php endforeach; ?>
+        </div>
+    </div>
+</div>
+<?php endif; ?>

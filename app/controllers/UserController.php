@@ -4,7 +4,6 @@
  */
 class UserController {
     private User $userModel;
-    private Application $appModel;
     private const DOC_MAX_BYTES = 2 * 1024 * 1024;
     private const PHOTO_MAX_BYTES = 1 * 1024 * 1024;
     private const DOC_MIMES = [
@@ -17,7 +16,6 @@ class UserController {
 
     public function __construct() {
         $this->userModel = new User();
-        $this->appModel = new Application();
     }
 
     public function profile(): void {
@@ -29,10 +27,9 @@ class UserController {
         unset($user['password']);
         $_SESSION['user_avatar_path'] = !empty($user['avatar_path']) ? (string) $user['avatar_path'] : '';
         $_SESSION['user_avatar_ver'] = !empty($user['avatar_path']) ? md5((string) $user['avatar_path']) : '0';
-        $applications = $this->appModel->getByUserId(currentUserId());
         $workExperiences = $this->userModel->getWorkExperiences(currentUserId());
         $achievements = $this->userModel->getAchievements(currentUserId());
-        render_view('user/settings/index', ['user' => $user, 'applications' => $applications, 'workExperiences' => $workExperiences, 'achievements' => $achievements, 'pageTitle' => 'Profil']);
+        render_view('user/settings/index', ['user' => $user, 'workExperiences' => $workExperiences, 'achievements' => $achievements, 'pageTitle' => 'Profil']);
     }
 
     private const AVATAR_MAX_BYTES = 1 * 1024 * 1024;
