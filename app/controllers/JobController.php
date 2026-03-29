@@ -20,10 +20,10 @@ class JobController {
             'salary' => trim($_GET['salary'] ?? ''), // legacy, jika masih dipakai
             'min_salary' => trim($_GET['min_salary'] ?? ''),
             'max_salary' => trim($_GET['max_salary'] ?? ''),
-            'job_type' => trim($_GET['job_type'] ?? ''),
-            'min_education' => trim($_GET['min_education'] ?? ''),
-            'experience_level' => trim($_GET['experience_level'] ?? ''),
-            'updated' => trim($_GET['updated'] ?? ''),
+            'job_type' => $this->normalizeCsvParam($_GET['job_type'] ?? ''),
+            'min_education' => $this->normalizeCsvParam($_GET['min_education'] ?? ''),
+            'experience_level' => $this->normalizeCsvParam($_GET['experience_level'] ?? ''),
+            'updated' => $this->normalizeUpdatedFilter((string) ($_GET['updated'] ?? '')),
         ];
         $jobView = trim($_GET['job_view'] ?? 'all');
         if (!in_array($jobView, ['all', 'saved', 'applied'], true)) {
@@ -205,5 +205,38 @@ class JobController {
             'savedJobIds' => $savedJobIds,
             'pageTitle' => 'Lowongan Tersimpan',
         ]);
+    }
+
+    private function normalizeUpdatedFilter(string $raw): string {
+        $normalized = strtolower(trim($raw));
+        $map = [
+            '' => '',
+            'latest' => '',
+            'terbaru' => '',
+            'day' => 'day',
+            'today' => 'day',
+            'week' => 'week',
+            'minggu' => 'week',
+            'month' => 'month',
+            'bulan' => 'month',
+            'year' => 'year',
+            'tahun' => 'year',
+        ];
+        return $map[$normalized] ?? '';
+    }
+
+    /**
+     * Normalize scalar or array GET param to comma-separated unique values.
+     *
+     * @param mixed $raw
+     */
+    private function normalizeCsvParam($raw): string {
+        if (is_array($raw)) {
+            $values = array_map(fn($v) => trim((string) $v), $raw);
+        } else {
+            $values = array_map('trim', explode(',', trim((string) $raw)));
+        }
+        $values = array_values(array_unique(array_filter($values, fn($v) => $v !== '')));
+        return implode(',', $values);
     }
 }

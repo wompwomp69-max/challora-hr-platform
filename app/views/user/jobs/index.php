@@ -1,18 +1,48 @@
 <?php
 $jobView = $jobView ?? 'all';
-$selectedType = (string) ($searchParams['job_type'] ?? '');
+$selectedTypeRaw = (string) ($searchParams['job_type'] ?? '');
+$selectedTypes = array_values(array_filter(array_map('trim', explode(',', $selectedTypeRaw)), fn($v) => $v !== ''));
+$selectedEducationRaw = (string) ($searchParams['min_education'] ?? '');
+$selectedEducations = array_values(array_filter(array_map('trim', explode(',', $selectedEducationRaw)), fn($v) => $v !== ''));
 ?>
 <style>
-.jobs-search{display:grid;grid-template-columns:1fr 1fr 1fr 160px;background:var(--color-secondary);border-radius:0;overflow:hidden;margin:-16px calc(var(--user-content-pad-x, 10vw) * -1) 20px;width:calc(100% + (var(--user-content-pad-x, 10vw) * 2));height:100px;padding:0 var(--user-bar-pad-x, 3.5vw);box-sizing:border-box;}
-.jobs-search-seg{display:flex;align-items:center;gap:12px;padding:18px 20px;color:#f8fafc;border-right:1px solid rgba(255,255,255,.2);}
+.jobs-search-sticky{position:sticky;top:0;z-index:40;margin:-16px calc(var(--user-content-pad-x, 10vw) * -1) 20px;width:calc(100% + (var(--user-content-pad-x, 10vw) * 2));background:var(--color-secondary);padding:0 var(--user-bar-pad-x, 3.5vw);box-sizing:border-box;box-shadow:0 10px 18px rgba(0,0,0,.16);}
+.jobs-search{display:grid;grid-template-columns:1fr 1fr 1fr 140px;gap:0;overflow:visible;position:relative;height:92px;}
+.jobs-search-seg{display:flex;align-items:center;gap:12px;padding:0 16px;color:#f8fafc;border:1px solid rgba(255,255,255,.2);height:92px;}
 .jobs-search-seg input,.jobs-search-seg select{width:100%;background:transparent;border:0;color:#fff;font-size:16px;outline:none;}
 .jobs-search-seg input::placeholder{color:#d6dce4;}
-.jobs-search-btn{background:#fff;color:#011627;border:0;border-radius:0;font-size:28px;font-weight:500;}
+.jobs-search-seg input, .jobs-search-seg button{height:100%;}
+.jobs-search-btn{background:#fff;color:#011627;border:0;border-radius:0;font-size:24px;font-weight:600;height:92px;}
+.jobs-exp-seg{position:relative;}
+.jobs-exp-trigger{display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;background:transparent;border:0;color:#fff;padding:0;font-size:16px;}
+.jobs-exp-trigger i{font-size:14px;}
+.jobs-exp-panel{position:absolute;top:calc(100% + 1px);left:-1px;right:-1px;background:var(--color-secondary);border:1px solid rgba(255,255,255,.22);box-shadow:0 18px 32px rgba(0,0,0,.24);}
+.jobs-exp-option{display:flex;align-items:center;gap:14px;color:#edf4fa;padding:20px 18px;border-bottom:1px solid rgba(255,255,255,.2);cursor:pointer;}
+.jobs-exp-option:last-child{border-bottom:0;}
+.jobs-exp-checkbox{width:24px;height:24px;border:2px solid #dce6ef;border-radius:7px;display:inline-flex;align-items:center;justify-content:center;font-size:14px;}
+.jobs-exp-option.active .jobs-exp-checkbox{background:#e7eef5;color:#05203e;}
+.jobs-exp-option.active .jobs-exp-checkbox::before{content:"\2713";font-weight:700;}
+.jobs-exp-hidden{display:none;}
+.jobs-header-row{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:10px;}
+.jobs-header-time{position:relative;min-width:260px;display:flex;justify-content:flex-end;}
+.jobs-header-time-trigger{display:flex;align-items:center;gap:8px;background:transparent;border:0;color:#111827;font-size:18px;padding:8px 0;}
+.jobs-header-time-trigger strong{font-weight:700;}
+.jobs-header-time-panel{position:absolute;top:calc(100% + 4px);right:0;min-width:320px;z-index:35;background:var(--color-secondary);border:1px solid rgba(255,255,255,.22);box-shadow:0 18px 32px rgba(0,0,0,.24);}
+.jobs-reset-wrap{margin-bottom:8px;}
+.jobs-reset-btn{display:inline-block;font-size:13px;background:var(--color-accent);color:#011627;padding:5px 14px;border-radius:999px;text-decoration:none;font-weight:600;}
 .jobs-body{margin:0 calc(var(--user-content-pad-x, 10vw) * -1);padding:0 var(--user-bar-pad-x, 3.5vw);}
-.jobs-layout{display:grid;grid-template-columns:180px 1fr;gap:18px;}
-.jobs-filter{background:rgba(255,255,255,.42);padding:12px;border-radius:8px;align-self:start;position:sticky;top:12px;}
+.jobs-layout{display:grid;grid-template-columns:220px 1fr;gap:48px;}
+.jobs-filter{background:var(--color-primary);padding:12px;border-radius:8px;align-self:start;position:sticky;top:108px;}
+.jobs-filter-toggle{display:flex;align-items:center;justify-content:space-between;width:100%;background:transparent;border:0;padding:0;margin-bottom:8px;color:#111827;}
+.jobs-filter-toggle-label{font-size:14px;font-weight:600;}
+.jobs-filter-toggle-icon{font-size:16px;line-height:1;}
 .jobs-filter-title{font-size:38px;font-weight:600;color:#111827;margin-bottom:10px;}
-.jobs-filter-box{border:2px solid #2ea0ff;border-radius:4px;padding:8px;background:#fff;}
+.jobs-filter-box{padding:10x;margin:30px 0;scrollbar-width: thin;scrollbar-color: #888 #f1f1f1;scrollbar-color:#888 transparent;}
+.jobs-filter-scroll{min-height:50vh;overflow-y:auto;padding-right:4px;}
+.jobs-filter-group{margin-bottom:12px;}
+.jobs-filter-group:last-child{margin-bottom:0;}
+.jobs-filter-group-title{display:block;font-size:19px;font-weight:700;margin-bottom:8px;}
+.jobs-filter-opt{display:flex;align-items:center;gap:8px;margin-top:6px;font-size:13px;color:#111827;}
 .jobs-card-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px;}
 .job-card{background:#fff;border:2px solid #032146;border-radius:28px;padding:14px;min-height:320px;display:flex;flex-direction:column;justify-content:space-around;}
 .job-card-top{background:#fff2d6;border-radius:18px;padding:18px 16px 18px;min-height:230px;display:flex;flex-direction:column;}
@@ -20,55 +50,214 @@ $selectedType = (string) ($searchParams['job_type'] ?? '');
 .job-title{font-size:24px;line-height:1.12;font-weight:700;color:#000;margin-top:14px;}
 .job-tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:auto;}
 .job-tag{font-size:12px;padding:3px 10px;border:2px solid #011627;border-radius:999px;background:#fff;color:#011627;font-weight:500;}
-.job-card-bottom{padding:14px 4px 2px;display:flex;justify-content:space-between;align-items:flex-end;gap:10px;}
+.job-card-bottom{padding:30px 4px 2px;display:flex;justify-content:space-between;align-items:flex-end;gap:10px;}
 .job-salary{font-size:22px;font-weight:700;color:#000;line-height:1;}
+.jobs-filter-sal-input{border:1px var(--color-secondary) solid;border-radius:30px;padding:8px 18px;background-color:rgba(0,0,0,0);}
+.jobs-filter-sal-input::-webkit-outer-spin-button,.jobs-filter-sal-input::-webkit-inner-spin-button{display:none;}
+.jobs-filter-sal-input:focus{background-color:var(--color-primary-muted);border:2.5px var(--color-secondary) solid;outline:none;box-shadow:none;}
 .job-loc{font-size:14px;color:#737982;line-height:1.25;margin-top:6px;}
 .job-detail-btn{background:#011627;color:#fff;border:0;padding:10px 18px;border-radius:999px;font-size:12px;font-weight:600;line-height:1;}
 .job-bookmark{width:42px;height:42px;border-radius:16px;background:#fff;display:flex;align-items:center;justify-content:center;}
 .job-bookmark i{font-size:20px;color:#011627;}
 @media (max-width: 1300px){.jobs-card-grid{grid-template-columns:repeat(3,minmax(0,1fr));}}
-@media (max-width: 1024px){.jobs-layout{grid-template-columns:1fr;}.jobs-filter{position:static;}.jobs-card-grid{grid-template-columns:repeat(2,minmax(0,1fr));}.jobs-search{grid-template-columns:1fr;}}
+@media (max-width: 1024px){.jobs-layout{grid-template-columns:1fr;}.jobs-filter{position:static;}.jobs-card-grid{grid-template-columns:repeat(2,minmax(0,1fr));}.jobs-search-sticky{position:static;}.jobs-search{grid-template-columns:1fr;height:auto;}.jobs-search-seg,.jobs-search-btn{height:60px;}.jobs-header-row{flex-direction:column;}.jobs-header-time{justify-content:flex-start;}}
 @media (max-width: 640px){.jobs-card-grid{grid-template-columns:1fr;}}
 </style>
 
-<form method="get" action="<?= BASE_URL ?>/jobs" class="jobs-search">
-    <div class="jobs-search-seg">
-        <i class="bi bi-search"></i>
-        <input type="text" name="q" placeholder="Cari Pekerjaan" value="<?= e($searchParams['q'] ?? '') ?>">
-    </div>
-    <div class="jobs-search-seg">
-        <i class="bi bi-geo-alt-fill"></i>
-        <input type="text" name="location" placeholder="Cari Lokasi" value="<?= e($searchParams['location'] ?? '') ?>">
-    </div>
-    <div class="jobs-search-seg">
-        <i class="bi bi-briefcase-fill"></i>
-        <select name="experience_level">
-            <option value="">Level Pengalaman</option>
-            <option value="fresh_grad" <?= ($searchParams['experience_level'] ?? '') === 'fresh_grad' ? 'selected' : '' ?>>Fresh Graduate</option>
-            <option value="y_1_3" <?= ($searchParams['experience_level'] ?? '') === 'y_1_3' ? 'selected' : '' ?>>1-3 Tahun</option>
-            <option value="y_3_5" <?= ($searchParams['experience_level'] ?? '') === 'y_3_5' ? 'selected' : '' ?>>3-5 Tahun</option>
-            <option value="y_5_10" <?= ($searchParams['experience_level'] ?? '') === 'y_5_10' ? 'selected' : '' ?>>5-10 Tahun</option>
-        </select>
-    </div>
-    <button type="submit" class="jobs-search-btn hover:bg-primary-muted">Cari</button>
-    <input type="hidden" name="per_page" value="<?= (int)($perPage ?? 20) ?>">
-    <input type="hidden" name="job_view" value="<?= e($jobView) ?>">
-</form>
+<?php
+$expSelectedRaw = (string) ($searchParams['experience_level'] ?? '');
+$expSelectedValues = array_values(array_filter(array_map('trim', explode(',', $expSelectedRaw)), fn($v) => $v !== ''));
+$expOptionsMap = [
+    'fresh_grad' => 'Fresh-Graduate',
+    'y_1_3' => '1 - 3 Tahun (Junior - Level)',
+    'y_3_5' => '3 - 5 Tahun (Mid - Level)',
+    'y_5_10' => '5 - 10 Tahun (Senior - Level)',
+];
+$updatedSelectedRaw = (string) ($searchParams['updated'] ?? '');
+$updatedOptionsMap = [
+    '' => 'Terbaru',
+    'week' => 'Minggu ini',
+    'month' => 'Bulan ini',
+    'year' => 'Tahun ini',
+];
+$updatedSelectedValue = array_key_exists($updatedSelectedRaw, $updatedOptionsMap) ? $updatedSelectedRaw : '';
+$updatedSelectedLabel = $updatedOptionsMap[$updatedSelectedValue];
+if (count($expSelectedValues) === 1) {
+    $expSelectedLabel = $expOptionsMap[$expSelectedValues[0]] ?? 'Level Pengalaman';
+} elseif (count($expSelectedValues) > 1) {
+    $expSelectedLabel = count($expSelectedValues) . ' dipilih';
+} else {
+    $expSelectedLabel = 'Level Pengalaman';
+}
+?>
+<div class="jobs-search-sticky">
+    <form method="get" action="<?= BASE_URL ?>/jobs" class="jobs-search">
+        <div class="jobs-search-seg">
+            <i class="bi bi-search"></i>
+            <input type="text" name="q" placeholder="Cari Pekerjaan" value="<?= e($searchParams['q'] ?? '') ?>">
+        </div>
+        <div class="jobs-search-seg">
+            <i class="bi bi-geo-alt-fill"></i>
+            <input type="text" name="location" placeholder="Cari Lokasi" value="<?= e($searchParams['location'] ?? '') ?>">
+        </div>
+        <div class="jobs-search-seg jobs-exp-seg" id="jobs-exp-root">
+            <i class="bi bi-briefcase-fill"></i>
+            <button type="button" class="jobs-exp-trigger" id="jobs-exp-trigger" aria-expanded="false">
+                <span id="jobs-exp-label"><?= e($expSelectedLabel) ?></span>
+                <i class="bi bi-chevron-left" id="jobs-exp-toggle-icon"></i>
+            </button>
+            <input type="hidden" name="experience_level" id="jobs-exp-input" value="<?= e(implode(',', $expSelectedValues)) ?>">
+            <div class="jobs-exp-panel jobs-exp-hidden" id="jobs-exp-panel">
+                <?php foreach ($expOptionsMap as $value => $label): ?>
+                    <div class="jobs-exp-option <?= in_array($value, $expSelectedValues, true) ? 'active' : '' ?>" data-value="<?= e($value) ?>" data-label="<?= e($label) ?>">
+                        <span class="jobs-exp-checkbox"></span>
+                        <span><?= e($label) ?></span>
+                    </div>
+                <?php endforeach; ?>
+            </div>
+        </div>
+        <button type="submit" class="jobs-search-btn hover:bg-primary-muted">Cari</button>
+        <input type="hidden" name="job_type" value="<?= e(implode(',', $selectedTypes)) ?>">
+        <input type="hidden" name="min_salary" value="<?= e($searchParams['min_salary'] ?? '') ?>">
+        <input type="hidden" name="max_salary" value="<?= e($searchParams['max_salary'] ?? '') ?>">
+        <input type="hidden" name="min_education" value="<?= e(implode(',', $selectedEducations)) ?>">
+        <input type="hidden" name="updated" id="jobs-updated-input" value="<?= e($updatedSelectedValue) ?>">
+        <input type="hidden" name="per_page" value="<?= (int)($perPage ?? 20) ?>">
+        <input type="hidden" name="job_view" value="<?= e($jobView) ?>">
+    </form>
+</div>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    var expRoot = document.getElementById('jobs-exp-root');
+    var expTrigger = document.getElementById('jobs-exp-trigger');
+    var expPanel = document.getElementById('jobs-exp-panel');
+    var expLabel = document.getElementById('jobs-exp-label');
+    var expInput = document.getElementById('jobs-exp-input');
+    var expToggleIcon = document.getElementById('jobs-exp-toggle-icon');
+    var updatedTrigger = document.getElementById('jobs-updated-trigger');
+    var updatedPanel = document.getElementById('jobs-updated-panel');
+    var updatedLabel = document.getElementById('jobs-updated-label');
+    var updatedInput = document.getElementById('jobs-updated-input');
+    var filterToggle = document.getElementById('jobs-filter-toggle');
+    var filterToggleIcon = document.getElementById('jobs-filter-toggle-icon');
+    var filterBox = document.getElementById('jobs-filter-box');
+    if (!expRoot || !expTrigger || !expPanel || !expLabel || !expInput || !updatedTrigger || !updatedPanel || !updatedLabel || !updatedInput) return;
+
+    function syncExperienceSelectedState() {
+        var activeOptions = Array.prototype.slice.call(expPanel.querySelectorAll('.jobs-exp-option.active'));
+        var values = activeOptions.map(function (el) { return el.getAttribute('data-value') || ''; }).filter(Boolean);
+        expInput.value = values.join(',');
+        if (values.length === 0) {
+            expLabel.textContent = 'Level Pengalaman';
+        } else if (values.length === 1) {
+            expLabel.textContent = activeOptions[0].getAttribute('data-label') || 'Level Pengalaman';
+        } else {
+            expLabel.textContent = values.length + ' dipilih';
+        }
+    }
+
+    function closeAllPanels() {
+        expPanel.classList.add('jobs-exp-hidden');
+        expTrigger.setAttribute('aria-expanded', 'false');
+        if (expToggleIcon) {
+            expToggleIcon.classList.remove('bi-chevron-down');
+            expToggleIcon.classList.add('bi-chevron-left');
+        }
+        updatedPanel.classList.add('jobs-exp-hidden');
+        updatedTrigger.setAttribute('aria-expanded', 'false');
+    }
+
+    expTrigger.addEventListener('click', function (event) {
+        event.stopPropagation();
+        updatedPanel.classList.add('jobs-exp-hidden');
+        updatedTrigger.setAttribute('aria-expanded', 'false');
+        expPanel.classList.toggle('jobs-exp-hidden');
+        var expClosed = expPanel.classList.contains('jobs-exp-hidden');
+        expTrigger.setAttribute('aria-expanded', expClosed ? 'false' : 'true');
+        if (expToggleIcon) {
+            expToggleIcon.classList.toggle('bi-chevron-left', expClosed);
+            expToggleIcon.classList.toggle('bi-chevron-down', !expClosed);
+        }
+    });
+
+    expPanel.querySelectorAll('.jobs-exp-option').forEach(function (optionEl) {
+        optionEl.addEventListener('click', function () {
+            this.classList.toggle('active');
+            syncExperienceSelectedState();
+        });
+    });
+
+    updatedTrigger.addEventListener('click', function (event) {
+        event.stopPropagation();
+        expPanel.classList.add('jobs-exp-hidden');
+        expTrigger.setAttribute('aria-expanded', 'false');
+        updatedPanel.classList.toggle('jobs-exp-hidden');
+        updatedTrigger.setAttribute('aria-expanded', updatedPanel.classList.contains('jobs-exp-hidden') ? 'false' : 'true');
+    });
+
+    updatedPanel.querySelectorAll('.jobs-exp-option').forEach(function (optionEl) {
+        optionEl.addEventListener('click', function () {
+            updatedPanel.querySelectorAll('.jobs-exp-option').forEach(function (opt) {
+                opt.classList.remove('active');
+            });
+            this.classList.add('active');
+            updatedInput.value = this.getAttribute('data-value') || '';
+            updatedLabel.textContent = this.getAttribute('data-label') || 'Terbaru';
+            closeAllPanels();
+        });
+    });
+
+    document.addEventListener('click', function (event) {
+        var inUpdated = updatedPanel.contains(event.target) || updatedTrigger.contains(event.target);
+        if (!expRoot.contains(event.target) && !inUpdated) {
+            closeAllPanels();
+        }
+    });
+
+    if (filterToggle && filterToggleIcon && filterBox) {
+        filterToggle.addEventListener('click', function () {
+            var isClosed = filterBox.classList.toggle('jobs-exp-hidden');
+            filterToggle.setAttribute('aria-expanded', isClosed ? 'false' : 'true');
+            filterToggleIcon.classList.toggle('bi-chevron-left', isClosed);
+            filterToggleIcon.classList.toggle('bi-chevron-down', !isClosed);
+        });
+    }
+
+    syncExperienceSelectedState();
+});
+</script>
 
 <div class="jobs-body">
 <div class="jobs-layout mt-10">
     <aside class="jobs-filter">
-        <div class="d-flex align-items-center justify-content-between mb-2">
-            <span class="text-sm fw-semibold">Filter Lainnya</span>
-            <span>▼</span>
-        </div>
-        <form method="get" action="<?= BASE_URL ?>/jobs" class="jobs-filter-box">
-            <small class="text-muted">Working schedule</small>
-            <label class="d-flex align-items-center gap-2 mt-2"><input type="radio" name="job_type" value="full_time" <?= $selectedType === 'full_time' ? 'checked' : '' ?>> Full time</label>
-            <label class="d-flex align-items-center gap-2 mt-1"><input type="radio" name="job_type" value="part_time" <?= $selectedType === 'part_time' ? 'checked' : '' ?>> Part time</label>
-            <label class="d-flex align-items-center gap-2 mt-1"><input type="radio" name="job_type" value="internship" <?= $selectedType === 'internship' ? 'checked' : '' ?>> Internship</label>
-            <label class="d-flex align-items-center gap-2 mt-1"><input type="radio" name="job_type" value="project" <?= $selectedType === 'project' ? 'checked' : '' ?>> Project work</label>
-            <label class="d-flex align-items-center gap-2 mt-1"><input type="radio" name="job_type" value="volunteer" <?= $selectedType === 'volunteer' ? 'checked' : '' ?>> Volunteering</label>
+        <button type="button" class="jobs-filter-toggle" id="jobs-filter-toggle" aria-expanded="true">
+            <span class="jobs-filter-toggle-label">Filter Lainnya</span>
+            <i class="bi bi-chevron-down jobs-filter-toggle-icon" id="jobs-filter-toggle-icon"></i>
+        </button>
+        <form method="get" action="<?= BASE_URL ?>/jobs" class="jobs-filter-box" id="jobs-filter-box">
+            <div class="jobs-filter-scroll">
+                <div class="jobs-filter-group">
+                    <span class="jobs-filter-group-title text-secondary">Jenis Kontrak</span>
+                    <label class="jobs-filter-opt"><input type="checkbox" name="job_type[]" value="full_time" <?= in_array('full_time', $selectedTypes, true) ? 'checked' : '' ?>> Full-Time</label>
+                    <label class="jobs-filter-opt"><input type="checkbox" name="job_type[]" value="part_time" <?= in_array('part_time', $selectedTypes, true) ? 'checked' : '' ?>> Part-Time</label>
+                    <label class="jobs-filter-opt"><input type="checkbox" name="job_type[]" value="contract" <?= in_array('contract', $selectedTypes, true) ? 'checked' : '' ?>> Kontrak</label>
+                    <label class="jobs-filter-opt"><input type="checkbox" name="job_type[]" value="freelance" <?= in_array('freelance', $selectedTypes, true) ? 'checked' : '' ?>> Freelance</label>
+                </div>
+                <div class="jobs-filter-group">
+                    <span class="jobs-filter-group-title mt-3 text-secondary">Preferensi Gaji</span>
+                    <label class="jobs-filter-opt d-block mt-0 mb-1">Minimal Gaji</label>
+                    <input type="number" class="form-control form-control-sm jobs-filter-sal-input" name="min_salary" min="0" placeholder="Rp." value="<?= e($searchParams['min_salary'] ?? '') ?>">
+                    <label class="jobs-filter-opt d-block mt-2 mb-1">Maximal Gaji</label>
+                    <input type="number" class="form-control form-control-sm jobs-filter-sal-input" name="max_salary" min="0" placeholder="Rp." value="<?= e($searchParams['max_salary'] ?? '') ?>">
+                </div>
+                <div class="jobs-filter-group">
+                    <span class="jobs-filter-group-title mt-3 text-secondary">Pendidikan Terakhir</span>
+                    <label class="jobs-filter-opt"><input type="checkbox" name="min_education[]" value="sma" <?= in_array('sma', $selectedEducations, true) ? 'checked' : '' ?>> SMA/SMK Sederajat</label>
+                    <label class="jobs-filter-opt"><input type="checkbox" name="min_education[]" value="d3" <?= in_array('d3', $selectedEducations, true) ? 'checked' : '' ?>> D3</label>
+                    <label class="jobs-filter-opt"><input type="checkbox" name="min_education[]" value="s1" <?= in_array('s1', $selectedEducations, true) ? 'checked' : '' ?>> S1</label>
+                    <label class="jobs-filter-opt"><input type="checkbox" name="min_education[]" value="s2" <?= in_array('s2', $selectedEducations, true) ? 'checked' : '' ?>> S2</label>
+                </div>
+            </div>
             <div class="d-flex gap-2 mt-3">
                 <button type="submit" class="btn btn-sm bg-accent text-secondary fw-semibold">Apply</button>
                 <a href="<?= BASE_URL ?>/jobs" class="btn btn-sm btn-outline-secondary">Reset</a>
@@ -76,12 +265,29 @@ $selectedType = (string) ($searchParams['job_type'] ?? '');
             <input type="hidden" name="q" value="<?= e($searchParams['q'] ?? '') ?>">
             <input type="hidden" name="location" value="<?= e($searchParams['location'] ?? '') ?>">
             <input type="hidden" name="experience_level" value="<?= e($searchParams['experience_level'] ?? '') ?>">
-            <input type="hidden" name="per_page" value="<?= (int)($perPage ?? 20) ?>">
+            <input type="hidden" name="updated" value="<?= e($searchParams['updated'] ?? '') ?>">
             <input type="hidden" name="job_view" value="<?= e($jobView) ?>">
+            <input type="hidden" name="per_page" value="<?= (int)($perPage ?? 20) ?>">
         </form>
     </aside>
     <section>
-        <h2 class="jobs-filter-title">Lowongan Tersedia</h2>
+        <div class="jobs-header-row">
+            <h2 class="jobs-filter-title mb-0">Lowongan Tersedia</h2>
+            <div class="jobs-header-time">
+                <button type="button" class="jobs-header-time-trigger" id="jobs-updated-trigger" aria-expanded="false">
+                    <span>Filter Berdasarkan : <strong id="jobs-updated-label"><?= e($updatedSelectedLabel) ?></strong></span>
+                    <i class="bi bi-sliders2"></i>
+                </button>
+                <div class="jobs-header-time-panel jobs-exp-hidden" id="jobs-updated-panel">
+                    <?php foreach ($updatedOptionsMap as $value => $label): ?>
+                        <div class="jobs-exp-option <?= $value === $updatedSelectedValue ? 'active' : '' ?>" data-value="<?= e($value) ?>" data-label="<?= e($label) ?>">
+                            <span class="jobs-exp-checkbox"></span>
+                            <span><?= e($label) ?></span>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+            </div>
+        </div>
         <?php if (empty($jobs)): ?>
             <div class="bg-white rounded-4 p-4 text-muted">Belum ada lowongan.</div>
         <?php else: ?>

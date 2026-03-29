@@ -67,28 +67,10 @@ class Job {
             $conditions[] = '(j.max_salary IS NULL OR j.max_salary <= ?)';
             $bind[] = $maxSalary;
         }
-        if (!empty(trim($params['job_type'] ?? ''))) {
-            $conditions[] = 'j.job_type = ?';
-            $bind[] = trim($params['job_type']);
-        }
-        if (!empty(trim($params['min_education'] ?? ''))) {
-            $conditions[] = 'j.min_education = ?';
-            $bind[] = trim($params['min_education']);
-        }
-        if (!empty(trim($params['experience_level'] ?? ''))) {
-            $conditions[] = 'j.experience_level = ?';
-            $bind[] = trim($params['experience_level']);
-        }
-        $updated = trim($params['updated'] ?? '');
-        if (in_array($updated, ['day', 'week', 'month'], true)) {
-            if ($updated === 'day') {
-                $conditions[] = 'j.created_at >= DATE_SUB(NOW(), INTERVAL 1 DAY)';
-            } elseif ($updated === 'week') {
-                $conditions[] = 'j.created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)';
-            } else {
-                $conditions[] = 'j.created_at >= DATE_SUB(NOW(), INTERVAL 1 MONTH)';
-            }
-        }
+        $this->appendJobTypeCondition($conditions, $bind, $params);
+        $this->appendMinEducationCondition($conditions, $bind, $params);
+        $this->appendExperienceLevelCondition($conditions, $bind, $params);
+        $this->appendUpdatedCondition($conditions, $params);
 
         $where = empty($conditions) ? '' : 'WHERE ' . implode(' AND ', $conditions);
         $sql = "SELECT j.*, u.name AS created_by_name
@@ -131,28 +113,10 @@ class Job {
             $conditions[] = '(j.max_salary IS NULL OR j.max_salary <= ?)';
             $bind[] = $maxSalary;
         }
-        if (!empty(trim($params['job_type'] ?? ''))) {
-            $conditions[] = 'j.job_type = ?';
-            $bind[] = trim($params['job_type']);
-        }
-        if (!empty(trim($params['min_education'] ?? ''))) {
-            $conditions[] = 'j.min_education = ?';
-            $bind[] = trim($params['min_education']);
-        }
-        if (!empty(trim($params['experience_level'] ?? ''))) {
-            $conditions[] = 'j.experience_level = ?';
-            $bind[] = trim($params['experience_level']);
-        }
-        $updated = trim($params['updated'] ?? '');
-        if (in_array($updated, ['day', 'week', 'month'], true)) {
-            if ($updated === 'day') {
-                $conditions[] = 'j.created_at >= DATE_SUB(NOW(), INTERVAL 1 DAY)';
-            } elseif ($updated === 'week') {
-                $conditions[] = 'j.created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)';
-            } else {
-                $conditions[] = 'j.created_at >= DATE_SUB(NOW(), INTERVAL 1 MONTH)';
-            }
-        }
+        $this->appendJobTypeCondition($conditions, $bind, $params);
+        $this->appendMinEducationCondition($conditions, $bind, $params);
+        $this->appendExperienceLevelCondition($conditions, $bind, $params);
+        $this->appendUpdatedCondition($conditions, $params);
         $where = empty($conditions) ? '' : 'WHERE ' . implode(' AND ', $conditions);
         $stmt = $this->db->prepare("SELECT COUNT(*) FROM jobs j $where");
         $stmt->execute($bind);
@@ -188,28 +152,10 @@ class Job {
             $conditions[] = '(j.max_salary IS NULL OR j.max_salary <= ?)';
             $bind[] = $maxSalary;
         }
-        if (!empty(trim($params['job_type'] ?? ''))) {
-            $conditions[] = 'j.job_type = ?';
-            $bind[] = trim($params['job_type']);
-        }
-        if (!empty(trim($params['min_education'] ?? ''))) {
-            $conditions[] = 'j.min_education = ?';
-            $bind[] = trim($params['min_education']);
-        }
-        if (!empty(trim($params['experience_level'] ?? ''))) {
-            $conditions[] = 'j.experience_level = ?';
-            $bind[] = trim($params['experience_level']);
-        }
-        $updated = trim($params['updated'] ?? '');
-        if (in_array($updated, ['day', 'week', 'month'], true)) {
-            if ($updated === 'day') {
-                $conditions[] = 'j.created_at >= DATE_SUB(NOW(), INTERVAL 1 DAY)';
-            } elseif ($updated === 'week') {
-                $conditions[] = 'j.created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)';
-            } else {
-                $conditions[] = 'j.created_at >= DATE_SUB(NOW(), INTERVAL 1 MONTH)';
-            }
-        }
+        $this->appendJobTypeCondition($conditions, $bind, $params);
+        $this->appendMinEducationCondition($conditions, $bind, $params);
+        $this->appendExperienceLevelCondition($conditions, $bind, $params);
+        $this->appendUpdatedCondition($conditions, $params);
         $where = empty($conditions) ? '' : 'WHERE ' . implode(' AND ', $conditions);
         $offset = max(0, ($page - 1) * $perPage);
         $sql = "SELECT j.*, u.name AS created_by_name FROM jobs j
@@ -256,28 +202,10 @@ class Job {
             $conditions[] = '(j.max_salary IS NULL OR j.max_salary <= ?)';
             $bind[] = $maxSalary;
         }
-        if (!empty(trim($params['job_type'] ?? ''))) {
-            $conditions[] = 'j.job_type = ?';
-            $bind[] = trim($params['job_type']);
-        }
-        if (!empty(trim($params['min_education'] ?? ''))) {
-            $conditions[] = 'j.min_education = ?';
-            $bind[] = trim($params['min_education']);
-        }
-        if (!empty(trim($params['experience_level'] ?? ''))) {
-            $conditions[] = 'j.experience_level = ?';
-            $bind[] = trim($params['experience_level']);
-        }
-        $updated = trim($params['updated'] ?? '');
-        if (in_array($updated, ['day', 'week', 'month'], true)) {
-            if ($updated === 'day') {
-                $conditions[] = 'j.created_at >= DATE_SUB(NOW(), INTERVAL 1 DAY)';
-            } elseif ($updated === 'week') {
-                $conditions[] = 'j.created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)';
-            } else {
-                $conditions[] = 'j.created_at >= DATE_SUB(NOW(), INTERVAL 1 MONTH)';
-            }
-        }
+        $this->appendJobTypeCondition($conditions, $bind, $params);
+        $this->appendMinEducationCondition($conditions, $bind, $params);
+        $this->appendExperienceLevelCondition($conditions, $bind, $params);
+        $this->appendUpdatedCondition($conditions, $params);
 
         $where = empty($conditions) ? '' : ' AND ' . implode(' AND ', $conditions);
         if ($jobView === 'saved') {
@@ -332,28 +260,10 @@ class Job {
             $conditions[] = '(j.max_salary IS NULL OR j.max_salary <= ?)';
             $bind[] = $maxSalary;
         }
-        if (!empty(trim($params['job_type'] ?? ''))) {
-            $conditions[] = 'j.job_type = ?';
-            $bind[] = trim($params['job_type']);
-        }
-        if (!empty(trim($params['min_education'] ?? ''))) {
-            $conditions[] = 'j.min_education = ?';
-            $bind[] = trim($params['min_education']);
-        }
-        if (!empty(trim($params['experience_level'] ?? ''))) {
-            $conditions[] = 'j.experience_level = ?';
-            $bind[] = trim($params['experience_level']);
-        }
-        $updated = trim($params['updated'] ?? '');
-        if (in_array($updated, ['day', 'week', 'month'], true)) {
-            if ($updated === 'day') {
-                $conditions[] = 'j.created_at >= DATE_SUB(NOW(), INTERVAL 1 DAY)';
-            } elseif ($updated === 'week') {
-                $conditions[] = 'j.created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)';
-            } else {
-                $conditions[] = 'j.created_at >= DATE_SUB(NOW(), INTERVAL 1 MONTH)';
-            }
-        }
+        $this->appendJobTypeCondition($conditions, $bind, $params);
+        $this->appendMinEducationCondition($conditions, $bind, $params);
+        $this->appendExperienceLevelCondition($conditions, $bind, $params);
+        $this->appendUpdatedCondition($conditions, $params);
 
         $where = empty($conditions) ? '' : ' AND ' . implode(' AND ', $conditions);
         $offset = max(0, ($page - 1) * $perPage);
@@ -591,6 +501,104 @@ class Job {
     private function encodeSkillsBenefits(array $items): ?string {
         $arr = array_values(array_filter(array_map('trim', $items), fn($x) => $x !== ''));
         return $arr === [] ? null : json_encode($arr);
+    }
+
+    /**
+     * Support single or multi value from `experience_level`.
+     * Multi values are expected as comma-separated string.
+     *
+     * @param array<int,string> $conditions
+     * @param array<int,mixed> $bind
+     * @param array<string,mixed> $params
+     */
+    private function appendExperienceLevelCondition(array &$conditions, array &$bind, array $params): void {
+        $raw = trim((string) ($params['experience_level'] ?? ''));
+        if ($raw === '') {
+            return;
+        }
+
+        $levels = array_values(array_unique(array_filter(array_map('trim', explode(',', $raw)), fn($v) => $v !== '')));
+        if ($levels === []) {
+            return;
+        }
+
+        if (count($levels) === 1) {
+            $conditions[] = 'j.experience_level = ?';
+            $bind[] = $levels[0];
+            return;
+        }
+
+        $placeholders = implode(', ', array_fill(0, count($levels), '?'));
+        $conditions[] = "j.experience_level IN ($placeholders)";
+        foreach ($levels as $lvl) {
+            $bind[] = $lvl;
+        }
+    }
+
+    /**
+     * @param array<int,string> $conditions
+     * @param array<int,mixed> $bind
+     * @param array<string,mixed> $params
+     */
+    private function appendJobTypeCondition(array &$conditions, array &$bind, array $params): void {
+        $this->appendCsvColumnCondition('j.job_type', $conditions, $bind, (string) ($params['job_type'] ?? ''));
+    }
+
+    /**
+     * @param array<int,string> $conditions
+     * @param array<int,mixed> $bind
+     * @param array<string,mixed> $params
+     */
+    private function appendMinEducationCondition(array &$conditions, array &$bind, array $params): void {
+        $this->appendCsvColumnCondition('j.min_education', $conditions, $bind, (string) ($params['min_education'] ?? ''));
+    }
+
+    /**
+     * @param array<int,string> $conditions
+     * @param array<int,mixed> $bind
+     */
+    private function appendCsvColumnCondition(string $column, array &$conditions, array &$bind, string $raw): void {
+        $raw = trim($raw);
+        if ($raw === '') {
+            return;
+        }
+        $values = array_values(array_unique(array_filter(array_map('trim', explode(',', $raw)), fn($v) => $v !== '')));
+        if ($values === []) {
+            return;
+        }
+        if (count($values) === 1) {
+            $conditions[] = "$column = ?";
+            $bind[] = $values[0];
+            return;
+        }
+        $placeholders = implode(', ', array_fill(0, count($values), '?'));
+        $conditions[] = "$column IN ($placeholders)";
+        foreach ($values as $value) {
+            $bind[] = $value;
+        }
+    }
+
+    /**
+     * @param array<int,string> $conditions
+     * @param array<string,mixed> $params
+     */
+    private function appendUpdatedCondition(array &$conditions, array $params): void {
+        $updated = trim((string) ($params['updated'] ?? ''));
+        if ($updated === 'day') {
+            $conditions[] = 'j.created_at >= DATE_SUB(NOW(), INTERVAL 1 DAY)';
+            return;
+        }
+        if ($updated === 'week') {
+            $conditions[] = 'j.created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)';
+            return;
+        }
+        if ($updated === 'month') {
+            $conditions[] = 'j.created_at >= DATE_SUB(NOW(), INTERVAL 1 MONTH)';
+            return;
+        }
+        if ($updated === 'year') {
+            $conditions[] = 'j.created_at >= DATE_SUB(NOW(), INTERVAL 1 YEAR)';
+        }
     }
 
     public function delete(int $id): bool {

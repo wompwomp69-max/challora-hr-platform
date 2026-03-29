@@ -11,6 +11,8 @@
 .user-mainnav-link:hover{color:#fff;background:rgba(255,255,255,.04);}
 .user-avatar-btn{width:40px;height:40px;border-radius:999px;background:#fff;color:var(--color-secondary);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;border:none;}
 .user-main-wrap{width:100%;padding:16px var(--user-content-pad-x) 24px;}
+#user-menu-root{position:relative;z-index:9998;}
+#user-menu-dropdown{z-index:9999 !important;}
 </style>
 <div class="user-shell">
 <header class="user-topnav">
@@ -37,7 +39,7 @@
                     </button>
                     <div
                         id="user-menu-dropdown"
-                        class="absolute right-0 mt-2 w-40 bg-surface rounded-xl shadow-lg border border-muted py-1 text-xs text-muted hidden z-20"
+                        class="absolute right-0 mt-2 w-40 bg-surface rounded-xl shadow-lg border border-muted py-1 text-xs text-muted hidden"
                     >
                         <a href="<?= BASE_URL ?>/user/settings" class="block px-3 py-2 hover:bg-muted">
                             Pengaturan user
