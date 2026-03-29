@@ -1,53 +1,94 @@
-<h1 class="text-2xl md:text-3xl font-semibold mb-4 text-center md:text-left">Lowongan Tersimpan</h1>
-<p class="mb-3">
-    <a href="<?= BASE_URL ?>/jobs" class="inline-flex items-center px-3 py-1.5 rounded-full border border-default text-xs text-muted hover:bg-muted">← Kembali ke daftar</a>
-</p>
+<style>
+.jobs-header-row{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:10px;}
+.jobs-filter-title{font-size:38px;font-weight:600;color:var(--gray-900);margin-bottom:10px;}
+.jobs-reset-btn{display:inline-block;font-size:13px;background:var(--color-accent);color:var(--color-on-primary);padding:5px 14px;border-radius:999px;text-decoration:none;font-weight:600;}
+.jobs-card-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px;}
+.job-card{background:var(--color-surface);border:2px solid var(--color-secondary);border-radius:28px;padding:14px;min-height:320px;display:flex;flex-direction:column;justify-content:space-around;}
+.job-card-top{background:var(--color-accent-muted);border-radius:18px;padding:18px 16px 18px;min-height:230px;display:flex;flex-direction:column;}
+.job-date{display:inline-block;background:var(--color-surface);border-radius:18px;padding:6px 12px;font-size:12px;font-weight:500;color:var(--color-text);}
+.job-title{font-size:24px;line-height:1.12;font-weight:700;color:var(--color-secondary);margin-top:14px;}
+.job-tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:auto;}
+.job-tag{font-size:12px;padding:3px 10px;border:2px solid var(--color-secondary);border-radius:999px;background:var(--color-surface);color:var(--color-secondary);font-weight:500;}
+.job-card-bottom{padding:30px 4px 2px;display:flex;justify-content:space-between;align-items:flex-end;gap:10px;}
+.job-salary{font-size:22px;font-weight:700;color:var(--color-text);line-height:1;}
+.job-loc{font-size:14px;color:var(--gray-500);line-height:1.25;margin-top:6px;}
+.job-detail-btn{background:var(--color-secondary);color:var(--color-surface);border:0;padding:10px 18px;border-radius:999px;font-size:12px;font-weight:600;line-height:1;}
+.job-bookmark{width:42px;height:42px;border-radius:16px;background:var(--color-surface);display:flex;align-items:center;justify-content:center;}
+.job-bookmark i{font-size:20px;color:var(--color-secondary);}
+@media (max-width: 1300px){.jobs-card-grid{grid-template-columns:repeat(3,minmax(0,1fr));}}
+@media (max-width: 1024px){.jobs-card-grid{grid-template-columns:repeat(2,minmax(0,1fr));}.jobs-header-row{flex-direction:column;align-items:flex-start;}}
+@media (max-width: 640px){.jobs-card-grid{grid-template-columns:1fr;}.jobs-filter-title{font-size:30px;}}
+</style>
+
+<?php
+$monthId = [
+    1 => 'Jan', 2 => 'Feb', 3 => 'Mar', 4 => 'Apr', 5 => 'Mei', 6 => 'Jun',
+    7 => 'Jul', 8 => 'Agu', 9 => 'Sep', 10 => 'Okt', 11 => 'Nov', 12 => 'Des',
+];
+?>
+
+<div class="jobs-header-row">
+    <h1 class="jobs-filter-title mb-0">Lowongan Tersimpan</h1>
+    <a href="<?= BASE_URL ?>/jobs" class="jobs-reset-btn">&larr; Kembali ke lowongan</a>
+</div>
 
 <?php if (empty($jobs)): ?>
-    <div class="bg-surface rounded-2xl shadow-sm p-6 text-center text-muted text-sm">Belum ada lowongan tersimpan.</div>
+    <div class="bg-white rounded-4 p-4 text-muted">Belum ada lowongan tersimpan.</div>
 <?php else: ?>
-    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+    <div class="jobs-card-grid mt-10">
         <?php foreach ($jobs as $j): ?>
-            <?php $applied = in_array((int)$j['id'], $appliedJobIds ?? [], true); ?>
             <?php
-            $description = (string) ($j['description'] ?? '');
-            $shortDescription = !empty($j['short_description']) ? (string) $j['short_description'] : mb_substr($description, 0, 120) . (mb_strlen($description) > 120 ? '…' : '');
-            $jobSkills = !empty($j['skills_json']) ? json_decode((string) $j['skills_json'], true) : [];
-            $jobBenefits = !empty($j['benefits_json']) ? json_decode((string) $j['benefits_json'], true) : [];
-            if (!is_array($jobSkills)) $jobSkills = [];
-            if (!is_array($jobBenefits)) $jobBenefits = [];
+            $applied = in_array((int)$j['id'], $appliedJobIds ?? [], true);
+            $jobTypeLabel = ucwords(str_replace('_', ' ', (string)($j['job_type'] ?? 'Part Time')));
+            $expLevelRaw = (string) ($j['experience_level'] ?? '');
+            if (in_array($expLevelRaw, ['fresh_grad', 'none', 'lt_1'], true)) {
+                $expLevelLabel = 'Fresh-Graduate';
+            } elseif (in_array($expLevelRaw, ['y_1_3'], true)) {
+                $expLevelLabel = 'Junior';
+            } elseif (in_array($expLevelRaw, ['y_3_5'], true)) {
+                $expLevelLabel = 'Mid';
+            } elseif (in_array($expLevelRaw, ['y_5_10'], true)) {
+                $expLevelLabel = 'Senior';
+            } else {
+                $expLevelLabel = 'General';
+            }
+            $postedRaw = (string) (!empty($j['created_at']) ? $j['created_at'] : ($j['updated_at'] ?? ''));
+            $postedDate = '-';
+            if ($postedRaw !== '') {
+                $ts = strtotime($postedRaw);
+                if ($ts !== false) {
+                    $postedDate = (string) ((int) date('d', $ts)) . ' ' . ($monthId[(int) date('n', $ts)] ?? date('M', $ts)) . ' ' . date('Y', $ts);
+                }
+            }
             ?>
-            <div class="cursor-pointer" onclick="window.location='<?= e(BASE_URL) ?>/jobs/show?id=<?= (int)$j['id'] ?>'" role="button">
-                <div class="h-full bg-surface rounded-2xl shadow-sm hover:shadow-md transition-shadow flex flex-col border border-accent">
-                    <div class="p-4 flex flex-col flex-grow">
-                        <div class="flex-grow flex flex-col gap-1">
-                            <div class="flex items-start justify-between gap-2 mb-1">
-                                <h2 class="text-sm font-semibold text-default leading-snug flex-1"><?= e($j['title']) ?></h2>
-                                <div class="flex flex-wrap gap-1 justify-end text-[10px]">
-                                    <?php if (!empty($j['is_urgent'])): ?><span class="inline-flex items-center px-2 py-0.5 rounded-full bg-danger-soft text-danger font-medium">Urgent</span><?php endif; ?>
-                                    <?php if ($applied): ?><span class="inline-flex items-center px-2 py-0.5 rounded-full bg-info-soft text-info font-medium">Sudah dilamar</span><?php endif; ?>
-                                    <span class="inline-flex items-center px-2 py-0.5 rounded-full bg-success-soft text-success font-medium">Tersimpan</span>
-                                </div>
-                            </div>
-                            <p class="text-xs text-muted mb-1 line-clamp-2 min-h-[2.5rem]"><?= e($shortDescription) ?></p>
-                            <p class="text-[11px] text-muted mb-0">Lokasi: <?= e($j['location'] ?? '-') ?> | Gaji: <?= e($j['salary_range'] ?? '-') ?></p>
-                            <div class="flex items-center justify-between gap-2 mt-2" onclick="event.stopPropagation()">
-                                <p class="text-[11px] text-muted mb-0 flex-1">
-                                    <?php if (!empty($jobSkills) || !empty($jobBenefits)): ?>
-                                    <?php if (!empty($jobSkills)): foreach (array_slice($jobSkills, 0, 5) as $s): ?><span class="inline-flex items-center px-2 py-0.5 rounded-full bg-muted text-default mr-1 mb-1"><?= e($s) ?></span><?php endforeach; ?><?php if (count($jobSkills) > 5): ?>…<?php endif; ?><?php endif; ?>
-                                    <?php if (!empty($jobBenefits)): foreach (array_slice($jobBenefits, 0, 3) as $b): ?><span class="inline-flex items-center px-2 py-0.5 rounded-full bg-sky-soft text-sky mr-1 mb-1"><?= e($b) ?></span><?php endforeach; ?><?php if (count($jobBenefits) > 3): ?>…<?php endif; ?><?php endif; ?>
-                                    <?php else: ?><span class="text-muted">—</span><?php endif; ?>
-                                </p>
-                                <div class="flex-shrink-0">
-                                    <form method="post" action="<?= BASE_URL ?>/jobs/unsave" class="d-inline">
-                                        <input type="hidden" name="job_id" value="<?= (int)$j['id'] ?>">
-                                        <input type="hidden" name="redirect" value="/jobs/saved">
-                                        <button type="submit" class="p-1 text-primary hover:text-primary" title="Hapus dari simpan"><i class="bi bi-bookmark-fill text-lg"></i></button>
-                                    </form>
-                                </div>
-                            </div>
+            <div class="job-card">
+                <div class="job-card-top">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <span class="job-date"><?= e($postedDate) ?></span>
+                        <div class="job-bookmark" onclick="event.stopPropagation()">
+                            <form method="post" action="<?= BASE_URL ?>/jobs/unsave" class="d-inline">
+                                <input type="hidden" name="job_id" value="<?= (int)$j['id'] ?>">
+                                <input type="hidden" name="redirect" value="/jobs/saved">
+                                <button type="submit" class="border-0 bg-transparent p-0" title="Hapus dari simpan"><i class="bi bi-bookmark-fill"></i></button>
+                            </form>
                         </div>
                     </div>
+                    <a href="<?= BASE_URL ?>/jobs/show?id=<?= (int)$j['id'] ?>" class="text-decoration-none">
+                        <div class="job-title"><?= e($j['title'] ?? '-') ?></div>
+                    </a>
+                    <div class="job-tags">
+                        <span class="job-tag"><?= e($jobTypeLabel) ?></span>
+                        <span class="job-tag"><?= e($expLevelLabel) ?></span>
+                        <?php if ($applied): ?><span class="job-tag">Applied</span><?php endif; ?>
+                        <span class="job-tag">Saved</span>
+                    </div>
+                </div>
+                <div class="job-card-bottom">
+                    <div>
+                        <div class="job-salary"><?= e($j['salary_range'] ?? '-') ?></div>
+                        <div class="job-loc"><?= e($j['location'] ?? '-') ?></div>
+                    </div>
+                    <a href="<?= BASE_URL ?>/jobs/show?id=<?= (int)$j['id'] ?>" class="job-detail-btn text-decoration-none">Detail</a>
                 </div>
             </div>
         <?php endforeach; ?>

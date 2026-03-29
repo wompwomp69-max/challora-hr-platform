@@ -1,7 +1,7 @@
 <?php require APP_PATH . '/views/layouts/header.php'; ?>
 <?php $activeUserPath = currentRoutePath('jobs'); ?>
 <style>
-.user-shell{min-height:100vh;background:var(--color-primary);--user-content-pad-x:10vw;--user-bar-pad-x:3.5vw;}
+.user-shell{min-height:100vh;background:var(--color-primary);--user-content-pad-x:10vw;--user-bar-pad-x:8vw;}
 .user-topnav{background:var(--color-secondary);color:var(--color-on-secondary);border-bottom:1px solid rgba(255,255,255,.28);}
 .user-topnav-inner{width:100%;padding:0 var(--user-bar-pad-x);min-height:84px;display:flex;align-items:stretch;justify-content:space-between;gap:22px;}
 .user-brand{display:flex;align-items:center;font-size:42px;font-weight:700;line-height:1;color:var(--color-primary);text-decoration:none;letter-spacing:.4px;}

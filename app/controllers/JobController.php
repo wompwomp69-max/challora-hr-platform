@@ -29,8 +29,8 @@ class JobController {
         if (!in_array($jobView, ['all', 'saved', 'applied'], true)) {
             $jobView = 'all';
         }
-        $perPage = (int) ($_GET['per_page'] ?? 20);
-        $perPage = in_array($perPage, [20, 50, 100], true) ? $perPage : 20;
+        // Fitur "card per halaman" dinonaktifkan: jumlah card dibuat tetap.
+        $perPage = 12;
         $page = max(1, (int) ($_GET['page'] ?? 1));
         $userId = currentUserId();
         if ($jobView === 'all') {
