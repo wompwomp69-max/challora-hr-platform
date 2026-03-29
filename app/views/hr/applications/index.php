@@ -1,16 +1,18 @@
 <?php
 $maritalLabels = ['single' => 'Belum menikah', 'married' => 'Menikah', 'divorced' => 'Cerai', 'widowed' => 'Duda/Janda'];
-if (!empty($openMailto ?? null)): ?>
-<script>window.location = <?= json_encode($openMailto) ?>;</script>
-<?php endif; ?>
-<?php
 $achTypeLabels = ['kompetisi' => 'Kompetisi', 'webinar_seminar' => 'Webinar/Seminar', 'workshop' => 'Workshop', 'pelatihan_kursus' => 'Pelatihan/Kursus', 'sertifikasi' => 'Sertifikasi', 'lainnya' => 'Lainnya'];
 $achLevelLabels = ['kota' => 'Kota', 'provinsi' => 'Provinsi', 'nasional' => 'Nasional', 'internasional' => 'Internasional'];
+$statusOptions = applicationStatusOptions();
 ?>
 <div class="card mb-3">
     <div class="card-body">
         <h1 class="card-title h4">Pelamar: <?= e($job['title']) ?></h1>
-        <a href="<?= BASE_URL ?>/hr/jobs" class="btn btn-outline-secondary btn-sm">← Kembali ke daftar lowongan</a>
+        <div class="d-flex flex-wrap align-items-center gap-2">
+            <a href="<?= BASE_URL ?>/hr/jobs" class="btn btn-outline-secondary btn-sm">← Kembali ke daftar lowongan</a>
+            <?php if (!empty($manualMailto ?? null)): ?>
+                <a href="<?= e((string) $manualMailto) ?>" class="btn btn-sm btn-outline-primary">Kirim Email Manual</a>
+            <?php endif; ?>
+        </div>
     </div>
 </div>
 <?php if (empty($applicants)): ?>
@@ -43,41 +45,25 @@ $achLevelLabels = ['kota' => 'Kota', 'provinsi' => 'Provinsi', 'nasional' => 'Na
                                 </td>
                                 <td><?= e($a['phone'] ?? '-') ?></td>
                                 <td>
-                                    <?php if (!empty($a['cv_path']) || !empty($a['diploma_path']) || !empty($a['photo_path'])): ?>
+                                    <?php $hasAnyDocument = !empty($a['cv_path']) || !empty($a['diploma_path']) || !empty($a['photo_path']); ?>
+                                    <?php if ($hasAnyDocument): ?>
                                         <a href="<?= BASE_URL ?>/index.php?url=download/berkas&id=<?= (int)$a['id'] ?>" class="btn btn-sm btn-outline-primary">Lihat Berkas</a>
                                     <?php else: ?>
-                                        <a href="<?= BASE_URL ?>/index.php?url=download/cv&id=<?= (int)$a['id'] ?>" class="btn btn-sm btn-outline-primary">Unduh CV</a>
+                                        <span class="text-muted small">Berkas belum tersedia</span>
                                     <?php endif; ?>
                                 </td>
                                 <td>
-                                    <?php
-                                    if (($a['status'] ?? '') === 'pending') {
-                                        $badgeClass = 'bg-primary text-secondary';
-                                        $statusLabel = 'Pending';
-                                    } elseif (($a['status'] ?? '') === 'reviewed') {
-                                        $badgeClass = 'bg-warning';
-                                        $statusLabel = 'CV review';
-                                    } elseif (($a['status'] ?? '') === 'accepted') {
-                                        $badgeClass = 'bg-success';
-                                        $statusLabel = 'Accepted';
-                                    } elseif (($a['status'] ?? '') === 'rejected') {
-                                        $badgeClass = 'bg-danger';
-                                        $statusLabel = 'Rejected';
-                                    } else {
-                                        $badgeClass = 'bg-secondary text-accent';
-                                        $statusLabel = e($a['status'] ?? '-');
-                                    }
-                                    ?>
-                                    <span class="badge <?= $badgeClass ?>"><?= $statusLabel ?></span>
+                                    <?php $statusMeta = applicationStatusMeta($a['status'] ?? ''); ?>
+                                    <span class="badge <?= e($statusMeta['badge']) ?>"><?= e($statusMeta['label']) ?></span>
                                 </td>
                                 <td>
                                     <form method="post" action="<?= BASE_URL ?>/index.php?url=hr/applications/update-status" class="d-inline">
                                         <input type="hidden" name="application_id" value="<?= (int)$a['id'] ?>">
+                                        <input type="hidden" name="open_mailto" value="1">
                                         <select name="status" class="form-select form-select-sm d-inline-block w-auto" onchange="this.form.submit()">
-                                            <option value="pending" <?= ($a['status'] ?? '') === 'pending' ? 'selected' : '' ?>>Pending</option>
-                                            <option value="reviewed" <?= ($a['status'] ?? '') === 'reviewed' ? 'selected' : '' ?>>CV review</option>
-                                            <option value="accepted" <?= ($a['status'] ?? '') === 'accepted' ? 'selected' : '' ?>>Accepted</option>
-                                            <option value="rejected" <?= ($a['status'] ?? '') === 'rejected' ? 'selected' : '' ?>>Rejected</option>
+                                            <?php foreach ($statusOptions as $statusValue => $statusLabel): ?>
+                                                <option value="<?= e($statusValue) ?>" <?= ($a['status'] ?? '') === $statusValue ? 'selected' : '' ?>><?= e($statusLabel) ?></option>
+                                            <?php endforeach; ?>
                                         </select>
                                     </form>
                                     <?php if (in_array($a['status'] ?? '', ['accepted', 'rejected'], true)): ?>

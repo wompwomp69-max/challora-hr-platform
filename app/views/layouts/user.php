@@ -1,5 +1,5 @@
 <?php require APP_PATH . '/views/layouts/header.php'; ?>
-<?php $activeUserPath = trim((string) ($_GET['url'] ?? 'jobs'), '/'); ?>
+<?php $activeUserPath = currentRoutePath('jobs'); ?>
 <style>
 .user-shell{min-height:100vh;background:var(--color-primary);--user-content-pad-x:10vw;--user-bar-pad-x:3.5vw;}
 .user-topnav{background:var(--color-secondary);color:var(--color-on-secondary);border-bottom:1px solid rgba(255,255,255,.28);}
@@ -19,9 +19,9 @@
     <div class="user-topnav-inner">
         <a href="<?= BASE_URL ?>/jobs" class="user-brand">CHALLORA</a>
         <nav class="user-mainnav flex-grow-1">
-            <a class="user-mainnav-link <?= str_starts_with($activeUserPath, 'jobs') && !str_contains($activeUserPath, 'saved') ? 'active' : '' ?>" href="<?= BASE_URL ?>/jobs">Lowongan</a>
+            <a class="user-mainnav-link <?= str_starts_with($activeUserPath, 'jobs') && !str_starts_with($activeUserPath, 'jobs/saved') ? 'active' : '' ?>" href="<?= BASE_URL ?>/jobs">Lowongan</a>
             <a class="user-mainnav-link <?= str_contains($activeUserPath, 'applications') ? 'active' : '' ?>" href="<?= BASE_URL ?>/applications">Sudah Dilamar</a>
-            <a class="user-mainnav-link <?= str_contains($activeUserPath, 'jobs/saved') ? 'active' : '' ?>" href="<?= BASE_URL ?>/jobs/saved">Lowongan Tersimpan</a>
+            <a class="user-mainnav-link <?= str_starts_with($activeUserPath, 'jobs/saved') ? 'active' : '' ?>" href="<?= BASE_URL ?>/jobs/saved">Lowongan Tersimpan</a>
         </nav>
         <div class="flex items-center gap-3">
             <?php if (isLoggedIn() && currentRole() === 'user'): ?>
@@ -58,8 +58,13 @@
 <main class="user-main-wrap">
 
     <?php if (!empty($_SESSION['flash']) && empty($_SESSION['flash_toast'])): ?>
-        <div class="alert alert-success"><?= e($_SESSION['flash']) ?></div>
+        <?php
+        $flashType = (string) ($_SESSION['flash_type'] ?? 'success');
+        $flashClass = $flashType === 'error' ? 'danger' : ($flashType === 'info' ? 'info' : 'success');
+        ?>
+        <div class="alert alert-<?= e($flashClass) ?>"><?= e($_SESSION['flash']) ?></div>
         <?php unset($_SESSION['flash']); ?>
+        <?php unset($_SESSION['flash_type']); ?>
     <?php endif; ?>
     <?php if (!empty($_SESSION['flash_error'])): ?>
         <div class="alert alert-danger"><?= e($_SESSION['flash_error']) ?></div>
@@ -78,17 +83,20 @@
 <?php
 $toast = $_SESSION['flash_toast'];
 unset($_SESSION['flash_toast']);
+$toastMessage = is_array($toast) ? (string) ($toast['message'] ?? '') : '';
+$toastUndo = is_array($toast) && !empty($toast['undo']) && is_array($toast['undo']) ? $toast['undo'] : null;
 ?>
+<?php if ($toastMessage !== ''): ?>
 <div id="toast-user" class="toast-user" role="alert">
     <div class="toast-user-inner">
-        <span class="toast-user-msg"><?= e($toast['message']) ?></span>
+        <span class="toast-user-msg"><?= e($toastMessage) ?></span>
         <div class="toast-user-actions">
-            <?php if (!empty($toast['undo'])): ?>
-            <form id="toast-undo-form" method="post" action="<?= e($toast['undo']['url']) ?>" class="d-inline">
-                <?php foreach ($toast['undo']['fields'] ?? [] as $k => $v): ?>
+            <?php if (!empty($toastUndo['url'])): ?>
+            <form id="toast-undo-form" method="post" action="<?= e((string) $toastUndo['url']) ?>" class="d-inline">
+                <?php foreach (($toastUndo['fields'] ?? []) as $k => $v): ?>
                 <input type="hidden" name="<?= e($k) ?>" value="<?= e($v) ?>">
                 <?php endforeach; ?>
-                <button type="submit" class="btn btn-link btn-sm p-0 text-decoration-none fw-bold toast-undo-btn"><?= e($toast['undo']['label'] ?? 'Undo') ?></button>
+                <button type="submit" class="btn btn-link btn-sm p-0 text-decoration-none fw-bold toast-undo-btn"><?= e((string) ($toastUndo['label'] ?? 'Undo')) ?></button>
             </form>
             <span class="toast-user-sep">|</span>
             <?php endif; ?>
@@ -164,6 +172,7 @@ unset($_SESSION['flash_toast']);
     setTimeout(dismiss, 5000);
 })();
 </script>
+<?php endif; ?>
 <?php endif; ?>
 <script>
 // simple user dropdown (selalu aktif untuk user)

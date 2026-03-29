@@ -8,13 +8,13 @@
 <?php else: ?>
     <div class="row g-3">
         <?php foreach ($applications as $a): ?>
-        <?php $badgeClass = $a['status'] === 'pending' ? 'bg-primary text-secondary' : ($a['status'] === 'accepted' ? 'bg-success' : ($a['status'] === 'rejected' ? 'bg-danger' : 'bg-secondary text-accent')); ?>
+        <?php $statusMeta = applicationStatusMeta($a['status'] ?? ''); ?>
         <div class="col-12 col-md-6 col-lg-4">
             <a href="<?= BASE_URL ?>/jobs/show?id=<?= (int)($a['job_id'] ?? 0) ?>" class="text-decoration-none text-dark">
             <div class="card h-100 card-hover">
                 <div class="card-body">
                     <h5 class="card-title"><?= e($a['job_title']) ?></h5>
-                    <span class="badge <?= $badgeClass ?>"><?= e($a['status']) ?></span>
+                    <span class="badge <?= e($statusMeta['badge']) ?>"><?= e($statusMeta['label']) ?></span>
                     <p class="card-text small mt-2"><?= e($a['created_at']) ?></p>
                     <p class="card-text small text-muted mb-0">Klik untuk lihat detail →</p>
                 </div>

@@ -1,5 +1,15 @@
 <?php require APP_PATH . '/views/layouts/header.php'; ?>
-<?php $activeHrMenu = trim((string) ($_GET['url'] ?? 'hr/jobs'), '/'); ?>
+<?php
+$activeHrMenu = currentRoutePath('hr/jobs');
+$activeHrKey = 'dashboard';
+if (str_starts_with($activeHrMenu, 'hr/applications/accepted')) {
+    $activeHrKey = 'accepted';
+} elseif (str_starts_with($activeHrMenu, 'hr/jobs/create')) {
+    $activeHrKey = 'recruitment';
+} elseif (str_starts_with($activeHrMenu, 'hr/jobs/applicants')) {
+    $activeHrKey = 'applicants';
+}
+?>
 <style>
 .hr-body-override{background:var(--color-secondary) !important;color:var(--color-on-secondary);}
 .hr-shell{padding:0;height:100vh;width:100vw;}
@@ -18,10 +28,10 @@
         <aside class="hr-sidebar flex-shrink-0">
             <a class="hr-brand text-decoration-none" href="<?= BASE_URL ?>/hr/jobs">MyRecruit</a>
             <nav class="d-flex flex-column gap-1">
-                <a class="hr-nav-link <?= str_starts_with($activeHrMenu, 'hr/jobs') && !str_contains($activeHrMenu, 'accepted') ? 'active' : '' ?>" href="<?= BASE_URL ?>/hr/jobs">Dashboard</a>
-                <a class="hr-nav-link <?= str_contains($activeHrMenu, 'hr/jobs/create') ? 'active' : '' ?>" href="<?= BASE_URL ?>/hr/jobs/create">Recruitment</a>
-                <a class="hr-nav-link <?= str_contains($activeHrMenu, 'hr/jobs/applicants') ? 'active' : '' ?>" href="<?= BASE_URL ?>/hr/jobs">Applicant Database</a>
-                <a class="hr-nav-link <?= str_contains($activeHrMenu, 'hr/applications/accepted') ? 'active' : '' ?>" href="<?= BASE_URL ?>/hr/applications/accepted">Pelamar Diterima</a>
+                <a class="hr-nav-link <?= $activeHrKey === 'dashboard' ? 'active' : '' ?>" href="<?= BASE_URL ?>/hr/jobs">Dashboard</a>
+                <a class="hr-nav-link <?= $activeHrKey === 'recruitment' ? 'active' : '' ?>" href="<?= BASE_URL ?>/hr/jobs/create">Recruitment</a>
+                <a class="hr-nav-link <?= $activeHrKey === 'applicants' ? 'active' : '' ?>" href="<?= BASE_URL ?>/hr/jobs">Applicant Database</a>
+                <a class="hr-nav-link <?= $activeHrKey === 'accepted' ? 'active' : '' ?>" href="<?= BASE_URL ?>/hr/applications/accepted">Pelamar Diterima</a>
             </nav>
             <div class="mt-auto d-grid gap-2">
                 <a class="btn btn-sm btn-light fw-semibold" href="<?= BASE_URL ?>/jobs">User Account Mode</a>
@@ -35,8 +45,13 @@
             </div>
             <div class="hr-content d-flex flex-column">
                 <?php if (!empty($_SESSION['flash'])): ?>
-                    <div class="alert alert-success"><?= e($_SESSION['flash']) ?></div>
+                    <?php
+                    $flashType = (string) ($_SESSION['flash_type'] ?? 'success');
+                    $flashClass = $flashType === 'error' ? 'danger' : ($flashType === 'info' ? 'info' : 'success');
+                    ?>
+                    <div class="alert alert-<?= e($flashClass) ?>"><?= e($_SESSION['flash']) ?></div>
                     <?php unset($_SESSION['flash']); ?>
+                    <?php unset($_SESSION['flash_type']); ?>
                 <?php endif; ?>
                 <?php if (!empty($_SESSION['flash_error'])): ?>
                     <div class="alert alert-danger"><?= e($_SESSION['flash_error']) ?></div>

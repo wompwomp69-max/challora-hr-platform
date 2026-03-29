@@ -139,8 +139,9 @@ if ($achLevelJson === false) $achLevelJson = '{}';
                 <section id="data-pendidikan" class="scroll-mt-24 border-t border-muted pt-6">
                     <div class="flex items-center justify-between mb-3">
                         <h2 class="text-base md:text-lg font-semibold text-default">Data Pendidikan</h2>
-                        <button type="button" class="px-3 py-1.5 rounded-full bg-accent text-primary text-xs font-semibold" id="add-education">+ Tambah</button>
+                        <button type="button" class="px-3 py-1.5 rounded-full bg-accent text-primary text-xs font-semibold" id="add-education">Ubah Data</button>
                     </div>
+                    <p class="text-xs text-muted mb-3">Sistem saat ini menyimpan 1 data pendidikan utama. Jika diubah, data sebelumnya akan diganti.</p>
                     <div id="education-card" class="space-y-3"></div>
                     <div id="education-inputs" class="hidden"></div>
                 </section>
@@ -422,8 +423,8 @@ document.getElementById('education-save-btn').addEventListener('click', function
         education_university: form.querySelector('[name="education_university"]').value.trim(),
     };
     if (!hasEducation(item)) return;
-    if (editingEducationIndex >= 0) educationItems[editingEducationIndex] = item;
-    else educationItems.unshift(item);
+    educationItems = [item];
+    editingEducationIndex = 0;
     renderEducationItems();
     closeModal('education-modal');
 });

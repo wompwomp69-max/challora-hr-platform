@@ -32,8 +32,13 @@
                     <?php endif; ?>
 
                     <?php if (!empty($_SESSION['flash'])): ?>
-                        <div class="mb-4 rounded-xl bg-success-soft text-success text-sm px-4 py-3"><?= e($_SESSION['flash']) ?></div>
+                        <?php
+                        $flashType = (string) ($_SESSION['flash_type'] ?? 'success');
+                        $flashClass = $flashType === 'error' ? 'bg-danger-soft text-danger' : ($flashType === 'info' ? 'bg-info-soft text-info' : 'bg-success-soft text-success');
+                        ?>
+                        <div class="mb-4 rounded-xl <?= e($flashClass) ?> text-sm px-4 py-3"><?= e($_SESSION['flash']) ?></div>
                         <?php unset($_SESSION['flash']); ?>
+                        <?php unset($_SESSION['flash_type']); ?>
                     <?php endif; ?>
 
                     <form method="post" action="<?= BASE_URL ?>/index.php?url=auth/login" class="space-y-4">

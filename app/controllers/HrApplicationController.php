@@ -33,11 +33,11 @@ class HrApplicationController {
             $workExpByUser[$uid] = $this->userModel->getWorkExperiences($uid);
             $achievementsByUser[$uid] = $this->userModel->getAchievements($uid);
         }
-        $openMailto = $_SESSION['open_mailto'] ?? null;
-        if ($openMailto) {
-            unset($_SESSION['open_mailto']);
+        $manualMailto = $_SESSION['manual_mailto'] ?? null;
+        if ($manualMailto) {
+            unset($_SESSION['manual_mailto']);
         }
-        render_view('hr/applications/index', ['job' => $job, 'applicants' => $applicants, 'workExpByUser' => $workExpByUser, 'achievementsByUser' => $achievementsByUser, 'pageTitle' => 'Pelamar - ' . e($job['title']), 'openMailto' => $openMailto]);
+        render_view('hr/applications/index', ['job' => $job, 'applicants' => $applicants, 'workExpByUser' => $workExpByUser, 'achievementsByUser' => $achievementsByUser, 'pageTitle' => 'Pelamar - ' . e($job['title']), 'manualMailto' => $manualMailto]);
     }
 
     public function updateStatus(): void {
@@ -69,7 +69,10 @@ class HrApplicationController {
                     $body = $status === 'accepted'
                         ? rawurlencode("Yth. {$name},\n\nSelamat! Anda dinyatakan LULUS seleksi untuk posisi {$jobTitle}.\n\nSilakan hubungi kami untuk langkah selanjutnya.\n\nTerima kasih.")
                         : rawurlencode("Yth. {$name},\n\nTerima kasih telah melamar untuk posisi {$jobTitle}.\n\nMohon maaf, setelah proses seleksi Anda belum dapat kami terima untuk posisi ini.\n\nTetap semangat dan terima kasih.");
-                    $_SESSION['open_mailto'] = "mailto:{$email}?subject={$subject}&body={$body}";
+                    if ($email !== '') {
+                        $_SESSION['manual_mailto'] = "mailto:{$email}?subject={$subject}&body={$body}";
+                        $_SESSION['flash'] = 'Status lamaran diperbarui. Klik tombol "Kirim Email Manual" untuk menghubungi pelamar.';
+                    }
                 }
             }
         }

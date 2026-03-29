@@ -7,9 +7,9 @@ $totalApplicants = (int) ($stats['total'] ?? 0);
 $accepted = (int) ($stats['accepted'] ?? 0);
 $rejected = (int) ($stats['rejected'] ?? 0);
 $pending = (int) ($stats['pending'] ?? 0);
-$reviewed = max(0, $totalApplicants - $pending - $accepted - $rejected);
+$underReview = $pending;
 $completionRate = $totalApplicants > 0 ? (int) round((($accepted + $rejected) / $totalApplicants) * 100) : 0;
-$callbackRate = $totalApplicants > 0 ? (int) round((($reviewed + $accepted) / $totalApplicants) * 100) : 0;
+$callbackRate = $totalApplicants > 0 ? (int) round((($underReview + $accepted) / $totalApplicants) * 100) : 0;
 $offerAcceptanceRate = ($accepted + $rejected) > 0 ? (int) round(($accepted / ($accepted + $rejected)) * 100) : 0;
 $hiringRate = $totalApplicants > 0 ? (int) round(($accepted / $totalApplicants) * 100) : 0;
 $jobTypeLabels = [
@@ -19,8 +19,6 @@ $jobTypeLabels = [
     'volunteer' => 'Volunteer',
     'internship' => 'Internship',
 ];
-$stageLabels = ['Shortlist', 'TOEFL Test', 'Skill Test', 'HR Interview', 'User Interview', 'Final Interview', 'Offering Letter'];
-$stageCounts = array_fill_keys($stageLabels, 0);
 ?>
 <style>
 .hr-inner{display:flex;flex-direction:column;gap:10px;}
@@ -70,10 +68,10 @@ $stageCounts = array_fill_keys($stageLabels, 0);
             <option value="has_accepted" <?= $filter === 'has_accepted' ? 'selected' : '' ?>>Has Accepted</option>
         </select>
         <select class="hr-chip" name="per_page" onchange="this.form.submit()">
-            <option value="20" <?= ($perPage ?? 20) == 20 ? 'selected' : '' ?>>All Time</option>
-            <option value="10" <?= ($perPage ?? 20) == 10 ? 'selected' : '' ?>>This Month</option>
-            <option value="50" <?= ($perPage ?? 20) == 50 ? 'selected' : '' ?>>This Quarter</option>
-            <option value="100" <?= ($perPage ?? 20) == 100 ? 'selected' : '' ?>>This Year</option>
+            <option value="10" <?= ($perPage ?? 20) == 10 ? 'selected' : '' ?>>10 / halaman</option>
+            <option value="20" <?= ($perPage ?? 20) == 20 ? 'selected' : '' ?>>20 / halaman</option>
+            <option value="50" <?= ($perPage ?? 20) == 50 ? 'selected' : '' ?>>50 / halaman</option>
+            <option value="100" <?= ($perPage ?? 20) == 100 ? 'selected' : '' ?>>100 / halaman</option>
         </select>
         <input type="hidden" name="page" value="1">
         <a href="<?= BASE_URL ?>/hr/jobs/create" class="btn bg-accent text-secondary fw-semibold ms-auto">+ Buat Lowongan</a>
@@ -85,7 +83,7 @@ $stageCounts = array_fill_keys($stageLabels, 0);
                 <div class="hr-kpi-title">Application Completion Rate</div>
                 <div class="d-flex align-items-end justify-content-between mt-2">
                     <div class="hr-kpi-value"><?= $completionRate ?>%</div>
-                    <div class="hr-kpi-delta"><span class="hr-kpi-delta-up">+5%</span><span>from<br>last month</span></div>
+                    <div class="hr-kpi-delta"><span>Live</span></div>
                 </div>
             </div>
         </div>
@@ -94,7 +92,7 @@ $stageCounts = array_fill_keys($stageLabels, 0);
                 <div class="hr-kpi-title">Candidate Call Back Rate</div>
                 <div class="d-flex align-items-end justify-content-between mt-2">
                     <div class="hr-kpi-value"><?= $callbackRate ?>%</div>
-                    <div class="hr-kpi-delta"><span class="hr-kpi-delta-down">-8%</span><span>from<br>last month</span></div>
+                    <div class="hr-kpi-delta"><span>Live</span></div>
                 </div>
             </div>
         </div>
@@ -103,7 +101,7 @@ $stageCounts = array_fill_keys($stageLabels, 0);
                 <div class="hr-kpi-title">Offer Acceptance Rate</div>
                 <div class="d-flex align-items-end justify-content-between mt-2">
                     <div class="hr-kpi-value"><?= $offerAcceptanceRate ?>%</div>
-                    <div class="hr-kpi-delta"><span class="hr-kpi-delta-up">+10%</span><span>from<br>last month</span></div>
+                    <div class="hr-kpi-delta"><span>Live</span></div>
                 </div>
             </div>
         </div>
@@ -112,7 +110,7 @@ $stageCounts = array_fill_keys($stageLabels, 0);
                 <div class="hr-kpi-title">Hiring Rate</div>
                 <div class="d-flex align-items-end justify-content-between mt-2">
                     <div class="hr-kpi-value"><?= $hiringRate ?>%</div>
-                    <div class="hr-kpi-delta"><span class="hr-kpi-delta-down">+2%</span><span>from<br>last month</span></div>
+                    <div class="hr-kpi-delta"><span>Live</span></div>
                 </div>
             </div>
         </div>
@@ -131,8 +129,8 @@ $stageCounts = array_fill_keys($stageLabels, 0);
                         <div class="hr-funnel-label">Application</div>
                     </div>
                     <div class="hr-funnel-item">
-                        <div class="hr-funnel-num"><?= $reviewed ?></div>
-                        <div class="hr-funnel-label">Interview <span class="hr-funnel-sub">(<?= $totalApplicants > 0 ? (int) round(($reviewed / $totalApplicants) * 100) : 0 ?>%)</span></div>
+                        <div class="hr-funnel-num"><?= $underReview ?></div>
+                        <div class="hr-funnel-label">Under Review <span class="hr-funnel-sub">(<?= $totalApplicants > 0 ? (int) round(($underReview / $totalApplicants) * 100) : 0 ?>%)</span></div>
                     </div>
                     <div class="hr-funnel-item">
                         <div class="hr-funnel-num"><?= $accepted ?></div>
@@ -144,26 +142,8 @@ $stageCounts = array_fill_keys($stageLabels, 0);
         <div class="col-lg-6">
             <div class="hr-panel">
                 <div class="hr-panel-title mb-2">Time to Hire</div>
-                <div class="row g-2 align-items-center">
-                    <div class="col-md-8">
-                        <div class="d-flex align-items-center gap-2 mb-2">
-                            <small>From:</small>
-                            <div class="hr-chip w-100" style="min-width:0;">Vacancy Activated</div>
-                        </div>
-                        <div class="d-flex align-items-center gap-2">
-                            <small>To:</small>
-                            <div class="hr-chip w-100" style="min-width:0;">Offering Sent</div>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="d-flex align-items-center justify-content-center gap-2 h-100">
-                            <span class="fs-4">🗓️</span>
-                            <div>
-                                <div style="font-size:38px;font-weight:700;line-height:1;">01 <span style="font-size:16px;">Week(s)</span></div>
-                                <div style="font-size:38px;font-weight:700;line-height:1;">15 <span style="font-size:16px;">Day(s)</span></div>
-                            </div>
-                        </div>
-                    </div>
+                <div class="text-muted small">
+                    Data time-to-hire belum tersedia. Panel ini akan diaktifkan setelah metrik waktu proses rekrutmen ditambahkan dari backend.
                 </div>
             </div>
         </div>
@@ -205,9 +185,8 @@ $stageCounts = array_fill_keys($stageLabels, 0);
                 $barColor = '#78b39f';
                 if ($daysLeftNum !== null && $daysLeftNum <= 7) $barColor = '#be6b74';
                 elseif ($daysLeftNum !== null && $daysLeftNum <= 14) $barColor = '#d3b36d';
-                $stageIndex = abs((int) ($j['id'] ?? 0)) % count($stageLabels);
-                $stage = $stageLabels[$stageIndex];
-                $stageCounts[$stage] = (int) ($stageCounts[$stage] ?? 0) + 1;
+                $isClosed = $daysLeftNum !== null && $daysLeftNum < 0;
+                $stage = $isClosed ? 'Closed' : 'Active';
                 ?>
                 <div class="hr-v-row">
                     <div class="hr-v-col">
@@ -236,7 +215,7 @@ $stageCounts = array_fill_keys($stageLabels, 0);
                             <ul class="dropdown-menu dropdown-menu-end">
                                 <li><a class="dropdown-item" href="<?= BASE_URL ?>/hr/jobs/edit?id=<?= (int) $j['id'] ?>">Edit</a></li>
                                 <li>
-                                    <form method="post" action="<?= BASE_URL ?>/index.php?url=hr/jobs/delete" onsubmit="return confirm('Hapus lowongan ini?');">
+                                    <form method="post" action="<?= BASE_URL ?>/hr/jobs/delete" onsubmit="return confirm('Hapus lowongan ini?');">
                                         <input type="hidden" name="id" value="<?= (int) $j['id'] ?>">
                                         <button type="submit" class="dropdown-item text-danger">Hapus</button>
                                     </form>
@@ -246,14 +225,6 @@ $stageCounts = array_fill_keys($stageLabels, 0);
                     </div>
                 </div>
             <?php endforeach; ?>
-            <div class="hr-stages">
-                <?php foreach ($stageLabels as $stageName): ?>
-                    <div class="hr-stage-item">
-                        <div class="hr-stage-name"><?= e($stageName) ?></div>
-                        <div class="hr-stage-val"><?= (int) ($stageCounts[$stageName] ?? 0) ?></div>
-                    </div>
-                <?php endforeach; ?>
-            </div>
         </div>
     <?php endif; ?>
 

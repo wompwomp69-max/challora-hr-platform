@@ -9,6 +9,14 @@
     <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
         <?php foreach ($jobs as $j): ?>
             <?php $applied = in_array((int)$j['id'], $appliedJobIds ?? [], true); ?>
+            <?php
+            $description = (string) ($j['description'] ?? '');
+            $shortDescription = !empty($j['short_description']) ? (string) $j['short_description'] : mb_substr($description, 0, 120) . (mb_strlen($description) > 120 ? '…' : '');
+            $jobSkills = !empty($j['skills_json']) ? json_decode((string) $j['skills_json'], true) : [];
+            $jobBenefits = !empty($j['benefits_json']) ? json_decode((string) $j['benefits_json'], true) : [];
+            if (!is_array($jobSkills)) $jobSkills = [];
+            if (!is_array($jobBenefits)) $jobBenefits = [];
+            ?>
             <div class="cursor-pointer" onclick="window.location='<?= e(BASE_URL) ?>/jobs/show?id=<?= (int)$j['id'] ?>'" role="button">
                 <div class="h-full bg-surface rounded-2xl shadow-sm hover:shadow-md transition-shadow flex flex-col border border-accent">
                     <div class="p-4 flex flex-col flex-grow">
@@ -21,12 +29,8 @@
                                     <span class="inline-flex items-center px-2 py-0.5 rounded-full bg-success-soft text-success font-medium">Tersimpan</span>
                                 </div>
                             </div>
-                            <p class="text-xs text-muted mb-1 line-clamp-2 min-h-[2.5rem]"><?= e(!empty($j['short_description']) ? $j['short_description'] : mb_substr($j['description'], 0, 120) . (mb_strlen($j['description']) > 120 ? '…' : '')) ?></p>
+                            <p class="text-xs text-muted mb-1 line-clamp-2 min-h-[2.5rem]"><?= e($shortDescription) ?></p>
                             <p class="text-[11px] text-muted mb-0">Lokasi: <?= e($j['location'] ?? '-') ?> | Gaji: <?= e($j['salary_range'] ?? '-') ?></p>
-                            <?php
-                            $jobSkills = !empty($j['skills_json']) ? json_decode($j['skills_json'], true) : [];
-                            $jobBenefits = !empty($j['benefits_json']) ? json_decode($j['benefits_json'], true) : [];
-                            ?>
                             <div class="flex items-center justify-between gap-2 mt-2" onclick="event.stopPropagation()">
                                 <p class="text-[11px] text-muted mb-0 flex-1">
                                     <?php if (!empty($jobSkills) || !empty($jobBenefits)): ?>

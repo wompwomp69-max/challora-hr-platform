@@ -43,6 +43,16 @@ $selectedEducations = array_values(array_filter(array_map('trim', explode(',', $
 .jobs-filter-group:last-child{margin-bottom:0;}
 .jobs-filter-group-title{display:block;font-size:19px;font-weight:700;margin-bottom:8px;}
 .jobs-filter-opt{display:flex;align-items:center;gap:8px;margin-top:6px;font-size:13px;color:#111827;}
+.jobs-filter-checklist{margin-top:6px;}
+.jobs-filter-opt-custom{position:relative;display:flex;align-items:center;gap:12px;margin-top:12px;color:#0b1d3a;font-size:17px;font-weight:500;line-height:1.25;cursor:pointer;user-select:none;}
+.jobs-filter-opt-custom:first-child{margin-top:0;}
+.jobs-filter-opt-input{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);clip-path:inset(50%);border:0;white-space:nowrap;}
+.jobs-filter-opt-box{width:24px;height:24px;flex:0 0 24px;border:2px solid #031b44;border-radius:7px;background:#fff;display:inline-flex;align-items:center;justify-content:center;transition:background-color .18s ease,border-color .18s ease;}
+.jobs-filter-opt-box::after{content:"";width:6px;height:11px;border:solid #fff;border-width:0 2px 2px 0;transform:rotate(45deg) scale(0);transform-origin:center;transition:transform .16s ease;}
+.jobs-filter-opt-input:checked + .jobs-filter-opt-box{background:#031b44;border-color:#031b44;}
+.jobs-filter-opt-input:checked + .jobs-filter-opt-box::after{transform:rotate(45deg) scale(1);}
+.jobs-filter-opt-input:checked ~ .jobs-filter-opt-text{font-weight:700;}
+.jobs-filter-opt-input:focus-visible + .jobs-filter-opt-box{outline:2px solid #2f5f9d;outline-offset:2px;}
 .jobs-card-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px;}
 .job-card{background:#fff;border:2px solid #032146;border-radius:28px;padding:14px;min-height:320px;display:flex;flex-direction:column;justify-content:space-around;}
 .job-card-top{background:#fff2d6;border-radius:18px;padding:18px 16px 18px;min-height:230px;display:flex;flex-direction:column;}
@@ -82,6 +92,15 @@ $updatedOptionsMap = [
 ];
 $updatedSelectedValue = array_key_exists($updatedSelectedRaw, $updatedOptionsMap) ? $updatedSelectedRaw : '';
 $updatedSelectedLabel = $updatedOptionsMap[$updatedSelectedValue];
+$stickyHiddenParams = [
+    'job_type' => implode(',', $selectedTypes),
+    'min_salary' => (string) ($searchParams['min_salary'] ?? ''),
+    'max_salary' => (string) ($searchParams['max_salary'] ?? ''),
+    'min_education' => implode(',', $selectedEducations),
+    'updated' => $updatedSelectedValue,
+    'per_page' => (string) ((int) ($perPage ?? 20)),
+    'job_view' => (string) $jobView,
+];
 if (count($expSelectedValues) === 1) {
     $expSelectedLabel = $expOptionsMap[$expSelectedValues[0]] ?? 'Level Pengalaman';
 } elseif (count($expSelectedValues) > 1) {
@@ -117,13 +136,9 @@ if (count($expSelectedValues) === 1) {
             </div>
         </div>
         <button type="submit" class="jobs-search-btn hover:bg-primary-muted">Cari</button>
-        <input type="hidden" name="job_type" value="<?= e(implode(',', $selectedTypes)) ?>">
-        <input type="hidden" name="min_salary" value="<?= e($searchParams['min_salary'] ?? '') ?>">
-        <input type="hidden" name="max_salary" value="<?= e($searchParams['max_salary'] ?? '') ?>">
-        <input type="hidden" name="min_education" value="<?= e(implode(',', $selectedEducations)) ?>">
-        <input type="hidden" name="updated" id="jobs-updated-input" value="<?= e($updatedSelectedValue) ?>">
-        <input type="hidden" name="per_page" value="<?= (int)($perPage ?? 20) ?>">
-        <input type="hidden" name="job_view" value="<?= e($jobView) ?>">
+        <?php foreach ($stickyHiddenParams as $hiddenName => $hiddenValue): ?>
+            <input type="hidden" name="<?= e($hiddenName) ?>"<?= $hiddenName === 'updated' ? ' id="jobs-updated-input"' : '' ?> value="<?= e($hiddenValue) ?>">
+        <?php endforeach; ?>
     </form>
 </div>
 <script>
@@ -238,10 +253,28 @@ document.addEventListener('DOMContentLoaded', function () {
             <div class="jobs-filter-scroll">
                 <div class="jobs-filter-group">
                     <span class="jobs-filter-group-title text-secondary">Jenis Kontrak</span>
-                    <label class="jobs-filter-opt"><input type="checkbox" name="job_type[]" value="full_time" <?= in_array('full_time', $selectedTypes, true) ? 'checked' : '' ?>> Full-Time</label>
-                    <label class="jobs-filter-opt"><input type="checkbox" name="job_type[]" value="part_time" <?= in_array('part_time', $selectedTypes, true) ? 'checked' : '' ?>> Part-Time</label>
-                    <label class="jobs-filter-opt"><input type="checkbox" name="job_type[]" value="contract" <?= in_array('contract', $selectedTypes, true) ? 'checked' : '' ?>> Kontrak</label>
-                    <label class="jobs-filter-opt"><input type="checkbox" name="job_type[]" value="freelance" <?= in_array('freelance', $selectedTypes, true) ? 'checked' : '' ?>> Freelance</label>
+                    <div class="jobs-filter-checklist">
+                        <label class="jobs-filter-opt-custom">
+                            <input class="jobs-filter-opt-input" type="checkbox" name="job_type[]" value="full_time" <?= in_array('full_time', $selectedTypes, true) ? 'checked' : '' ?>>
+                            <span class="jobs-filter-opt-box" aria-hidden="true"></span>
+                            <span class="jobs-filter-opt-text">Full-Time</span>
+                        </label>
+                        <label class="jobs-filter-opt-custom">
+                            <input class="jobs-filter-opt-input" type="checkbox" name="job_type[]" value="part_time" <?= in_array('part_time', $selectedTypes, true) ? 'checked' : '' ?>>
+                            <span class="jobs-filter-opt-box" aria-hidden="true"></span>
+                            <span class="jobs-filter-opt-text">Part-Time</span>
+                        </label>
+                        <label class="jobs-filter-opt-custom">
+                            <input class="jobs-filter-opt-input" type="checkbox" name="job_type[]" value="contract" <?= in_array('contract', $selectedTypes, true) ? 'checked' : '' ?>>
+                            <span class="jobs-filter-opt-box" aria-hidden="true"></span>
+                            <span class="jobs-filter-opt-text">Kontrak</span>
+                        </label>
+                        <label class="jobs-filter-opt-custom">
+                            <input class="jobs-filter-opt-input" type="checkbox" name="job_type[]" value="freelance" <?= in_array('freelance', $selectedTypes, true) ? 'checked' : '' ?>>
+                            <span class="jobs-filter-opt-box" aria-hidden="true"></span>
+                            <span class="jobs-filter-opt-text">Freelance</span>
+                        </label>
+                    </div>
                 </div>
                 <div class="jobs-filter-group">
                     <span class="jobs-filter-group-title mt-3 text-secondary">Preferensi Gaji</span>
@@ -252,21 +285,39 @@ document.addEventListener('DOMContentLoaded', function () {
                 </div>
                 <div class="jobs-filter-group">
                     <span class="jobs-filter-group-title mt-3 text-secondary">Pendidikan Terakhir</span>
-                    <label class="jobs-filter-opt"><input type="checkbox" name="min_education[]" value="sma" <?= in_array('sma', $selectedEducations, true) ? 'checked' : '' ?>> SMA/SMK Sederajat</label>
-                    <label class="jobs-filter-opt"><input type="checkbox" name="min_education[]" value="d3" <?= in_array('d3', $selectedEducations, true) ? 'checked' : '' ?>> D3</label>
-                    <label class="jobs-filter-opt"><input type="checkbox" name="min_education[]" value="s1" <?= in_array('s1', $selectedEducations, true) ? 'checked' : '' ?>> S1</label>
-                    <label class="jobs-filter-opt"><input type="checkbox" name="min_education[]" value="s2" <?= in_array('s2', $selectedEducations, true) ? 'checked' : '' ?>> S2</label>
+                    <div class="jobs-filter-checklist">
+                        <label class="jobs-filter-opt-custom">
+                            <input class="jobs-filter-opt-input" type="checkbox" name="min_education[]" value="sma" <?= in_array('sma', $selectedEducations, true) ? 'checked' : '' ?>>
+                            <span class="jobs-filter-opt-box" aria-hidden="true"></span>
+                            <span class="jobs-filter-opt-text">SMA/SMK Sederajat</span>
+                        </label>
+                        <label class="jobs-filter-opt-custom">
+                            <input class="jobs-filter-opt-input" type="checkbox" name="min_education[]" value="d3" <?= in_array('d3', $selectedEducations, true) ? 'checked' : '' ?>>
+                            <span class="jobs-filter-opt-box" aria-hidden="true"></span>
+                            <span class="jobs-filter-opt-text">D3</span>
+                        </label>
+                        <label class="jobs-filter-opt-custom">
+                            <input class="jobs-filter-opt-input" type="checkbox" name="min_education[]" value="s1" <?= in_array('s1', $selectedEducations, true) ? 'checked' : '' ?>>
+                            <span class="jobs-filter-opt-box" aria-hidden="true"></span>
+                            <span class="jobs-filter-opt-text">S1</span>
+                        </label>
+                        <label class="jobs-filter-opt-custom">
+                            <input class="jobs-filter-opt-input" type="checkbox" name="min_education[]" value="s2" <?= in_array('s2', $selectedEducations, true) ? 'checked' : '' ?>>
+                            <span class="jobs-filter-opt-box" aria-hidden="true"></span>
+                            <span class="jobs-filter-opt-text">S2</span>
+                        </label>
+                    </div>
                 </div>
             </div>
             <div class="d-flex gap-2 mt-3">
                 <button type="submit" class="btn btn-sm bg-accent text-secondary fw-semibold">Apply</button>
                 <a href="<?= BASE_URL ?>/jobs" class="btn btn-sm btn-outline-secondary">Reset</a>
             </div>
-            <input type="hidden" name="q" value="<?= e($searchParams['q'] ?? '') ?>">
-            <input type="hidden" name="location" value="<?= e($searchParams['location'] ?? '') ?>">
-            <input type="hidden" name="experience_level" value="<?= e($searchParams['experience_level'] ?? '') ?>">
-            <input type="hidden" name="updated" value="<?= e($searchParams['updated'] ?? '') ?>">
-            <input type="hidden" name="job_view" value="<?= e($jobView) ?>">
+            <input type="hidden" name="q" value="<?= e((string) ($searchParams['q'] ?? '')) ?>">
+            <input type="hidden" name="location" value="<?= e((string) ($searchParams['location'] ?? '')) ?>">
+            <input type="hidden" name="experience_level" value="<?= e(implode(',', $expSelectedValues)) ?>">
+            <input type="hidden" name="updated" value="<?= e($updatedSelectedValue) ?>">
+            <input type="hidden" name="job_view" value="<?= e((string) $jobView) ?>">
             <input type="hidden" name="per_page" value="<?= (int)($perPage ?? 20) ?>">
         </form>
     </aside>
@@ -310,8 +361,12 @@ document.addEventListener('DOMContentLoaded', function () {
                         $expLevelLabel = 'Fresh-Graduate';
                     } elseif (in_array($expLevelRaw, ['y_1_3'], true)) {
                         $expLevelLabel = 'Junior';
-                    } else {
+                    } elseif (in_array($expLevelRaw, ['y_3_5'], true)) {
+                        $expLevelLabel = 'Mid';
+                    } elseif (in_array($expLevelRaw, ['y_5_10'], true)) {
                         $expLevelLabel = 'Senior';
+                    } else {
+                        $expLevelLabel = 'General';
                     }
                     $postedRaw = (string) (!empty($j['created_at']) ? $j['created_at'] : ($j['updated_at'] ?? ''));
                     $postedDate = '-';
@@ -350,7 +405,6 @@ document.addEventListener('DOMContentLoaded', function () {
                             <div class="job-tags">
                                 <span class="job-tag"><?= e($jobTypeLabel) ?></span>
                                 <span class="job-tag"><?= e($expLevelLabel) ?></span>
-                                <span class="job-tag">Remote</span>
                                 <?php if ($applied): ?><span class="job-tag">Applied</span><?php endif; ?>
                             </div>
                         </div>

@@ -1,7 +1,8 @@
 <?php
 $maritalLabels = ['single' => 'Belum menikah', 'married' => 'Menikah', 'divorced' => 'Cerai', 'widowed' => 'Duda/Janda'];
 $religionLabels = ['islam' => 'Islam', 'katolik' => 'Katolik', 'kristen' => 'Kristen', 'hindu' => 'Hindu', 'buddha' => 'Buddha', 'konghucu' => 'Konghucu', 'lainnya' => 'Lainnya'];
-$genderLabel = $user['gender'] === 'male' ? 'Laki-laki' : ($user['gender'] === 'female' ? 'Perempuan' : '-');
+$genderLabels = ['male' => 'Laki-laki', 'female' => 'Perempuan', 'other' => 'Lainnya'];
+$genderLabel = $genderLabels[(string) ($user['gender'] ?? '')] ?? '-';
 $profileAvatarSrc = currentUserAvatarImgSrc();
 $profileInitial = mb_strtoupper(mb_substr($user['name'] ?? 'U', 0, 1));
 $formatDocUploadedAt = static function (?string $relativePath): string {
@@ -78,8 +79,12 @@ $formatDocUploadedAt = static function (?string $relativePath): string {
                             <?php
                             $age = '-';
                             if (!empty($user['birth_date'])) {
-                                $b = new DateTime($user['birth_date']);
-                                $age = $b->diff(new DateTime())->y . ' tahun';
+                                try {
+                                    $b = new DateTime((string) $user['birth_date']);
+                                    $age = $b->diff(new DateTime())->y . ' tahun';
+                                } catch (Throwable $e) {
+                                    $age = '-';
+                                }
                             }
                             ?>
                             <?= e($age) ?>, <?= e($genderLabel) ?>

@@ -60,6 +60,7 @@ class AuthController {
             } else {
                 $this->userModel->create($old['name'], $old['email'], $password, 'user', $old['phone'] ?: null, $old['address'] ?: null);
                 $_SESSION['flash'] = 'Registrasi berhasil. Silakan login.';
+                $_SESSION['flash_type'] = 'success';
                 redirect('/auth/login');
             }
         }
@@ -99,14 +100,14 @@ class AuthController {
                         $sent = $mail->sendPasswordReset($user['email'], $user['name'], $link);
                         if ($sent) {
                             $success = 'Instruksi reset password telah dikirim ke email Anda.';
+                            $link = '';
                         } else {
                             $success = 'Gagal mengirim email, gunakan tautan berikut untuk mereset password:';
                         }
                     } else {
                         $success = 'Mail dinonaktifkan; gunakan tautan berikut untuk mereset password:';
                     }
-                }
-                if ($success === '') {
+                } else {
                     $success = 'Jika email terdaftar, instruksi reset password telah dikirim.';
                 }
             }
@@ -125,22 +126,30 @@ class AuthController {
         }
         $token = $_GET['token'] ?? $_POST['token'] ?? '';
         $error = '';
+        $hasValidToken = false;
+        $reset = null;
+        if ($token !== '') {
+            $reset = $this->userModel->getPasswordResetByToken($token);
+            $hasValidToken = (bool) $reset;
+        }
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $password = $_POST['password'] ?? '';
             $confirm  = $_POST['password_confirm'] ?? '';
-            if ($password === '' || $confirm === '') {
+            if (!$hasValidToken) {
+                $error = 'Token tidak valid atau sudah kadaluarsa.';
+            } elseif ($password === '' || $confirm === '') {
                 $error = 'Password dan konfirmasi wajib diisi.';
             } elseif ($password !== $confirm) {
                 $error = 'Konfirmasi tidak cocok.';
             } elseif (strlen($password) < 6) {
                 $error = 'Password minimal 6 karakter.';
             } else {
-                $reset = $this->userModel->getPasswordResetByToken($token);
                 if ($reset) {
                     $this->userModel->updatePassword((int)$reset['user_id'], $password);
                     $this->userModel->invalidatePasswordResetToken($token);
                     $_SESSION['flash'] = 'Password berhasil diubah. Silakan login.';
+                    $_SESSION['flash_type'] = 'success';
                     redirect('/auth/login');
                 } else {
                     $error = 'Token tidak valid atau sudah kadaluarsa.';
@@ -148,14 +157,13 @@ class AuthController {
             }
         } else {
             if ($token !== '') {
-                $reset = $this->userModel->getPasswordResetByToken($token);
-                if (!$reset) {
+                if (!$hasValidToken) {
                     $error = 'Token tidak valid atau sudah kadaluarsa.';
                 }
             } else {
                 $error = 'Token tidak tersedia.';
             }
         }
-        render_view('auth/reset', ['error' => $error, 'token' => $token, 'pageTitle' => 'Reset Password']);
+        render_view('auth/reset', ['error' => $error, 'token' => $token, 'hasValidToken' => $hasValidToken, 'pageTitle' => 'Reset Password']);
     }
 }

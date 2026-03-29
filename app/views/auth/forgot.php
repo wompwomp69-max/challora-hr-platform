@@ -25,18 +25,15 @@
             <div class="mb-4 rounded-xl bg-danger-soft text-danger text-sm px-4 py-3">
                 <?= e($error) ?>
             </div>
-        <?php endif; ?>
-
-        <?php if (!empty($success)): ?>
+        <?php elseif (!empty($success)): ?>
             <div class="mb-4 rounded-xl bg-success-soft text-success text-sm px-4 py-3">
                 <?= e($success) ?>
             </div>
-        <?php endif; ?>
-
-        <?php if (!empty($link)): ?>
-            <div class="mb-4 rounded-xl bg-info-soft text-info text-sm px-4 py-3 break-all">
-                <a href="<?= e($link) ?>" target="_blank" class="underline"><?= e($link) ?></a>
-            </div>
+            <?php if (!empty($link)): ?>
+                <div class="mt-3 rounded-xl bg-info-soft text-info text-sm px-4 py-3 break-all">
+                    <a href="<?= e($link) ?>" target="_blank" class="underline"><?= e($link) ?></a>
+                </div>
+            <?php endif; ?>
         <?php endif; ?>
 
         <form method="post" action="<?= BASE_URL ?>/index.php?url=auth/forgot" class="space-y-4">

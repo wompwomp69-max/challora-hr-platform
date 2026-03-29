@@ -43,6 +43,47 @@ function currentRole(): string {
     return $_SESSION['role'] ?? '';
 }
 
+/**
+ * Route path aktif dari query parameter `url`.
+ */
+function currentRoutePath(string $fallback = ''): string {
+    $path = trim((string) ($_GET['url'] ?? ''), '/');
+    if ($path !== '') {
+        return $path;
+    }
+    return trim($fallback, '/');
+}
+
+/**
+ * Mapping status lamaran untuk label + badge.
+ *
+ * @return array{label:string,badge:string}
+ */
+function applicationStatusMeta(?string $status): array {
+    $key = strtolower(trim((string) $status));
+    $map = [
+        'pending' => ['label' => 'Pending', 'badge' => 'bg-primary text-secondary'],
+        'reviewed' => ['label' => 'CV review', 'badge' => 'bg-warning'],
+        'accepted' => ['label' => 'Accepted', 'badge' => 'bg-success'],
+        'rejected' => ['label' => 'Rejected', 'badge' => 'bg-danger'],
+    ];
+    return $map[$key] ?? ['label' => ($status !== null && trim((string) $status) !== '' ? (string) $status : '-'), 'badge' => 'bg-secondary text-accent'];
+}
+
+/**
+ * Opsi status lamaran untuk form update status.
+ *
+ * @return array<string,string>
+ */
+function applicationStatusOptions(): array {
+    return [
+        'pending' => 'Pending',
+        'reviewed' => 'CV review',
+        'accepted' => 'Accepted',
+        'rejected' => 'Rejected',
+    ];
+}
+
 /** URL img avatar untuk user yang login; null jika tidak ada foto profil */
 function currentUserAvatarImgSrc(): ?string {
     if (!isLoggedIn() || currentRole() !== 'user') {

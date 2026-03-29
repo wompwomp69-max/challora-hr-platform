@@ -6,6 +6,18 @@
         <?php
         $jobSkills = !empty($job['skills_json']) ? json_decode($job['skills_json'], true) : [];
         $jobBenefits = !empty($job['benefits_json']) ? json_decode($job['benefits_json'], true) : [];
+        $renderSaveToggle = static function (bool $saved, int $jobId, string $redirect, string $saveButtonClass, ?string $unsaveButtonClass = null, string $saveText = 'Simpan lowongan', string $unsaveText = 'Hapus dari simpan'): void {
+            $action = $saved ? '/jobs/unsave' : '/jobs/save';
+            $label = $saved ? $unsaveText : $saveText;
+            $buttonClass = $saved ? ($unsaveButtonClass ?? $saveButtonClass) : $saveButtonClass;
+            ?>
+            <form method="post" action="<?= BASE_URL . $action ?>" class="inline mb-0">
+                <input type="hidden" name="job_id" value="<?= $jobId ?>">
+                <input type="hidden" name="redirect" value="<?= e($redirect) ?>">
+                <button type="submit" class="<?= e($buttonClass) ?>"><?= e($label) ?></button>
+            </form>
+            <?php
+        };
         ?>
         <?php if (is_array($jobSkills) && !empty($jobSkills)): ?>
         <div class="mb-1 text-sm">
@@ -24,19 +36,7 @@
         <?php if (isLoggedIn() && currentRole() === 'user'): ?>
             <?php if ($alreadyApplied): ?>
                 <div class="mb-4 flex flex-wrap items-center gap-2 text-sm">
-                    <?php if ($isSaved ?? false): ?>
-                    <form method="post" action="<?= BASE_URL ?>/jobs/unsave" class="inline">
-                        <input type="hidden" name="job_id" value="<?= (int)$job['id'] ?>">
-                        <input type="hidden" name="redirect" value="/jobs/show?id=<?= (int)$job['id'] ?>">
-                        <button type="submit" class="px-3 py-1.5 rounded-full bg-muted text-default text-xs font-medium hover:bg-muted">Hapus dari simpan</button>
-                    </form>
-                    <?php else: ?>
-                    <form method="post" action="<?= BASE_URL ?>/jobs/save" class="inline">
-                        <input type="hidden" name="job_id" value="<?= (int)$job['id'] ?>">
-                        <input type="hidden" name="redirect" value="/jobs/show?id=<?= (int)$job['id'] ?>">
-                        <button type="submit" class="px-3 py-1.5 rounded-full bg-primary text-secondary text-xs font-medium hover:bg-primary-hover">Simpan lowongan</button>
-                    </form>
-                    <?php endif; ?>
+                    <?php $renderSaveToggle((bool) ($isSaved ?? false), (int) $job['id'], '/jobs/show?id=' . (int) $job['id'], 'px-3 py-1.5 rounded-full bg-primary text-secondary text-xs font-medium hover:bg-primary-hover', 'px-3 py-1.5 rounded-full bg-muted text-default text-xs font-medium hover:bg-muted'); ?>
                     <span class="text-muted">Anda sudah melamar lowongan ini.</span>
                 </div>
             <?php elseif ($canApply): ?>
@@ -55,19 +55,7 @@
                     <?php else: ?>
                         <a href="<?= BASE_URL ?>/user/settings" class="px-4 py-2 rounded-full bg-primary text-secondary text-sm font-semibold hover:bg-primary-hover">Lengkapi Dokumen</a>
                     <?php endif; ?>
-                    <?php if ($isSaved ?? false): ?>
-                    <form method="post" action="<?= BASE_URL ?>/jobs/unsave" class="inline mb-0">
-                        <input type="hidden" name="job_id" value="<?= (int)$job['id'] ?>">
-                        <input type="hidden" name="redirect" value="/jobs/show?id=<?= (int)$job['id'] ?>">
-                        <button type="submit" class="px-4 py-2 rounded-full bg-muted text-default text-sm font-semibold hover:bg-muted">Hapus dari simpan</button>
-                    </form>
-                    <?php else: ?>
-                    <form method="post" action="<?= BASE_URL ?>/jobs/save" class="inline mb-0">
-                        <input type="hidden" name="job_id" value="<?= (int)$job['id'] ?>">
-                        <input type="hidden" name="redirect" value="/jobs/show?id=<?= (int)$job['id'] ?>">
-                        <button type="submit" class="px-4 py-2 rounded-full bg-primary text-secondary text-sm font-semibold">Simpan lowongan</button>
-                    </form>
-                    <?php endif; ?>
+                    <?php $renderSaveToggle((bool) ($isSaved ?? false), (int) $job['id'], '/jobs/show?id=' . (int) $job['id'], 'px-4 py-2 rounded-full bg-primary text-secondary text-sm font-semibold', 'px-4 py-2 rounded-full bg-muted text-default text-sm font-semibold hover:bg-muted'); ?>
                 </div>
                 <?php if (($hasRequiredDocs ?? true)): ?>
                     <div id="apply-confirm-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/50 px-4">
@@ -106,19 +94,7 @@
                 <?php endif; ?>
             <?php else: ?>
                 <div class="mb-4">
-                    <?php if ($isSaved ?? false): ?>
-                    <form method="post" action="<?= BASE_URL ?>/jobs/unsave" class="inline">
-                        <input type="hidden" name="job_id" value="<?= (int)$job['id'] ?>">
-                        <input type="hidden" name="redirect" value="/jobs/show?id=<?= (int)$job['id'] ?>">
-                        <button type="submit" class="px-3 py-1.5 rounded-full bg-muted text-default text-xs font-medium hover:bg-muted">Hapus dari simpan</button>
-                    </form>
-                    <?php else: ?>
-                    <form method="post" action="<?= BASE_URL ?>/jobs/save" class="inline">
-                        <input type="hidden" name="job_id" value="<?= (int)$job['id'] ?>">
-                        <input type="hidden" name="redirect" value="/jobs/show?id=<?= (int)$job['id'] ?>">
-                        <button type="submit" class="px-3 py-1.5 rounded-full bg-primary text-white text-xs font-medium hover:bg-primary-hover">Simpan lowongan</button>
-                    </form>
-                    <?php endif; ?>
+                    <?php $renderSaveToggle((bool) ($isSaved ?? false), (int) $job['id'], '/jobs/show?id=' . (int) $job['id'], 'px-3 py-1.5 rounded-full bg-primary text-white text-xs font-medium hover:bg-primary-hover', 'px-3 py-1.5 rounded-full bg-muted text-default text-xs font-medium hover:bg-muted'); ?>
                 </div>
             <?php endif; ?>
         <?php endif; ?>
