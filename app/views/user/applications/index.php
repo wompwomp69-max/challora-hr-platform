@@ -2,7 +2,7 @@
 .jobs-header-row{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:10px;}
 .jobs-filter-title{font-size:38px;font-weight:600;color:var(--gray-900);margin-bottom:10px;}
 .jobs-reset-btn{display:inline-block;font-size:13px;background:var(--color-accent);color:var(--color-on-primary);padding:5px 14px;border-radius:999px;text-decoration:none;font-weight:600;}
-.jobs-card-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px;}
+.jobs-card-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;}
 .job-card{background:var(--color-surface);border:2px solid var(--color-secondary);border-radius:28px;padding:14px;min-height:320px;display:flex;flex-direction:column;justify-content:space-around;}
 .job-card-top{background:var(--color-accent-muted);border-radius:18px;padding:18px 16px 18px;min-height:230px;display:flex;flex-direction:column;}
 .job-date{display:inline-block;background:var(--color-surface);border-radius:18px;padding:6px 12px;font-size:12px;font-weight:500;color:var(--color-text);}
@@ -12,8 +12,9 @@
 .job-card-bottom{padding:30px 4px 2px;display:flex;justify-content:space-between;align-items:flex-end;gap:10px;}
 .job-salary{font-size:22px;font-weight:700;color:var(--color-text);line-height:1;}
 .job-loc{font-size:14px;color:var(--gray-500);line-height:1.25;margin-top:6px;}
+.job-progress-cta{display:flex;flex-direction:column;align-items:flex-end;gap:8px;}
+.job-applied-label{font-size:12px;font-weight:600;color:var(--color-secondary);line-height:1;}
 .job-detail-btn{background:var(--color-secondary);color:var(--color-surface);border:0;padding:10px 18px;border-radius:999px;font-size:12px;font-weight:600;line-height:1;}
-@media (max-width: 1300px){.jobs-card-grid{grid-template-columns:repeat(3,minmax(0,1fr));}}
 @media (max-width: 1024px){.jobs-card-grid{grid-template-columns:repeat(2,minmax(0,1fr));}.jobs-header-row{flex-direction:column;align-items:flex-start;}}
 @media (max-width: 640px){.jobs-card-grid{grid-template-columns:1fr;}.jobs-filter-title{font-size:30px;}}
 </style>
@@ -67,7 +68,10 @@ $monthId = [
                         <div class="job-salary">Lamaran</div>
                         <div class="job-loc">Status saat ini: <?= e($statusLabel) ?></div>
                     </div>
-                    <a href="<?= BASE_URL ?>/jobs/show?id=<?= (int)($a['job_id'] ?? 0) ?>" class="job-detail-btn text-decoration-none">Detail</a>
+                    <div class="job-progress-cta">
+                        <span class="job-applied-label">Telah Dilamar</span>
+                        <a href="<?= BASE_URL ?>/jobs/show?id=<?= (int)($a['job_id'] ?? 0) ?>" class="job-detail-btn text-decoration-none">Lihat Progress</a>
+                    </div>
                 </div>
             </div>
         <?php endforeach; ?>

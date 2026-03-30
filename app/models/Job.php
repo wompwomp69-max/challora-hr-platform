@@ -27,7 +27,7 @@ class Job {
      * - job_type: jenis pekerjaan (full_time, part_time, freelance, remote, hybrid, onsite, dll)
      * - min_education: minimal pendidikan (sma, d3, s1, s2, s3)
      * - experience_level: level pengalaman (fresh_grad, junior_1_3, senior_5_10, dll)
-     * - updated: rentang pembaruan (month, week, day, any)
+     * - updated: rentang pembaruan (week, month, year, latest)
      * @param array<string,mixed> $params
      */
     public function searchAndFilter(array $params): array {
@@ -584,20 +584,16 @@ class Job {
      */
     private function appendUpdatedCondition(array &$conditions, array $params): void {
         $updated = trim((string) ($params['updated'] ?? ''));
-        if ($updated === 'day') {
-            $conditions[] = 'j.created_at >= DATE_SUB(NOW(), INTERVAL 1 DAY)';
-            return;
-        }
         if ($updated === 'week') {
-            $conditions[] = 'j.created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)';
+            $conditions[] = 'YEARWEEK(j.created_at, 1) = YEARWEEK(CURDATE(), 1)';
             return;
         }
         if ($updated === 'month') {
-            $conditions[] = 'j.created_at >= DATE_SUB(NOW(), INTERVAL 1 MONTH)';
+            $conditions[] = 'YEAR(j.created_at) = YEAR(CURDATE()) AND MONTH(j.created_at) = MONTH(CURDATE())';
             return;
         }
         if ($updated === 'year') {
-            $conditions[] = 'j.created_at >= DATE_SUB(NOW(), INTERVAL 1 YEAR)';
+            $conditions[] = 'YEAR(j.created_at) = YEAR(CURDATE())';
         }
     }
 

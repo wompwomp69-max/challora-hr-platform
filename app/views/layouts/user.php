@@ -1,10 +1,10 @@
 <?php require APP_PATH . '/views/layouts/header.php'; ?>
 <?php $activeUserPath = currentRoutePath('jobs'); ?>
 <style>
-.user-shell{min-height:100vh;background:var(--color-primary);--user-content-pad-x:10vw;--user-bar-pad-x:8vw;}
+.user-shell{min-height:100vh;background:var(--color-primary);--user-content-pad-x:10vw;--user-bar-pad-x:5vw;}
 .user-topnav{background:var(--color-secondary);color:var(--color-on-secondary);border-bottom:1px solid rgba(255,255,255,.28);}
 .user-topnav-inner{width:100%;padding:0 var(--user-bar-pad-x);min-height:84px;display:flex;align-items:stretch;justify-content:space-between;gap:22px;}
-.user-brand{display:flex;align-items:center;font-size:42px;font-weight:700;line-height:1;color:var(--color-primary);text-decoration:none;letter-spacing:.4px;}
+.user-brand{display:flex;align-items:center;font-size:28px;font-weight:700;line-height:1;color:var(--color-primary);text-decoration:none;letter-spacing:.4px;}
 .user-mainnav{display:flex;align-items:stretch;gap:8px;flex-grow:1;}
 .user-mainnav-link{display:flex;align-items:center;padding:0 22px;color:#edf3f8;text-decoration:none;font-weight:400;font-size:18px;border-bottom:5px solid transparent;}
 .user-mainnav-link.active{border-bottom-color:#fff;font-weight:600;}
@@ -19,7 +19,7 @@
     <div class="user-topnav-inner">
         <a href="<?= BASE_URL ?>/jobs" class="user-brand">CHALLORA</a>
         <nav class="user-mainnav flex-grow-1">
-            <a class="user-mainnav-link <?= str_starts_with($activeUserPath, 'jobs') && !str_starts_with($activeUserPath, 'jobs/saved') ? 'active' : '' ?>" href="<?= BASE_URL ?>/jobs">Lowongan</a>
+            <a class="user-mainnav-link ml-20 <?= str_starts_with($activeUserPath, 'jobs') && !str_starts_with($activeUserPath, 'jobs/saved') ? 'active' : '' ?>" href="<?= BASE_URL ?>/jobs">Lowongan</a>
             <a class="user-mainnav-link <?= str_contains($activeUserPath, 'applications') ? 'active' : '' ?>" href="<?= BASE_URL ?>/applications">Sudah Dilamar</a>
             <a class="user-mainnav-link <?= str_starts_with($activeUserPath, 'jobs/saved') ? 'active' : '' ?>" href="<?= BASE_URL ?>/jobs/saved">Lowongan Tersimpan</a>
         </nav>

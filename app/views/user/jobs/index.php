@@ -53,15 +53,15 @@ $selectedEducations = array_values(array_filter(array_map('trim', explode(',', $
 .jobs-filter-opt-input:checked + .jobs-filter-opt-box::after{transform:rotate(45deg) scale(1);}
 .jobs-filter-opt-input:checked ~ .jobs-filter-opt-text{font-weight:700;}
 .jobs-filter-opt-input:focus-visible + .jobs-filter-opt-box{outline:2px solid var(--color-info-text);outline-offset:2px;}
-.jobs-card-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px;}
-.job-card{background:var(--color-surface);border:2px solid var(--color-secondary);border-radius:28px;padding:14px;min-height:320px;display:flex;flex-direction:column;justify-content:space-around;}
-.job-card-top{background:var(--color-accent-muted);border-radius:18px;padding:18px 16px 18px;min-height:230px;display:flex;flex-direction:column;}
+.jobs-card-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;}
+.job-card{background:var(--color-surface);border:1px solid var(--color-secondary);border-radius:28px;padding:14px;min-height:320px;display:flex;flex-direction:column;justify-content:space-around;}
+.job-card-top{background:var(--color-accent-muted);border-radius:18px;padding:18px 16px 18px;min-height:220px;display:flex;flex-direction:column;}
 .job-date{display:inline-block;background:var(--color-surface);border-radius:18px;padding:6px 12px;font-size:12px;font-weight:500;color:var(--color-text);}
-.job-title{font-size:24px;line-height:1.12;font-weight:700;color:var(--color-secondary);margin-top:14px;}
+.job-title{font-size:24px;line-height:1.12;font-weight:700;color:var(--color-secondary);margin-top:14px;margin-bottom:24px;}
 .job-tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:auto;}
-.job-tag{font-size:12px;padding:3px 10px;border:2px solid var(--color-secondary);border-radius:999px;background:var(--color-surface);color:var(--color-secondary);font-weight:500;}
-.job-card-bottom{padding:30px 4px 2px;display:flex;justify-content:space-between;align-items:flex-end;gap:10px;}
-.job-salary{font-size:22px;font-weight:700;color:var(--color-text);line-height:1;}
+.job-tag{font-size:12px;padding:5px 10px;border:2px solid var(--color-secondary);border-radius:999px;background:var(--color-accent-muted);color:var(--color-secondary);font-weight:500;}
+.job-card-bottom{padding:20px 4px 2px;display:flex;justify-content:space-between;align-items:flex-end;gap:10px;}
+.job-salary{font-size:22px;font-weight:600;color:var(--color-text);line-height:1;}
 .jobs-filter-sal-input{border:1px var(--color-secondary) solid;border-radius:30px;padding:8px 18px;background-color:transparent;}
 .jobs-filter-sal-input::-webkit-outer-spin-button,.jobs-filter-sal-input::-webkit-inner-spin-button{display:none;}
 .jobs-filter-sal-input:focus{background-color:var(--color-primary-muted);border:2.5px var(--color-secondary) solid;outline:none;box-shadow:none;}
@@ -69,7 +69,8 @@ $selectedEducations = array_values(array_filter(array_map('trim', explode(',', $
 .job-detail-btn{background:var(--color-secondary);color:var(--color-surface);border:0;padding:10px 18px;border-radius:999px;font-size:12px;font-weight:600;line-height:1;}
 .job-bookmark{width:42px;height:42px;border-radius:16px;background:var(--color-surface);display:flex;align-items:center;justify-content:center;}
 .job-bookmark i{font-size:20px;color:var(--color-secondary);}
-@media (max-width: 1300px){.jobs-card-grid{grid-template-columns:repeat(3,minmax(0,1fr));}}
+.job-progress-cta{display:flex;flex-direction:column;align-items:flex-end;gap:8px;}
+.job-applied-label{font-size:12px;font-weight:600;color:var(--color-secondary);line-height:1;}
 @media (max-width: 1024px){.jobs-layout{grid-template-columns:1fr;}.jobs-filter{position:static;}.jobs-card-grid{grid-template-columns:repeat(2,minmax(0,1fr));}.jobs-search-sticky{position:static;}.jobs-search{grid-template-columns:1fr;height:auto;}.jobs-search-seg,.jobs-search-btn{height:60px;}.jobs-header-row{flex-direction:column;}.jobs-header-time{justify-content:flex-start;}}
 @media (max-width: 640px){.jobs-card-grid{grid-template-columns:1fr;}}
 </style>
@@ -142,6 +143,8 @@ if (count($expSelectedValues) === 1) {
 </div>
 <script>
 document.addEventListener('DOMContentLoaded', function () {
+    var stickySearchForm = document.querySelector('.jobs-search-sticky form.jobs-search');
+    var asideFilterForm = document.getElementById('jobs-filter-box');
     var expRoot = document.getElementById('jobs-exp-root');
     var expTrigger = document.getElementById('jobs-exp-trigger');
     var expPanel = document.getElementById('jobs-exp-panel');
@@ -155,6 +158,41 @@ document.addEventListener('DOMContentLoaded', function () {
     var filterToggle = document.getElementById('jobs-filter-toggle');
     var filterToggleIcon = document.getElementById('jobs-filter-toggle-icon');
     var filterBox = document.getElementById('jobs-filter-box');
+    var updatedInputAside = document.getElementById('jobs-updated-input-aside');
+
+    if (asideFilterForm) {
+        var submitAsideFilters = function () {
+            if (typeof asideFilterForm.requestSubmit === 'function') {
+                asideFilterForm.requestSubmit();
+            } else {
+                asideFilterForm.submit();
+            }
+        };
+        asideFilterForm.querySelectorAll('input[type="checkbox"][name="job_type[]"], input[type="checkbox"][name="min_education[]"]').forEach(function (checkboxEl) {
+            checkboxEl.addEventListener('change', function () {
+                submitAsideFilters();
+            });
+        });
+        asideFilterForm.querySelectorAll('input[name="min_salary"], input[name="max_salary"]').forEach(function (salaryInputEl) {
+            var lastCommittedValue = salaryInputEl.value;
+            salaryInputEl.addEventListener('change', function () {
+                lastCommittedValue = salaryInputEl.value;
+                submitAsideFilters();
+            });
+            salaryInputEl.addEventListener('blur', function () {
+                if (salaryInputEl.value === lastCommittedValue) return;
+                lastCommittedValue = salaryInputEl.value;
+                submitAsideFilters();
+            });
+            salaryInputEl.addEventListener('keydown', function (event) {
+                if (event.key !== 'Enter') return;
+                event.preventDefault();
+                lastCommittedValue = salaryInputEl.value;
+                submitAsideFilters();
+            });
+        });
+    }
+
     if (!expRoot || !expTrigger || !expPanel || !expLabel || !expInput || !updatedTrigger || !updatedPanel || !updatedLabel || !updatedInput) return;
 
     function syncExperienceSelectedState() {
@@ -216,8 +254,14 @@ document.addEventListener('DOMContentLoaded', function () {
             });
             this.classList.add('active');
             updatedInput.value = this.getAttribute('data-value') || '';
+            if (updatedInputAside) {
+                updatedInputAside.value = updatedInput.value;
+            }
             updatedLabel.textContent = this.getAttribute('data-label') || 'Terbaru';
             closeAllPanels();
+            if (stickySearchForm) {
+                stickySearchForm.submit();
+            }
         });
     });
 
@@ -249,6 +293,9 @@ document.addEventListener('DOMContentLoaded', function () {
             <i class="bi bi-chevron-down jobs-filter-toggle-icon" id="jobs-filter-toggle-icon"></i>
         </button>
         <form method="get" action="<?= BASE_URL ?>/jobs" class="jobs-filter-box" id="jobs-filter-box">
+            <div class="jobs-reset-wrap">
+                <a href="<?= BASE_URL ?>/jobs" class="jobs-reset-btn">Reset</a>
+            </div>
             <div class="jobs-filter-scroll">
                 <div class="jobs-filter-group">
                     <span class="jobs-filter-group-title text-secondary">Jenis Kontrak</span>
@@ -308,14 +355,10 @@ document.addEventListener('DOMContentLoaded', function () {
                     </div>
                 </div>
             </div>
-            <div class="d-flex gap-2 mt-3">
-                <button type="submit" class="btn btn-sm bg-accent text-secondary fw-semibold">Apply</button>
-                <a href="<?= BASE_URL ?>/jobs" class="btn btn-sm btn-outline-secondary">Reset</a>
-            </div>
             <input type="hidden" name="q" value="<?= e((string) ($searchParams['q'] ?? '')) ?>">
             <input type="hidden" name="location" value="<?= e((string) ($searchParams['location'] ?? '')) ?>">
             <input type="hidden" name="experience_level" value="<?= e(implode(',', $expSelectedValues)) ?>">
-            <input type="hidden" name="updated" value="<?= e($updatedSelectedValue) ?>">
+            <input type="hidden" name="updated" id="jobs-updated-input-aside" value="<?= e($updatedSelectedValue) ?>">
             <input type="hidden" name="job_view" value="<?= e((string) $jobView) ?>">
         </form>
     </aside>
@@ -351,6 +394,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     <?php
                     $applied = in_array((int)$j['id'], $appliedJobIds ?? [], true);
                     $saved = in_array((int)$j['id'], $savedJobIds ?? [], true);
+                    $isAppliedView = ($jobView ?? 'all') === 'applied';
                     $qs = array_filter(array_merge($searchParams ?? [], ['page' => $page ?? 1, 'job_view' => $jobView]));
                     $redirectBack = '/jobs' . (empty($qs) ? '' : '?' . http_build_query($qs));
                     $jobTypeLabel = ucwords(str_replace('_', ' ', (string)($j['job_type'] ?? 'Part Time')));
@@ -411,7 +455,14 @@ document.addEventListener('DOMContentLoaded', function () {
                                 <div class="job-salary"><?= e($j['salary_range'] ?? '-') ?></div>
                                 <div class="job-loc"><?= e($j['location'] ?? '-') ?></div>
                             </div>
-                            <a href="<?= BASE_URL ?>/jobs/show?id=<?= (int)$j['id'] ?>" class="job-detail-btn text-decoration-none">Detail</a>
+                            <?php if ($isAppliedView): ?>
+                                <div class="job-progress-cta">
+                                    <span class="job-applied-label">Telah Dilamar</span>
+                                    <a href="<?= BASE_URL ?>/jobs/show?id=<?= (int)$j['id'] ?>" class="job-detail-btn text-decoration-none">Lihat Progress</a>
+                                </div>
+                            <?php else: ?>
+                                <a href="<?= BASE_URL ?>/jobs/show?id=<?= (int)$j['id'] ?>" class="job-detail-btn text-decoration-none">Detail</a>
+                            <?php endif; ?>
                         </div>
                     </div>
                 <?php endforeach; ?>
@@ -419,21 +470,35 @@ document.addEventListener('DOMContentLoaded', function () {
         <?php endif; ?>
 
         <?php if (($totalPages ?? 1) > 1): ?>
-        <nav class="mt-3">
-            <ul class="inline-flex items-center gap-1 text-xs">
+        <nav class="mt-10">
+            <ul class="flex justify-center items-center gap-2 text-lg font-semibold">
                 <?php
                 $curPage = (int)($page ?? 1);
                 $tp = (int)($totalPages ?? 1);
                 $baseQ = array_merge(array_filter($searchParams ?? []), ['job_view' => $jobView]);
                 ?>
                 <li class="<?= $curPage <= 1 ? 'opacity-40 pointer-events-none' : '' ?>">
-                    <a class="px-2 py-1 rounded border sem-border-default sem-hover-bg-muted" href="<?= BASE_URL ?>/jobs?<?= http_build_query($baseQ + ['page' => $curPage - 1]) ?>">«</a>
+                    <a
+                        class="px-4 py-2 rounded-full border sem-border-default sem-hover-bg-muted transition-all duration-150"
+                        style="min-width:48px;font-size:1.25em;"
+                        href="<?= BASE_URL ?>/jobs?<?= http_build_query($baseQ + ['page' => $curPage - 1]) ?>"
+                    >«</a>
                 </li>
                 <?php for ($i = 1; $i <= $tp; $i++): ?>
-                <li><a class="px-2 py-1 rounded border <?= $i === $curPage ? 'bg-accent text-primary sem-border-accent' : 'sem-border-default sem-hover-bg-muted' ?>" href="<?= BASE_URL ?>/jobs?<?= http_build_query($baseQ + ['page' => $i]) ?>"><?= $i ?></a></li>
+                <li>
+                    <a
+                        class="px-4 py-2 rounded-full border transition-all duration-150 <?= $i === $curPage ? 'bg-accent text-secondary sem-border-accent shadow-lg scale-105' : 'sem-border-default sem-hover-bg-muted' ?>"
+                        style="min-width:48px;font-size:1.3em;"
+                        href="<?= BASE_URL ?>/jobs?<?= http_build_query($baseQ + ['page' => $i]) ?>"
+                    ><?= $i ?></a>
+                </li>
                 <?php endfor; ?>
                 <li class="<?= $curPage >= $tp ? 'opacity-40 pointer-events-none' : '' ?>">
-                    <a class="px-2 py-1 rounded border sem-border-default sem-hover-bg-muted" href="<?= BASE_URL ?>/jobs?<?= http_build_query($baseQ + ['page' => min($curPage + 1, $tp)]) ?>">»</a>
+                    <a
+                        class="px-4 py-2 rounded-full border sem-border-default sem-hover-bg-muted transition-all duration-150"
+                        style="min-width:48px;font-size:1.25em;"
+                        href="<?= BASE_URL ?>/jobs?<?= http_build_query($baseQ + ['page' => min($curPage + 1, $tp)]) ?>"
+                    >»</a>
                 </li>
             </ul>
         </nav>
