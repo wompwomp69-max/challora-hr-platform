@@ -6,15 +6,16 @@ $selectedEducationRaw = (string) ($searchParams['min_education'] ?? '');
 $selectedEducations = array_values(array_filter(array_map('trim', explode(',', $selectedEducationRaw)), fn($v) => $v !== ''));
 ?>
 <style>
+/* *{border:1px solid red;} */
 .jobs-search-sticky{position:sticky;top:0;z-index:40;margin:-16px calc(var(--user-content-pad-x, 10vw) * -1) 20px;width:calc(100% + (var(--user-content-pad-x, 10vw) * 2));background:var(--color-secondary);padding:0 var(--user-bar-pad-x, 3.5vw);box-sizing:border-box;box-shadow:var(--shadow-md);}
 .jobs-search{display:grid;grid-template-columns:1fr 1fr 1fr 140px;gap:0;overflow:visible;position:relative;height:92px;}
 .jobs-search-seg{display:flex;align-items:center;gap:12px;padding:0 16px;color:var(--gray-50);border:1px solid color-mix(in srgb,var(--color-surface) 20%,transparent);height:92px;}
-.jobs-search-seg input,.jobs-search-seg select{width:100%;background:transparent;border:0;color:var(--color-surface);font-size:16px;outline:none;}
+.jobs-search-seg input,.jobs-search-seg select{width:100%;background:transparent;border:0;color:var(--color-surface);font-size:15px;outline:none;}
 .jobs-search-seg input::placeholder{color:var(--color-border);}
 .jobs-search-seg input, .jobs-search-seg button{height:100%;}
-.jobs-search-btn{background:var(--color-surface);color:var(--color-secondary);border:0;border-radius:0;font-size:24px;font-weight:600;height:92px;}
+.jobs-search-btn{background:var(--color-surface);color:var(--color-secondary);border:0;border-radius:0;font-size:20px;font-weight:600;height:92px;}
 .jobs-exp-seg{position:relative;}
-.jobs-exp-trigger{display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;background:transparent;border:0;color:var(--color-surface);padding:0;font-size:16px;}
+.jobs-exp-trigger{display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;background:transparent;border:0;color:var(--color-surface);padding:0;font-size:15px;}
 .jobs-exp-trigger i{font-size:14px;}
 .jobs-exp-panel{position:absolute;top:calc(100% + 1px);left:-1px;right:-1px;background:var(--color-secondary);border:1px solid color-mix(in srgb,var(--color-surface) 22%,transparent);box-shadow:var(--shadow-lg);}
 .jobs-exp-option{display:flex;align-items:center;gap:14px;color:var(--gray-100);padding:20px 18px;border-bottom:1px solid color-mix(in srgb,var(--color-surface) 20%,transparent);cursor:pointer;}
@@ -25,54 +26,69 @@ $selectedEducations = array_values(array_filter(array_map('trim', explode(',', $
 .jobs-exp-hidden{display:none;}
 .jobs-header-row{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:10px;}
 .jobs-header-time{position:relative;min-width:260px;display:flex;justify-content:flex-end;}
-.jobs-header-time-trigger{display:flex;align-items:center;gap:8px;background:transparent;border:0;color:var(--gray-900);font-size:18px;padding:8px 0;}
+.jobs-header-time-trigger{display:flex;align-items:center;gap:8px;background:transparent;border:0;color:var(--gray-900);font-size:16px;padding:8px 0;}
 .jobs-header-time-trigger strong{font-weight:700;}
 .jobs-header-time-panel{position:absolute;top:calc(100% + 4px);right:0;min-width:320px;z-index:35;background:var(--color-secondary);border:1px solid color-mix(in srgb,var(--color-surface) 22%,transparent);box-shadow:var(--shadow-lg);}
 .jobs-reset-wrap{margin-bottom:8px;}
-.jobs-reset-btn{display:inline-block;font-size:13px;background:var(--color-accent);color:var(--color-on-primary);padding:5px 14px;border-radius:999px;text-decoration:none;font-weight:600;}
-.jobs-body{margin:0 calc(var(--user-content-pad-x, 10vw) * -1);padding:0 var(--user-bar-pad-x, 3.5vw);}
-.jobs-layout{display:grid;grid-template-columns:220px 1fr;gap:48px;}
-.jobs-filter{background:var(--color-primary);padding:12px;border-radius:8px;align-self:start;position:sticky;top:108px;}
+.jobs-reset-btn{display:inline-block;font-size:12px;background:var(--color-accent);color:var(--color-on-primary);padding:5px 14px;border-radius:999px;text-decoration:none;font-weight:600;}
+.jobs-body{margin:0 calc(var(--user-content-pad-x, 10vw) * -1);padding:0 var(--user-bar-pad-x, 3.5vw);box-sizing:border-box;}
+.jobs-layout{display:grid;grid-template-columns:220px minmax(0,1fr);gap:92px;align-items:start;width:100vh-33vh-92px;}
+.jobs-layout>section{min-width:0;}
+.jobs-filter{background:var(--color-surface);padding:0 12px;border-radius:8px;align-self:start;position:sticky;width: 33vh;}
 .jobs-filter-toggle{display:flex;align-items:center;justify-content:space-between;width:100%;background:transparent;border:0;padding:0;margin-bottom:8px;color:var(--gray-900);}
-.jobs-filter-toggle-label{font-size:14px;font-weight:600;}
+.jobs-filter-toggle-label{font-size:13px;font-weight:600;}
 .jobs-filter-toggle-icon{font-size:16px;line-height:1;}
-.jobs-filter-title{font-size:38px;font-weight:600;color:var(--gray-900);margin-bottom:10px;}
-.jobs-filter-box{padding:10x;margin:30px 0;scrollbar-width: thin;scrollbar-color:var(--gray-500) var(--gray-100);}
+.jobs-filter-title{font-size:32px;font-weight:600;color:var(--gray-900);margin-bottom:10px;}
+.jobs-filter-box{padding:0 10px 0 0;margin:10px 0 0;scrollbar-width: thin;scrollbar-color:var(--gray-500) var(--gray-100);}
 .jobs-filter-scroll{min-height:50vh;overflow-y:auto;padding-right:4px;}
 .jobs-filter-group{margin-bottom:12px;}
 .jobs-filter-group:last-child{margin-bottom:0;}
-.jobs-filter-group-title{display:block;font-size:19px;font-weight:700;margin-bottom:8px;}
-.jobs-filter-opt{display:flex;align-items:center;gap:8px;margin-top:6px;font-size:13px;color:var(--gray-900);}
+.jobs-filter-group-title{display:block;font-size:16px;font-weight:700;margin-bottom:8px;}
+.jobs-filter-opt{display:flex;align-items:center;gap:8px;margin-top:6px;font-size:12px;color:var(--gray-900);}
 .jobs-filter-checklist{margin-top:6px;}
-.jobs-filter-opt-custom{position:relative;display:flex;align-items:center;gap:12px;margin-top:12px;color:var(--color-secondary);font-size:17px;font-weight:500;line-height:1.25;cursor:pointer;user-select:none;}
+.jobs-filter-opt-custom{position:relative;display:flex;align-items:center;gap:12px;margin-top:12px;color:var(--color-secondary);font-size:15px;font-weight:500;line-height:1.25;cursor:pointer;user-select:none;}
 .jobs-filter-opt-custom:first-child{margin-top:0;}
 .jobs-filter-opt-input{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);clip-path:inset(50%);border:0;white-space:nowrap;}
-.jobs-filter-opt-box{width:24px;height:24px;flex:0 0 24px;border:2px solid var(--color-secondary);border-radius:7px;background:var(--color-primary);display:inline-flex;align-items:center;justify-content:center;transition:background-color .18s ease,border-color .18s ease;}
-.jobs-filter-opt-box::after{content:"";width:6px;height:11px;border:solid var(--color-surface);border-width:0 2px 2px 0;transform:rotate(45deg) scale(0);transform-origin:center;transition:transform .16s ease;}
+.jobs-filter-opt-box{width:20px;height:20px;flex:0 0 20px;border:2px solid var(--color-secondary);border-radius:6px;background:transparent;display:inline-flex;align-items:center;justify-content:center;transition:background-color .18s ease,border-color .18s ease;}
+.jobs-filter-opt-box::after{content:"";width:5px;height:9px;border:solid var(--color-surface);border-width:0 2px 2px 0;transform:rotate(45deg) scale(0);transform-origin:center;transition:transform .16s ease;}
 .jobs-filter-opt-input:checked + .jobs-filter-opt-box{background:var(--color-secondary);border-color:var(--color-secondary);}
 .jobs-filter-opt-input:checked + .jobs-filter-opt-box::after{transform:rotate(45deg) scale(1);}
 .jobs-filter-opt-input:checked ~ .jobs-filter-opt-text{font-weight:700;}
 .jobs-filter-opt-input:focus-visible + .jobs-filter-opt-box{outline:2px solid var(--color-info-text);outline-offset:2px;}
-.jobs-card-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;}
-.job-card{background:var(--color-surface);border:1px solid var(--color-secondary);border-radius:28px;padding:14px;min-height:320px;display:flex;flex-direction:column;justify-content:space-around;}
+.jobs-card-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:32px;width:100%;}
+.job-card{background:var(--color-surface);border:1px solid var(--color-secondary);border-radius:28px;padding:14px;min-height:320px;min-width:0;width:100%;box-sizing:border-box;display:flex;flex-direction:column;justify-content:space-around;}
 .job-card-top{background:var(--color-accent-muted);border-radius:18px;padding:18px 16px 18px;min-height:220px;display:flex;flex-direction:column;}
-.job-date{display:inline-block;background:var(--color-surface);border-radius:18px;padding:6px 12px;font-size:12px;font-weight:500;color:var(--color-text);}
-.job-title{font-size:24px;line-height:1.12;font-weight:700;color:var(--color-secondary);margin-top:14px;margin-bottom:24px;}
+.job-date{display:inline-block;background:var(--color-surface);border-radius:18px;padding:6px 12px;font-size:11px;font-weight:500;color:var(--color-text);}
+.job-title{font-size:20px;line-height:1.12;font-weight:700;color:var(--color-secondary);margin-top:14px;margin-bottom:24px;overflow-wrap:break-word;word-break:break-word;}
 .job-tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:auto;}
-.job-tag{font-size:12px;padding:5px 10px;border:2px solid var(--color-secondary);border-radius:999px;background:var(--color-accent-muted);color:var(--color-secondary);font-weight:500;}
+.job-tag{font-size:11px;padding:5px 10px;border:2px solid var(--color-secondary);border-radius:999px;background:var(--color-accent-muted);color:var(--color-secondary);font-weight:500;}
 .job-card-bottom{padding:20px 4px 2px;display:flex;justify-content:space-between;align-items:flex-end;gap:10px;}
-.job-salary{font-size:22px;font-weight:600;color:var(--color-text);line-height:1;}
+.job-salary{font-size:19px;font-weight:600;color:var(--color-text);line-height:1;}
 .jobs-filter-sal-input{border:1px var(--color-secondary) solid;border-radius:30px;padding:8px 18px;background-color:transparent;}
 .jobs-filter-sal-input::-webkit-outer-spin-button,.jobs-filter-sal-input::-webkit-inner-spin-button{display:none;}
 .jobs-filter-sal-input:focus{background-color:var(--color-primary-muted);border:2.5px var(--color-secondary) solid;outline:none;box-shadow:none;}
-.job-loc{font-size:14px;color:var(--gray-500);line-height:1.25;margin-top:6px;}
-.job-detail-btn{background:var(--color-secondary);color:var(--color-surface);border:0;padding:10px 18px;border-radius:999px;font-size:12px;font-weight:600;line-height:1;}
+.job-loc{font-size:12px;color:var(--gray-500);line-height:1.25;margin-top:6px;}
+.job-detail-btn{background:var(--color-secondary);color:var(--color-surface);border:0;padding:10px 18px;border-radius:999px;font-size:11px;font-weight:600;line-height:1;}
 .job-bookmark{width:42px;height:42px;border-radius:16px;background:var(--color-surface);display:flex;align-items:center;justify-content:center;}
-.job-bookmark i{font-size:20px;color:var(--color-secondary);}
+.job-bookmark i{font-size:18px;color:var(--color-secondary);}
 .job-progress-cta{display:flex;flex-direction:column;align-items:flex-end;gap:8px;}
-.job-applied-label{font-size:12px;font-weight:600;color:var(--color-secondary);line-height:1;}
+.job-applied-label{font-size:11px;font-weight:600;color:var(--color-secondary);line-height:1;}
+@media (max-width: 1240px) and (min-width: 1025px){.jobs-card-grid{grid-template-columns:repeat(2,minmax(0,1fr));}}
 @media (max-width: 1024px){.jobs-layout{grid-template-columns:1fr;}.jobs-filter{position:static;}.jobs-card-grid{grid-template-columns:repeat(2,minmax(0,1fr));}.jobs-search-sticky{position:static;}.jobs-search{grid-template-columns:1fr;height:auto;}.jobs-search-seg,.jobs-search-btn{height:60px;}.jobs-header-row{flex-direction:column;}.jobs-header-time{justify-content:flex-start;}}
 @media (max-width: 640px){.jobs-card-grid{grid-template-columns:1fr;}}
+.jobs-pagination{display:flex;align-items:center;justify-content:center;gap:10px;margin-top:2.75rem;padding:12px 0 8px;flex-wrap:wrap;width:100%;}
+.jobs-pagination-pages{display:flex;align-items:center;justify-content:center;gap:10px;list-style:none;margin:0;padding:0;}
+.jobs-pagination-pages>li{margin:0;display:flex;align-items:center;}
+.jobs-pagination-arrow{display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;border:0;background:transparent;padding:0;color:var(--color-secondary);text-decoration:none;flex-shrink:0;transition:opacity .15s ease,color .15s ease;}
+.jobs-pagination-arrow:hover:not(.jobs-pagination-arrow--disabled){opacity:.72;color:var(--color-secondary-hover);}
+.jobs-pagination-arrow:focus-visible{outline:2px solid var(--color-secondary);outline-offset:2px;border-radius:4px;}
+.jobs-pagination-arrow--disabled{opacity:.35;pointer-events:none;cursor:default;}
+.jobs-pagination-arrow i{font-size:0.8rem;line-height:1;}
+.jobs-pagination-num{display:inline-flex;align-items:center;justify-content:center;min-width:40px;height:40px;padding:0 10px;box-sizing:border-box;border-radius:10px;border:1px solid var(--color-secondary);background:var(--color-surface);color:var(--color-secondary);font-size:15px;font-weight:600;font-family:var(--font-sans);line-height:1;text-decoration:none;transition:background-color .15s ease,color .15s ease,border-color .15s ease;}
+a.jobs-pagination-num:hover{background:color-mix(in srgb,var(--color-secondary) 6%,var(--color-surface));color:var(--color-secondary);border-color:var(--color-secondary);}
+.jobs-pagination-num--active{background:var(--color-secondary);color:var(--color-surface);border-color:var(--color-secondary);cursor:default;pointer-events:none;}
+.jobs-pagination-num.jobs-pagination-ellipsis{min-width:40px;padding:0 10px;cursor:default;user-select:none;letter-spacing:.02em;font-weight:600;line-height:1;}
+@media (max-width: 480px){.jobs-pagination{gap:8px;margin-top:2rem;padding-top:8px;}.jobs-pagination-pages{gap:8px;}.jobs-pagination-arrow{width:36px;min-width:36px;height:36px;}.jobs-pagination-num{min-width:36px;height:36px;padding:0 8px;font-size:14px;border-radius:9px;}.jobs-pagination-num.jobs-pagination-ellipsis{min-width:36px;padding:0 6px;}.jobs-pagination-arrow i{font-size:0.72rem;}}
 </style>
 
 <?php
@@ -286,7 +302,7 @@ document.addEventListener('DOMContentLoaded', function () {
 </script>
 
 <div class="jobs-body">
-<div class="jobs-layout mt-10">
+<div class="jobs-layout mt-8">
     <aside class="jobs-filter">
         <button type="button" class="jobs-filter-toggle" id="jobs-filter-toggle" aria-expanded="true">
             <span class="jobs-filter-toggle-label">Filter Lainnya</span>
@@ -469,37 +485,94 @@ document.addEventListener('DOMContentLoaded', function () {
         <?php endif; ?>
 
         <?php if (($totalPages ?? 1) > 1): ?>
-        <nav class="mt-10">
-            <ul class="flex justify-center items-center gap-2 text-lg font-semibold">
-                <?php
-                $curPage = (int)($page ?? 1);
-                $tp = (int)($totalPages ?? 1);
-                $baseQ = array_merge(array_filter($searchParams ?? []), ['job_view' => $jobView]);
-                ?>
-                <li class="<?= $curPage <= 1 ? 'opacity-40 pointer-events-none' : '' ?>">
-                    <a
-                        class="px-4 py-2 rounded-full border sem-border-default sem-hover-bg-muted transition-all duration-150"
-                        style="min-width:48px;font-size:1.25em;"
-                        href="<?= BASE_URL ?>/jobs?<?= http_build_query($baseQ + ['page' => $curPage - 1]) ?>"
-                    >«</a>
-                </li>
-                <?php for ($i = 1; $i <= $tp; $i++): ?>
-                <li>
-                    <a
-                        class="px-4 py-2 rounded-full border transition-all duration-150 <?= $i === $curPage ? 'bg-accent text-secondary sem-border-accent shadow-lg scale-105' : 'sem-border-default sem-hover-bg-muted' ?>"
-                        style="min-width:48px;font-size:1.3em;"
-                        href="<?= BASE_URL ?>/jobs?<?= http_build_query($baseQ + ['page' => $i]) ?>"
-                    ><?= $i ?></a>
-                </li>
-                <?php endfor; ?>
-                <li class="<?= $curPage >= $tp ? 'opacity-40 pointer-events-none' : '' ?>">
-                    <a
-                        class="px-4 py-2 rounded-full border sem-border-default sem-hover-bg-muted transition-all duration-150"
-                        style="min-width:48px;font-size:1.25em;"
-                        href="<?= BASE_URL ?>/jobs?<?= http_build_query($baseQ + ['page' => min($curPage + 1, $tp)]) ?>"
-                    >»</a>
-                </li>
+        <?php
+        $curPage = (int) ($page ?? 1);
+        $tp = (int) ($totalPages ?? 1);
+        $baseQ = array_merge(array_filter($searchParams ?? []), ['job_view' => $jobView]);
+        if ($tp <= 7) {
+            $paginationItems = [];
+            for ($i = 1; $i <= $tp; $i++) {
+                $paginationItems[] = ['type' => 'page', 'n' => $i];
+            }
+        } elseif ($curPage <= 4) {
+            $paginationItems = [
+                ['type' => 'page', 'n' => 1],
+                ['type' => 'page', 'n' => 2],
+                ['type' => 'page', 'n' => 3],
+                ['type' => 'page', 'n' => 4],
+                ['type' => 'ellipsis'],
+                ['type' => 'page', 'n' => $tp],
+            ];
+        } elseif ($curPage >= $tp - 3) {
+            $paginationItems = [
+                ['type' => 'page', 'n' => 1],
+                ['type' => 'ellipsis'],
+                ['type' => 'page', 'n' => $tp - 3],
+                ['type' => 'page', 'n' => $tp - 2],
+                ['type' => 'page', 'n' => $tp - 1],
+                ['type' => 'page', 'n' => $tp],
+            ];
+        } else {
+            $paginationItems = [
+                ['type' => 'page', 'n' => 1],
+                ['type' => 'ellipsis'],
+                ['type' => 'page', 'n' => $curPage - 1],
+                ['type' => 'page', 'n' => $curPage],
+                ['type' => 'page', 'n' => $curPage + 1],
+                ['type' => 'ellipsis'],
+                ['type' => 'page', 'n' => $tp],
+            ];
+        }
+        ?>
+        <nav class="jobs-pagination" aria-label="Navigasi halaman lowongan">
+            <?php if ($curPage <= 1): ?>
+                <span class="jobs-pagination-arrow jobs-pagination-arrow--disabled" aria-disabled="true" aria-label="Halaman sebelumnya">
+                    <i class="bi bi-caret-left-fill" aria-hidden="true"></i>
+                </span>
+            <?php else: ?>
+                <a
+                    class="jobs-pagination-arrow"
+                    href="<?= BASE_URL ?>/jobs?<?= http_build_query($baseQ + ['page' => $curPage - 1]) ?>"
+                    aria-label="Halaman sebelumnya"
+                ><i class="bi bi-caret-left-fill" aria-hidden="true"></i></a>
+            <?php endif; ?>
+            <ul class="jobs-pagination-pages">
+                <?php foreach ($paginationItems as $item): ?>
+                    <?php if (($item['type'] ?? '') === 'ellipsis'): ?>
+                        <li>
+                            <span class="jobs-pagination-num jobs-pagination-ellipsis" aria-hidden="true">...</span>
+                        </li>
+                    <?php else: ?>
+                        <?php
+                        $pn = (int) ($item['n'] ?? 0);
+                        if ($pn < 1) {
+                            continue;
+                        }
+                        ?>
+                        <li>
+                            <?php if ($pn === $curPage): ?>
+                                <span class="jobs-pagination-num jobs-pagination-num--active" aria-current="page"><?= $pn ?></span>
+                            <?php else: ?>
+                                <a
+                                    class="jobs-pagination-num"
+                                    href="<?= BASE_URL ?>/jobs?<?= http_build_query($baseQ + ['page' => $pn]) ?>"
+                                ><?= $pn ?></a>
+                            <?php endif; ?>
+                        </li>
+                    <?php endif; ?>
+                <?php endforeach; ?>
             </ul>
+            <?php if ($curPage >= $tp): ?>
+                <span class="jobs-pagination-arrow jobs-pagination-arrow--disabled" aria-disabled="true" aria-label="Halaman berikutnya">
+                    <i class="bi bi-caret-right-fill" aria-hidden="true"></i>
+                </span>
+            <?php else: ?>
+                <a
+                    class="jobs-pagination-arrow"
+                    href="<?= BASE_URL ?>/jobs?<?= http_build_query($baseQ + ['page' => min($curPage + 1, $tp)]) ?>"
+                    aria-label="Halaman berikutnya"
+                ><i class="bi bi-caret-right-fill" aria-hidden="true"></i></a>
+            <?php endif; ?>
         </nav>
         <?php endif; ?>
     </section>

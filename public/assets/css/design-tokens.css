@@ -76,6 +76,13 @@
     --shadow-md: 0 8px 24px rgba(15, 23, 42, 0.08);
     --shadow-lg: 0 20px 50px rgba(15, 23, 42, 0.18);
 
+    /* --- Scrollbars (global; komponen bisa override scrollbar-color / ::-webkit-* lebih spesifik) --- */
+    --scrollbar-size: 9px;
+    --scrollbar-thumb: var(--color-secondary-muted);
+    --scrollbar-thumb-hover: var(--color-secondary);
+    --scrollbar-thumb-active: var(--color-secondary-hover);
+    --scrollbar-track: transparent;
+
     /* --- Alias untuk stylesheet lama / utility cepat (auth, dsb.) --- */
     --primary: var(--color-primary);
     --secondary: var(--color-secondary);
@@ -104,6 +111,42 @@ html,
 body {
     color: var(--color-text);
     background: var(--color-surface);
+}
+
+/* Scrollbars — Firefox: hanya html agar scrollbar-color di ancestor (mis. .jobs-filter-box) tetap diwariskan ke area scroll dalam */
+html {
+    scrollbar-width: thin;
+    scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+}
+
+/* Scrollbars — Chrome, Edge, Safari, Opera */
+*::-webkit-scrollbar {
+    width: var(--scrollbar-size);
+    height: var(--scrollbar-size);
+}
+*::-webkit-scrollbar-track {
+    background: var(--scrollbar-track);
+    border-radius: var(--radius-full);
+}
+*::-webkit-scrollbar-thumb {
+    background: var(--scrollbar-thumb);
+    border-radius: var(--radius-full);
+    border: 2px solid transparent;
+    background-clip: padding-box;
+    transition: background-color 0.18s ease;
+}
+*::-webkit-scrollbar-thumb:hover {
+    background: var(--scrollbar-thumb-hover);
+    border: 2px solid transparent;
+    background-clip: padding-box;
+}
+*::-webkit-scrollbar-thumb:active {
+    background: var(--scrollbar-thumb-active);
+    border: 2px solid transparent;
+    background-clip: padding-box;
+}
+*::-webkit-scrollbar-corner {
+    background: transparent;
 }
 
 /* Semantic utilities (pakai langsung di view jika mau lepas dari Tailwind color map) */

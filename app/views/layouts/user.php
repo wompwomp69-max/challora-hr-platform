@@ -1,9 +1,12 @@
 <?php require APP_PATH . '/views/layouts/header.php'; ?>
 <?php $activeUserPath = currentRoutePath('jobs'); ?>
 <style>
-.user-shell{min-height:100vh;background:var(--color-primary);--user-content-pad-x:10vw;--user-bar-pad-x:5vw;display:flex;flex-direction:column;}
-.user-topnav{background:var(--color-secondary);color:var(--color-on-secondary);border-bottom:1px solid rgba(255,255,255,.28);}
-.user-topnav-inner{width:100%;padding:0 var(--user-bar-pad-x);min-height:84px;display:flex;align-items:stretch;justify-content:space-between;gap:22px;}
+html,body{-ms-overflow-style:none;scrollbar-width:none;}
+html::-webkit-scrollbar,body::-webkit-scrollbar{width:0;height:0;display:none;}
+.user-shell{min-height:100vh;background:var(--color-surface);--user-content-pad-x:10vw;--user-bar-pad-x:5vw;display:flex;flex-direction:column;}
+/* Stacking: must sit above in-page sticky bars (e.g. .jobs-search-sticky z-index:40) so avatar dropdown is not covered */
+.user-topnav{position:relative;z-index:50;overflow:visible;background:var(--color-secondary);color:var(--color-on-secondary);border-bottom:1px solid rgba(255,255,255,.28);}
+.user-topnav-inner{width:100%;padding:0 var(--user-bar-pad-x);min-height:84px;display:flex;align-items:stretch;justify-content:space-between;gap:22px;overflow:visible;}
 .user-brand{display:flex;align-items:center;font-size:28px;font-weight:700;line-height:1;color:var(--color-primary);text-decoration:none;letter-spacing:.4px;}
 .user-mainnav{display:flex;align-items:stretch;gap:8px;flex-grow:1;}
 .user-mainnav-link{display:flex;align-items:center;padding:0 22px;color:#edf3f8;text-decoration:none;font-weight:400;font-size:18px;border-bottom:5px solid transparent;}
@@ -12,7 +15,37 @@
 .user-avatar-btn{width:40px;height:40px;border-radius:999px;background:#fff;color:var(--color-secondary);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;border:none;}
 .user-main-wrap{width:100%;padding:16px var(--user-content-pad-x) 24px;flex:1 0 auto;}
 #user-menu-root{position:relative;z-index:9998;}
-#user-menu-dropdown{z-index:9999 !important;}
+#user-menu-dropdown{
+    position:absolute;
+    top:calc(100% + 8px);
+    right:0;
+    min-width:220px;
+    z-index:9999 !important;
+    padding:0;
+    margin:0;
+    background:var(--color-secondary);
+    border:1px solid color-mix(in srgb,var(--color-surface) 22%,transparent);
+    box-shadow:var(--shadow-lg);
+}
+.user-menu-dropdown-link{
+    display:flex;
+    align-items:center;
+    gap:14px;
+    color:var(--gray-100);
+    font-size:16px;
+    font-weight:400;
+    line-height:1.25;
+    text-decoration:none;
+    padding:20px 18px;
+    border-bottom:1px solid color-mix(in srgb,var(--color-surface) 20%,transparent);
+    transition:background-color .18s ease,color .18s ease;
+}
+.user-menu-dropdown-link:last-child{border-bottom:0;}
+.user-menu-dropdown-link:hover{
+    background:color-mix(in srgb,var(--color-surface) 10%,transparent);
+    color:#fff;
+}
+.user-menu-dropdown-link i{font-size:14px;line-height:1;flex-shrink:0;opacity:.95;}
 .user-footer{margin-top:24px;border-top:1px solid color-mix(in srgb,var(--color-secondary) 15%,transparent);background:var(--color-secondary);}
 .user-footer-inner{width:100%;padding:16px var(--user-content-pad-x);display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;}
 .user-footer-copy{font-size:13px;color:var(--color-text-muted);}
@@ -50,15 +83,14 @@
                             <?= e($initial) ?>
                         <?php endif; ?>
                     </button>
-                    <div
-                        id="user-menu-dropdown"
-                        class="absolute right-0 mt-2 w-40 bg-surface rounded-xl shadow-lg border border-muted py-1 text-xs text-muted hidden"
-                    >
-                        <a href="<?= BASE_URL ?>/user/settings" class="block px-3 py-2 hover:bg-muted">
-                            Pengaturan user
+                    <div id="user-menu-dropdown" class="hidden">
+                        <a href="<?= BASE_URL ?>/user/settings" class="user-menu-dropdown-link">
+                            <i class="bi bi-gear" aria-hidden="true"></i>
+                            <span>Pengaturan user</span>
                         </a>
-                        <a href="<?= BASE_URL ?>/auth/logout" class="block px-3 py-2 hover:bg-muted">
-                            Logout
+                        <a href="<?= BASE_URL ?>/auth/logout" class="user-menu-dropdown-link">
+                            <i class="bi bi-box-arrow-right" aria-hidden="true"></i>
+                            <span>Logout</span>
                         </a>
                     </div>
                 </div>
