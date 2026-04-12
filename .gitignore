@@ -7,4 +7,5 @@ database/
 storage/
 .vscode/
 docs/superpowers/specs/
-.superpowers/brainstorm/12345/
+.superpowers/brainstorm/
+scratch/
