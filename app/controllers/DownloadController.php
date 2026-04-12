@@ -26,7 +26,7 @@ class DownloadController {
         requireRole('user');
         $type = $_GET['type'] ?? '';
         if (!in_array($type, ['cv', 'diploma', 'photo'], true)) {
-            $_SESSION['flash_error'] = 'Tipe dokumen tidak valid.';
+            $_SESSION['flash_error'] = 'Invalid document type.';
             redirect('/user/settings');
         }
 
@@ -37,7 +37,7 @@ class DownloadController {
         $pathKey = $type === 'cv' ? 'cv_path' : ($type === 'diploma' ? 'diploma_path' : 'photo_path');
         $rel = (string) ($user[$pathKey] ?? '');
         if ($rel === '') {
-            $_SESSION['flash_error'] = ucfirst($type) . ' belum diunggah.';
+            $_SESSION['flash_error'] = ucfirst($type) . ' has not been uploaded.';
             redirect('/user/settings');
         }
 
@@ -64,30 +64,30 @@ class DownloadController {
         $id = (int) ($_GET['id'] ?? 0);
         $type = $_GET['type'] ?? '';
         if ($id < 1 || !in_array($type, ['cv', 'diploma', 'photo'], true)) {
-            $_SESSION['flash_error'] = 'Tidak valid.';
+            $_SESSION['flash_error'] = 'Invalid request.';
             redirect('/jobs');
         }
         $app = $this->appModel->findById($id);
         if (!$app) {
-            $_SESSION['flash_error'] = 'Lamaran tidak ditemukan.';
+            $_SESSION['flash_error'] = 'Application not found.';
             redirect('/jobs');
         }
         $pathKey = $type === 'cv' ? 'cv_path' : ($type === 'diploma' ? 'diploma_path' : 'photo_path');
         if (empty($app[$pathKey])) {
-            $_SESSION['flash_error'] = ucfirst($type) . ' tidak ditemukan.';
+            $_SESSION['flash_error'] = ucfirst($type) . ' not found.';
             redirect('/jobs');
         }
         $uid = currentUserId();
         $role = currentRole();
         $allowed = ($role === 'hr') || (($role === 'user') && ((int)$app['user_id']) === $uid);
         if (!$allowed) {
-            $_SESSION['flash_error'] = 'Akses ditolak.';
+            $_SESSION['flash_error'] = 'Access denied.';
             redirect('/jobs');
         }
         $path = BASE_PATH . '/' . $app[$pathKey];
         $pattern = '#^storage/(cv|diplomas|photos)/[a-zA-Z0-9_.-]+$#';
         if (!preg_match($pattern, $app[$pathKey]) || !is_file($path)) {
-            $_SESSION['flash_error'] = 'File tidak ditemukan.';
+            $_SESSION['flash_error'] = 'File not found.';
             redirect('/jobs');
         }
         $mime = mime_content_type($path) ?: 'application/octet-stream';
@@ -103,7 +103,7 @@ class DownloadController {
     public function avatar(): void {
         requireLogin();
         if (currentRole() !== 'user') {
-            $_SESSION['flash_error'] = 'Akses ditolak.';
+            $_SESSION['flash_error'] = 'Access denied.';
             redirect('/jobs');
         }
         $user = $this->userModel->findById(currentUserId());
@@ -139,25 +139,40 @@ class DownloadController {
         requireLogin();
         $id = (int) ($_GET['id'] ?? 0);
         if ($id < 1) {
-            $_SESSION['flash_error'] = 'Tidak valid.';
+            $_SESSION['flash_error'] = 'Invalid request.';
             redirect('/jobs');
         }
         $app = $this->appModel->findById($id);
         if (!$app) {
-            $_SESSION['flash_error'] = 'Lamaran tidak ditemukan.';
+            $_SESSION['flash_error'] = 'Application not found.';
             redirect('/jobs');
         }
         $uid = currentUserId();
         $role = currentRole();
         $allowed = ($role === 'hr') || (($role === 'user') && ((int)$app['user_id']) === $uid);
         if (!$allowed) {
-            $_SESSION['flash_error'] = 'Akses ditolak.';
+            $_SESSION['flash_error'] = 'Access denied.';
             redirect('/jobs');
         }
         if ($role === 'hr' && ($app['status'] ?? '') === 'pending') {
             $this->appModel->updateStatus((int)$app['id'], 'reviewed');
             $app['status'] = 'reviewed';
         }
-        render_view('hr/applications/berkas', ['app' => $app]);
+
+        $user = $this->userModel->findById((int) $app['user_id']);
+        $job = $this->jobModel->findById((int) $app['job_id']);
+        $returnTo = trim((string) ($_GET['return_to'] ?? '')) ?: 'hr/applications';
+        $returnToRoute = $returnTo;
+        $returnToQuery = '';
+        if (strpos($returnTo, '?') !== false) {
+            [$returnToRoute, $returnToQuery] = explode('?', $returnTo, 2);
+        }
+        render_view('hr/applications/berkas', [
+            'app' => $app,
+            'user' => $user ?: [],
+            'job' => $job ?: [],
+            'returnToRoute' => $returnToRoute,
+            'returnToQuery' => $returnToQuery,
+        ]);
     }
 }

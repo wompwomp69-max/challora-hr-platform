@@ -6,73 +6,161 @@
     <title>Login - Challora</title>
 
     <link rel="stylesheet" href="<?= BASE_URL ?>/assets/css/design-tokens.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { font-family: var(--font-sans); background: var(--color-surface); color: var(--color-text); }
+        .brutalist-card {
+            border: 2px solid var(--color-border);
+            box-shadow: 8px 8px 0 rgba(0,0,0,1);
+            background: #0a0a0a;
+            border-radius: 0;
+            overflow: hidden;
+        }
+        .brutalist-input {
+            background: #111;
+            border: 2px solid var(--color-border);
+            border-radius: 0;
+            color: var(--color-text);
+            padding: 14px 16px;
+            width: 100%;
+            transition: all 0.2s ease;
+            box-shadow: 2px 2px 0 rgba(0,0,0,0.5);
+            text-transform: lowercase;
+            font-size: 16px;
+        }
+        .brutalist-input:focus {
+            border-color: var(--color-accent);
+            box-shadow: 4px 4px 0 var(--color-accent);
+            outline: none;
+            transform: translate(-2px, -2px);
+        }
+        .brutalist-btn {
+            display: inline-block;
+            width: 100%;
+            background: var(--color-accent);
+            color: var(--color-surface);
+            padding: 16px 24px;
+            font-weight: 800;
+            font-size: 16px;
+            text-transform: lowercase;
+            text-decoration: none;
+            text-align: center;
+            border: 2px solid var(--color-border);
+            border-radius: 0;
+            cursor: pointer;
+            box-shadow: 4px 4px 0 rgba(0,0,0,1);
+            transition: all 0.2s ease;
+        }
+        .brutalist-btn:hover {
+            transform: translate(-2px, -2px);
+            box-shadow: 6px 6px 0 rgba(0,0,0,1);
+        }
+        .brutalist-btn:active {
+            transform: translate(2px, 2px);
+            box-shadow: 0px 0px 0 rgba(0,0,0,1);
+        }
+        .brutalist-label {
+            text-transform: lowercase;
+            font-weight: 600;
+            font-size: 14px;
+            margin-bottom: 8px;
+            display: block;
+        }
+        .brutalist-title {
+            font-size: 56px;
+            font-weight: 600;
+            letter-spacing: -3px;
+            color: var(--color-text);
+            margin-bottom: 12px;
+            text-transform: lowercase;
+            line-height: 1.1;
+        }
+        .brutalist-alert {
+            background: var(--color-accent);
+            color: var(--color-surface);
+            padding: 16px;
+            border: 2px solid var(--color-border);
+            font-weight: bold;
+            font-size: 14px;
+            text-transform: lowercase;
+            margin-bottom: 24px;
+            box-shadow: 4px 4px 0 rgba(0,0,0,1);
+        }
+        .brutalist-hero {
+            background: var(--color-accent);
+            color: var(--color-surface);
+            border-left: 2px solid var(--color-border);
+            padding: 48px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        @media (max-width: 1024px) {
+            .brutalist-hero { border-left: none; border-top: 2px solid var(--color-border); }
+        }
+    </style>
 </head>
-<body class="min-h-screen bg-primary text-default" style="font-family: var(--font-sans);">
+<body class="min-h-screen lowercase">
     <div class="min-h-screen flex items-center justify-center p-4 md:p-8">
-        <div class="w-full max-w-6xl bg-surface rounded-3xl shadow-lg overflow-hidden border border-muted grid grid-cols-1 lg:grid-cols-2">
-            <div class="p-6 md:p-10 lg:p-12">
-                <div class="flex items-center gap-3 mb-8">
-                    <div class="w-11 h-11 rounded-xl bg-secondary text-accent flex items-center justify-center font-bold text-lg">A</div>
+        <div class="w-full max-w-6xl brutalist-card grid grid-cols-1 lg:grid-cols-2">
+            <!-- Left Side / Form -->
+            <div class="p-8 md:p-12 lg:p-16">
+                <div class="flex items-center gap-4 mb-10">
+                    <div class="w-12 h-12 bg-accent text-surface flex items-center justify-center font-bold text-xl border-2 border-border" style="box-shadow: 4px 4px 0 rgba(0,0,0,1)">C</div>
                     <div>
-                        <h2 class="text-lg font-bold text-default">Challora</h2>
-                        <p class="text-xs text-muted">Masuk atau Registrasi untuk melanjutkan.</p>
+                        <h2 class="text-xl font-bold" style="letter-spacing: -1px;">challora</h2>
+                        <p class="text-sm font-semibold opacity-70">portal login</p>
                     </div>
                 </div>
 
                 <div class="max-w-md">
-                    <h1 class="text-3xl font-bold text-default mb-2">Masuk</h1>
-                    <p class="text-sm text-muted mb-6">Masuk untuk melanjutkan ke dashboard rekrutmen.</p>
+                    <h1 class="brutalist-title">sign in</h1>
+                    <p class="text-base mb-8 font-semibold opacity-75">access the brutal recruitment platform.</p>
 
                     <?php if (!empty($error)): ?>
-                        <div class="mb-4 rounded-xl bg-danger-soft text-danger text-sm px-4 py-3"><?= e($error) ?></div>
+                        <div class="brutalist-alert"><?= e($error) ?></div>
                     <?php endif; ?>
 
                     <?php if (!empty($_SESSION['flash'])): ?>
                         <?php
                         $flashType = (string) ($_SESSION['flash_type'] ?? 'success');
-                        $flashClass = $flashType === 'error' ? 'bg-danger-soft text-danger' : ($flashType === 'info' ? 'bg-info-soft text-info' : 'bg-success-soft text-success');
                         ?>
-                        <div class="mb-4 rounded-xl <?= e($flashClass) ?> text-sm px-4 py-3"><?= e($_SESSION['flash']) ?></div>
+                        <div class="brutalist-alert" style="<?= $flashType === 'error' ? 'background:var(--color-text); color:var(--color-surface);' : '' ?>"><?= e($_SESSION['flash']) ?></div>
                         <?php unset($_SESSION['flash']); ?>
                         <?php unset($_SESSION['flash_type']); ?>
                     <?php endif; ?>
 
-                    <form method="post" action="<?= BASE_URL ?>/index.php?url=auth/login" class="space-y-4">
+                    <form method="post" action="<?= BASE_URL ?>/index.php?url=auth/login" class="space-y-6">
                         <div>
-                            <label for="email" class="block text-secondary font-semibold mb-1">Alamat Email</label>
-                            <input type="email" id="email" name="email" placeholder="john.doe@gmail.com" required autocomplete="email" value="<?= e($_POST['email'] ?? '') ?>" class="w-full rounded-xl border border-default bg-surface px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40">
+                            <label for="email" class="brutalist-label">email address</label>
+                            <input type="email" id="email" name="email" placeholder="john.doe@gmail.com" required autocomplete="email" value="<?= e($_POST['email'] ?? '') ?>" class="brutalist-input">
                         </div>
                         <div>
-                            <label for="password" class="block text-secondary font-semibold mb-1">Password</label>
-                            <input type="password" id="password" name="password" placeholder="Masukkan password" required autocomplete="current-password" class="w-full rounded-xl border border-default bg-surface px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40">
+                            <label for="password" class="brutalist-label">password</label>
+                            <input type="password" id="password" name="password" placeholder="enter password" required autocomplete="current-password" class="brutalist-input">
                         </div>
                         <div class="flex items-center justify-end">
-                            <a href="<?= BASE_URL ?>/auth/forgot" class="text-sm font-semibold text-secondary hover:underline">Lupa password?</a>
+                            <a href="<?= BASE_URL ?>/auth/forgot" class="font-bold hover:text-accent transition" style="text-decoration: underline; text-underline-offset: 4px;">forgot password?</a>
                         </div>
-                        <button type="submit" class="w-full rounded-xl bg-secondary text-accent py-3 text-sm font-semibold hover:bg-secondary-hover transition">Masuk</button>
-                        <div class="pt-1 text-sm text-muted">
-                            <p>Belum punya akun? <a href="<?= BASE_URL ?>/auth/register" class="font-semibold text-default hover:underline">Registrasi</a></p>
+                        <button type="submit" class="brutalist-btn mt-2">sign in</button>
+                        <div class="pt-4 text-center font-semibold text-sm">
+                            <p>don't have an account? <a href="<?= BASE_URL ?>/auth/register" class="text-accent underline" style="text-underline-offset: 4px;">register</a></p>
                         </div>
                     </form>
                 </div>
             </div>
 
-            <div class="relative min-h-[360px] lg:min-h-full p-6 md:p-8 text-white overflow-hidden" style="background-image: linear-gradient(180deg, rgba(1,22,39,0.82), rgba(1,22,39,0.92)), url('<?= BASE_URL ?>/assets/images/login-side.jpg'); background-size: cover; background-position: center;">
-                <div class="absolute inset-0 bg-black/20"></div>
-                <div class="relative z-10 h-full flex flex-col justify-between">
-                    <div>
-                        <div class="text-sm font-semibold text-accent mb-5">Challora</div>
-                        <h2 class="text-3xl md:text-4xl font-bold leading-tight mb-3 text-white">Selamat datang di Challora</h2>
-                        <p class="text-sm text-white/85 max-w-md">Challora membantu kandidat dan HR terhubung dalam satu platform rekrutmen yang rapi, cepat, dan mudah digunakan.</p>
-                    </div>
-                    <div class="bg-white/10 rounded-2xl border border-white/20 p-5 max-w-md mt-6">
-                        <h3 class="text-2xl font-bold text-white mb-2">Temukan pekerjaan yang tepat untukmu</h3>
-                        <p class="text-sm text-white/80">Lengkapi profilmu, lamar posisi terbaik, dan pantau proses seleksi dengan lebih terstruktur.</p>
-                    </div>
+            <!-- Right Side / Hero Image Replacement -->
+            <div class="brutalist-hero">
+                <div>
+                    <h2 class="font-bold" style="font-size: 64px; line-height: 1; letter-spacing: -3px; margin-bottom: 24px;">destroy<br>the average.</h2>
+                    <p class="font-bold" style="font-size: 20px; max-w: 400px; line-height: 1.4;">Challora cuts through the corporate noise. Sign in, complete your strictly formatted profile, and stand out.</p>
+                </div>
+                
+                <div style="background: var(--color-surface); color: var(--color-text); border: 2px solid var(--color-border); padding: 24px; box-shadow: 6px 6px 0 rgba(0,0,0,1); display: inline-block; max-width: 350px;">
+                    <h3 class="text-2xl font-bold mb-2 lowercase" style="letter-spacing:-1px;">for candidates & hr</h3>
+                    <p class="text-sm font-semibold opacity-80 lowercase">We separate the signal from the noise with raw, uncompromising data focus.</p>
                 </div>
             </div>
         </div>

@@ -20,8 +20,9 @@ class HrApplicationController {
     public function index(): void {
         $this->requireHr();
         $jobId = (int) ($_GET['id'] ?? 0);
-        if ($jobId < 1 || !$this->jobModel->isCreatedBy($jobId, currentUserId())) {
-            $_SESSION['flash_error'] = 'Lowongan tidak ditemukan.';
+        $job = $this->jobModel->findById($jobId);
+        if (!$job) {
+            $_SESSION['flash_error'] = 'Job posting not found.';
             redirect('/hr/jobs');
         }
         $job = $this->jobModel->findById($jobId);
@@ -37,7 +38,57 @@ class HrApplicationController {
         if ($manualMailto) {
             unset($_SESSION['manual_mailto']);
         }
-        render_view('hr/applications/index', ['job' => $job, 'applicants' => $applicants, 'workExpByUser' => $workExpByUser, 'achievementsByUser' => $achievementsByUser, 'pageTitle' => 'Pelamar - ' . e($job['title']), 'manualMailto' => $manualMailto]);
+        render_view('hr/applications/index', ['job' => $job, 'applicants' => $applicants, 'workExpByUser' => $workExpByUser, 'achievementsByUser' => $achievementsByUser, 'pageTitle' => 'Applicants - ' . e($job['title']), 'manualMailto' => $manualMailto]);
+    }
+
+    public function review(): void {
+        $this->requireHr();
+        $hrId = currentUserId();
+        $status = trim((string) ($_GET['status'] ?? ''));
+        $searchQuery = trim((string) ($_GET['q'] ?? ''));
+        $jobId = (int) ($_GET['job_id'] ?? 0);
+        $perPage = (int) ($_GET['per_page'] ?? 20);
+        $perPage = in_array($perPage, [10, 20, 50, 100], true) ? $perPage : 20;
+        $page = max(1, (int) ($_GET['page'] ?? 1));
+
+        $allowedStatuses = array_keys(applicationStatusOptions());
+        $status = in_array($status, $allowedStatuses, true) ? $status : '';
+        if ($jobId > 0 && !$this->jobModel->isCreatedBy($jobId, $hrId)) {
+            $jobId = 0;
+        }
+
+        $totalApplicants = $this->appModel->countApplicantsForHr($status ?: null, $searchQuery ?: null, $jobId ?: null);
+        $totalPages = $totalApplicants > 0 ? (int) ceil($totalApplicants / $perPage) : 1;
+        $page = min($page, $totalPages);
+
+        $applicants = $this->appModel->getApplicantsForHr($status ?: null, $searchQuery ?: null, $jobId ?: null, $page, $perPage);
+        $jobs = $this->jobModel->all(); // Show all jobs for filter
+        $workExpByUser = [];
+        $achievementsByUser = [];
+        foreach ($applicants as $a) {
+            $uid = (int) $a['user_id'];
+            $workExpByUser[$uid] = $this->userModel->getWorkExperiences($uid);
+            $achievementsByUser[$uid] = $this->userModel->getAchievements($uid);
+        }
+        $manualMailto = $_SESSION['manual_mailto'] ?? null;
+        if ($manualMailto) {
+            unset($_SESSION['manual_mailto']);
+        }
+        render_view('hr/applications/review', [
+            'applicants' => $applicants,
+            'workExpByUser' => $workExpByUser,
+            'achievementsByUser' => $achievementsByUser,
+            'pageTitle' => 'Applicant Review',
+            'manualMailto' => $manualMailto,
+            'statusFilter' => $status,
+            'searchQuery' => $searchQuery,
+            'jobFilter' => $jobId,
+            'jobs' => $jobs,
+            'page' => $page,
+            'perPage' => $perPage,
+            'totalPages' => $totalPages,
+            'totalApplicants' => $totalApplicants,
+        ]);
     }
 
     public function updateStatus(): void {
@@ -48,22 +99,22 @@ class HrApplicationController {
         $appId = (int) ($_POST['application_id'] ?? 0);
         $status = trim($_POST['status'] ?? '');
         $openMailto = !empty($_POST['open_mailto']);
-        $app = $this->appModel->getApplicationForHrJob($appId, currentUserId());
+        $app = $this->appModel->getApplicationForHrJob($appId);
         if (!$app) {
-            $_SESSION['flash_error'] = 'Data lamaran tidak ditemukan.';
+            $_SESSION['flash_error'] = 'Application data not found.';
             redirect('/hr/jobs');
         }
         if ($this->appModel->updateStatus($appId, $status)) {
-            $_SESSION['flash'] = 'Status lamaran diperbarui.';
+            $_SESSION['flash'] = 'Application status updated.';
             if ($openMailto && in_array($status, ['accepted', 'rejected'], true)) {
                 $user = $this->userModel->findById((int) $app['user_id']);
                 $job = $this->jobModel->findById((int) $app['job_id']);
-                $name = $user['name'] ?? 'Pelamar';
+                $name = $user['name'] ?? 'Applicant';
                 $email = $user['email'] ?? '';
-                $jobTitle = $job['title'] ?? 'lowongan';
+                $jobTitle = $job['title'] ?? 'job posting';
                 $mail = new MailService();
                 if ($mail->isEnabled() && $email && $mail->sendApplicationResult($email, $name, $jobTitle, $status)) {
-                    $_SESSION['flash'] = 'Status lamaran diperbarui. Email otomatis telah dikirim ke pelamar.';
+                    $_SESSION['flash'] = 'Status updated. An automated email has been sent to the applicant.';
                 } else {
                     $subject = rawurlencode('Hasil Lamaran: ' . $jobTitle . ' - ' . ($status === 'accepted' ? 'Diterima' : 'Tidak Diterima'));
                     $body = $status === 'accepted'
@@ -71,28 +122,33 @@ class HrApplicationController {
                         : rawurlencode("Yth. {$name},\n\nTerima kasih telah melamar untuk posisi {$jobTitle}.\n\nMohon maaf, setelah proses seleksi Anda belum dapat kami terima untuk posisi ini.\n\nTetap semangat dan terima kasih.");
                     if ($email !== '') {
                         $_SESSION['manual_mailto'] = "mailto:{$email}?subject={$subject}&body={$body}";
-                        $_SESSION['flash'] = 'Status lamaran diperbarui. Klik tombol "Kirim Email Manual" untuk menghubungi pelamar.';
+                        $_SESSION['flash'] = 'Status updated. Click "Send Email Manually" to contact the applicant.';
                     }
                 }
             }
         }
+
+        $returnTo = trim((string) ($_POST['return_to'] ?? ''));
+        if ($returnTo !== '') {
+            redirect('/' . ltrim($returnTo, '/'));
+        }
+
         redirect('/hr/jobs/applicants?id=' . $app['job_id']);
     }
 
     /** Daftar pelamar yang sudah diterima (untuk semua lowongan HR) */
     public function accepted(): void {
         $this->requireHr();
-        $hrId = currentUserId();
         $perPage = (int) ($_GET['per_page'] ?? 20);
         $perPage = in_array($perPage, [10, 20, 50, 100], true) ? $perPage : 20;
         $page = max(1, (int) ($_GET['page'] ?? 1));
-        $totalAccepted = $this->appModel->countAcceptedForHr($hrId);
+        $totalAccepted = $this->appModel->countAcceptedForHr();
         $totalPages = $totalAccepted > 0 ? (int) ceil($totalAccepted / $perPage) : 1;
         $page = min($page, $totalPages);
-        $applicants = $this->appModel->getAcceptedApplicantsForHr($hrId, $page, $perPage);
+        $applicants = $this->appModel->getAcceptedApplicantsForHr($page, $perPage);
         render_view('hr/applications/accepted', [
             'applicants' => $applicants,
-            'pageTitle' => 'Pelamar Diterima',
+            'pageTitle' => 'Hired Applicants',
             'page' => $page,
             'perPage' => $perPage,
             'totalPages' => $totalPages,

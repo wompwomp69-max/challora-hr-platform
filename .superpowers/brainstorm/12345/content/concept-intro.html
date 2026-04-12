@@ -1,0 +1,41 @@
+<h2>Job Board Refinement Concept</h2>
+<p class="subtitle">Applying Dark Brutalist aesthetic to functional sections</p>
+
+<div class="mockup">
+  <div class="mockup-header">Concept 1: Hero Search Input</div>
+  <div class="mockup-body" style="background:#111; color:#fff; padding:60px; font-family:'Space Grotesk', sans-serif;">
+    <div style="display:flex; align-items:center; gap:20px; margin-bottom:40px;">
+      <div style="width:5px; height:60px; background:#ff4500;"></div>
+      <input type="text" value="find your perfect job" style="background:transparent; border:none; border-bottom:3px solid #333; color:#f3f4f6; font-size:62px; font-weight:600; letter-spacing:-2.5px; width:100%; outline:none; text-transform:lowercase; padding-bottom:5px;" readonly>
+    </div>
+    <p style="color:#9ca3af; font-size:18px;">Instead of a separate static title and search box, the title *is* the search input.</p>
+  </div>
+</div>
+
+<div class="section">
+  <h3>Current Filter Set:</h3>
+  <ul class="text-muted">
+    <li>Job Type (Status: Done)</li>
+    <li>Experience (Status: Done)</li>
+    <li>Salary (Status: Done)</li>
+    <li><strong>New:</strong> Work Type (Remote, On-site, Hybrid)</li>
+    <li><strong>New:</strong> Location (City, Country)</li>
+  </ul>
+</div>
+
+<div class="options" data-multiselect>
+  <div class="option" data-choice="hero-search" onclick="toggleSelect(this)">
+    <div class="letter">A</div>
+    <div class="content">
+      <h3>Hero Search Integration</h3>
+      <p>Merge the decorative hero text with the actual search input.</p>
+    </div>
+  </div>
+  <div class="option" data-choice="filters-row" onclick="toggleSelect(this)">
+    <div class="letter">B</div>
+    <div class="content">
+      <h3>Expanded Filter Row</h3>
+      <p>Add Work Type and Location dropdowns to the filter bar.</p>
+    </div>
+  </div>
+</div>

@@ -1,79 +1,183 @@
 <style>
-.jobs-header-row{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:10px;}
-.jobs-filter-title{font-size:38px;font-weight:600;color:var(--gray-900);margin-bottom:10px;}
-.jobs-reset-btn{display:inline-block;font-size:13px;background:var(--color-accent);color:var(--color-on-primary);padding:5px 14px;border-radius:999px;text-decoration:none;font-weight:600;}
-.jobs-card-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;}
-.job-card{background:var(--color-surface);border:2px solid var(--color-secondary);border-radius:28px;padding:14px;min-height:320px;display:flex;flex-direction:column;justify-content:space-around;}
-.job-card-top{background:var(--color-accent-muted);border-radius:18px;padding:18px 16px 18px;min-height:230px;display:flex;flex-direction:column;}
-.job-date{display:inline-block;background:var(--color-surface);border-radius:18px;padding:6px 12px;font-size:12px;font-weight:500;color:var(--color-text);}
-.job-title{font-size:24px;line-height:1.12;font-weight:700;color:var(--color-secondary);margin-top:14px;}
-.job-tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:auto;}
-.job-tag{font-size:12px;padding:3px 10px;border:2px solid var(--color-secondary);border-radius:999px;background:var(--color-surface);color:var(--color-secondary);font-weight:500;}
-.job-card-bottom{padding:30px 4px 2px;display:flex;justify-content:space-between;align-items:flex-end;gap:10px;}
-.job-salary{font-size:22px;font-weight:700;color:var(--color-text);line-height:1;}
-.job-loc{font-size:14px;color:var(--gray-500);line-height:1.25;margin-top:6px;}
-.job-progress-cta{display:flex;flex-direction:column;align-items:flex-end;gap:8px;}
-.job-applied-label{font-size:12px;font-weight:600;color:var(--color-secondary);line-height:1;}
-.job-detail-btn{background:var(--color-secondary);color:var(--color-surface);border:0;padding:10px 18px;border-radius:999px;font-size:12px;font-weight:600;line-height:1;}
-@media (max-width: 1024px){.jobs-card-grid{grid-template-columns:repeat(2,minmax(0,1fr));}.jobs-header-row{flex-direction:column;align-items:flex-start;}}
-@media (max-width: 640px){.jobs-card-grid{grid-template-columns:1fr;}.jobs-filter-title{font-size:30px;}}
+    .brutalist-title {
+        font-size: 56px;
+        font-weight: 600;
+        letter-spacing: -2px;
+        color: var(--color-text-muted);
+        margin-bottom: 60px;
+        padding-bottom: 24px;
+        border-bottom: 1px solid var(--color-border);
+    }
+
+    .brutalist-job-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 32px 32px;
+        border-bottom: 1px solid var(--color-border);
+        transition: background-color 0.2s ease;
+    }
+
+    .brutalist-job-name,
+    .brutalist-job-desc {
+        font-size: 28px;
+        font-weight: 400;
+        color: var(--color-text);
+        text-decoration: none;
+        letter-spacing: -1px;
+    }
+
+    .brutalist-job-desc {
+        opacity: 0.6;
+    }
+
+    .brutalist-job-row:hover .brutalist-job-name {
+        color: var(--color-accent);
+    }
+
+    .brutalist-job-row:hover {
+        background-color: rgba(255, 255, 255, 0.02);
+    }
+
+    .brutalist-job-left {
+        display: flex;
+        align-items: center;
+        gap: 24px;
+    }
+
+    .brutalist-company-icon {
+        width: 48px;
+        height: 48px;
+        background-color: var(--color-text);
+        color: var(--color-surface);
+        border-radius: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        font-weight: bold;
+    }
+
+    .brutalist-job-info {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    .brutalist-company-name {
+        font-size: 28px;
+        font-weight: 600;
+        color: var(--color-text);
+        text-decoration: none;
+        letter-spacing: -1px;
+    }
+
+    .brutalist-company-name:hover {
+        color: var(--color-accent);
+    }
+
+    .brutalist-job-title {
+        font-size: 24px;
+        font-weight: 500;
+        color: var(--color-text-muted);
+        letter-spacing: -0.5px;
+    }
+
+    .brutalist-job-right {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 8px;
+    }
+
+    .brutalist-salary {
+        font-size: 24px;
+        font-weight: 600;
+        color: var(--color-accent);
+        letter-spacing: -1px;
+    }
+
+    .brutalist-meta {
+        font-size: 14px;
+        color: var(--color-text-muted);
+        font-weight: 500;
+    }
+
+    .brutalist-pill {
+        padding: 6px 12px;
+        border: 1px solid var(--color-accent);
+        color: var(--color-accent);
+        font-size: 12px;
+        font-weight: 600;
+        text-transform: lowercase;
+    }
+
+    @media (max-width: 768px) {
+        .brutalist-job-row {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 20px;
+        }
+
+        .brutalist-job-right {
+            align-items: flex-start;
+            flex-direction: row;
+            justify-content: space-between;
+            width: 100%;
+        }
+    }
 </style>
 
-<?php
-$monthId = [
-    1 => 'Jan', 2 => 'Feb', 3 => 'Mar', 4 => 'Apr', 5 => 'Mei', 6 => 'Jun',
-    7 => 'Jul', 8 => 'Agu', 9 => 'Sep', 10 => 'Okt', 11 => 'Nov', 12 => 'Des',
-];
-?>
+<div class="lowercase">
+    <h1 class="brutalist-title">applied jobs</h1>
 
-<div class="jobs-header-row">
-    <h1 class="jobs-filter-title mb-0">Sudah Dilamar</h1>
-    <a href="<?= BASE_URL ?>/jobs" class="jobs-reset-btn">&larr; Kembali ke lowongan</a>
-</div>
-
-<?php if (empty($applications)): ?>
-    <div class="bg-white rounded-4 p-4 text-muted">
-        Belum ada lamaran. <a href="<?= BASE_URL ?>/jobs" class="text-secondary text-decoration-none">Cari lowongan</a>
-    </div>
-<?php else: ?>
-    <div class="jobs-card-grid mt-10">
-        <?php foreach ($applications as $a): ?>
-            <?php
-            $statusMeta = applicationStatusMeta($a['status'] ?? '');
-            $postedRaw = (string) ($a['created_at'] ?? '');
-            $postedDate = '-';
-            if ($postedRaw !== '') {
-                $ts = strtotime($postedRaw);
-                if ($ts !== false) {
-                    $postedDate = (string) ((int) date('d', $ts)) . ' ' . ($monthId[(int) date('n', $ts)] ?? date('M', $ts)) . ' ' . date('Y', $ts);
-                }
-            }
-            $statusLabel = (string) ($statusMeta['label'] ?? 'Diproses');
-            ?>
-            <div class="job-card">
-                <div class="job-card-top">
-                    <div class="d-flex justify-content-between align-items-start">
-                        <span class="job-date"><?= e($postedDate) ?></span>
-                        <span class="job-tag">Applied</span>
-                    </div>
-                    <a href="<?= BASE_URL ?>/jobs/show?id=<?= (int)($a['job_id'] ?? 0) ?>" class="text-decoration-none">
-                        <div class="job-title"><?= e($a['job_title'] ?? '-') ?></div>
-                    </a>
-                    <div class="job-tags">
-                        <span class="job-tag"><?= e($statusLabel) ?></span>
-                    </div>
-                </div>
-                <div class="job-card-bottom">
-                    <div>
-                        <div class="job-salary">Lamaran</div>
-                        <div class="job-loc">Status saat ini: <?= e($statusLabel) ?></div>
-                    </div>
-                    <div class="job-progress-cta">
-                        <span class="job-applied-label">Telah Dilamar</span>
-                        <a href="<?= BASE_URL ?>/jobs/show?id=<?= (int)($a['job_id'] ?? 0) ?>" class="job-detail-btn text-decoration-none">Lihat Progress</a>
-                    </div>
-                </div>
+    <div class="brutalist-job-list">
+        <?php if (empty($applications)): ?>
+            <div class="py-10 text-xl text-gray-500 font-medium">
+                no applications yet.
             </div>
-        <?php endforeach; ?>
+        <?php else: ?>
+            <?php foreach ($applications as $a): ?>
+                <?php
+                $companies = ['qclay studio', 'malvah', 'motto', 'netflix', 'google'];
+                $companyIndex = ((int) ($a['job_id'] ?? 0)) % count($companies);
+                $companyName = $companies[$companyIndex];
+                $companyInitial = mb_substr($companyName, 0, 1);
+
+                $statusMeta = applicationStatusMeta($a['status'] ?? '');
+                $statusLabel = (string) ($statusMeta['label'] ?? 'Diproses');
+
+                // Format salary
+                $salaryDisplay = '';
+                $curr = $a['currency'] ?? 'IDR';
+                if (!empty($a['min_salary']) && !empty($a['max_salary'])) {
+                    $salaryDisplay = $curr . ' ' . number_format($a['min_salary'], 0, '.', ',') . ' - ' . number_format($a['max_salary'], 0, '.', ',');
+                } else {
+                    $salaryDisplay = e($a['salary_range'] ?? 'IDR 10,000,000');
+                }
+                ?>
+                <div class="brutalist-job-row" style="cursor: pointer;"
+                    onclick="window.location.href='<?= BASE_URL ?>/jobs/show?id=<?= $a['job_id'] ?>'">
+                    <div class="brutalist-job-left">
+                        <div class="brutalist-job-info">
+                            <a href="<?= BASE_URL ?>/jobs/show?id=<?= $a['job_id'] ?>"
+                                class="brutalist-job-name"><?= e($a['job_title'] ?? '-') ?></a>
+                            <span class="brutalist-job-desc"
+                                style="font-size: 20px; margin-top: 4px;"><?= e($a['short_description'] ?? 'No description available.') ?></span>
+                        </div>
+                    </div>
+                    <div class="brutalist-job-right">
+                        <div class="brutalist-salary" style="font-size: 24px; color: var(--color-text);"><?= e($statusLabel) ?>
+                        </div>
+                        <div class="flex items-center gap-4">
+                            <div class="brutalist-meta">
+                                <?= e($companyName) ?> / <?= e($a['location'] ?: 'remote') ?>
+                            </div>
+                            <span class="brutalist-pill">applied: <?= date('d M Y', strtotime($a['created_at'])) ?></span>
+                        </div>
+                    </div>
+                </div>
+            <?php endforeach; ?>
+        <?php endif; ?>
     </div>
-<?php endif; ?>
+</div>

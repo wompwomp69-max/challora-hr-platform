@@ -23,14 +23,20 @@ class JobController {
             'job_type' => $this->normalizeCsvParam($_GET['job_type'] ?? ''),
             'min_education' => $this->normalizeCsvParam($_GET['min_education'] ?? ''),
             'experience_level' => $this->normalizeCsvParam($_GET['experience_level'] ?? ''),
+            'work_type' => $this->normalizeCsvParam($_GET['work_type'] ?? ''),
             'updated' => $this->normalizeUpdatedFilter((string) ($_GET['updated'] ?? '')),
         ];
         $jobView = trim($_GET['job_view'] ?? 'all');
         if (!in_array($jobView, ['all', 'saved', 'applied'], true)) {
             $jobView = 'all';
         }
-        // Fitur "card per halaman" dinonaktifkan: jumlah card dibuat tetap.
-        $perPage = 12;
+        // Pagination
+        $defaultPerPage = 10;
+        $allowedLimits = [5, 10, 20, 50];
+        $perPage = (int) ($_GET['limit'] ?? $defaultPerPage);
+        if (!in_array($perPage, $allowedLimits, true)) {
+            $perPage = $defaultPerPage;
+        }
         $page = max(1, (int) ($_GET['page'] ?? 1));
         $userId = currentUserId();
         if ($jobView === 'all') {
@@ -47,6 +53,8 @@ class JobController {
 
         $appliedJobIds = [];
         $savedJobIds = [];
+        $isProfileComplete = true;
+
         if (isLoggedIn() && currentRole() === 'user') {
             $appModel = new Application();
             $savedJobIds = $this->savedJobModel->getSavedJobIds($userId);
@@ -55,12 +63,20 @@ class JobController {
                     $appliedJobIds[] = (int)$j['id'];
                 }
             }
+            
+            $u = (new User())->findById($userId);
+            if ($u) {
+                if (empty($u['cv_path']) || empty($u['diploma_path']) || empty($u['photo_path'])) {
+                    $isProfileComplete = false;
+                }
+            }
         }
 
         render_view('user/jobs/index', [
             'jobs' => $jobs,
             'appliedJobIds' => $appliedJobIds,
             'savedJobIds' => $savedJobIds,
+            'isProfileComplete' => $isProfileComplete,
             'searchParams' => $searchParams,
             'jobView' => $jobView,
             'page' => $page,
@@ -79,7 +95,7 @@ class JobController {
         }
         $job = $this->jobModel->findById($id);
         if (!$job) {
-            $_SESSION['flash_error'] = 'Lowongan tidak ditemukan.';
+            $_SESSION['flash_error'] = 'Job not found.';
             redirect('/jobs');
         }
         $canApply = false;
@@ -138,18 +154,18 @@ class JobController {
         }
         $jobId = (int) ($_POST['job_id'] ?? 0);
         if ($jobId < 1) {
-            $_SESSION['flash_error'] = 'Job tidak valid.';
+            $_SESSION['flash_error'] = 'Invalid job.';
             redirect('/jobs');
         }
         $job = $this->jobModel->findById($jobId);
         if (!$job) {
-            $_SESSION['flash_error'] = 'Lowongan tidak ditemukan.';
+            $_SESSION['flash_error'] = 'Job not found.';
             redirect('/jobs');
         }
         $this->savedJobModel->save(currentUserId(), $jobId);
         $redirect = !empty(trim($_POST['redirect'] ?? '')) ? trim($_POST['redirect']) : '/jobs/show?id=' . $jobId;
         $_SESSION['flash_toast'] = [
-            'message' => 'Lowongan berhasil disimpan.',
+            'message' => 'Job successfully saved.',
             'undo' => [
                 'label' => 'Undo',
                 'url' => BASE_URL . '/index.php?url=jobs/unsave',
@@ -173,7 +189,7 @@ class JobController {
         $this->savedJobModel->unsave(currentUserId(), $jobId);
         $redirect = !empty(trim($_POST['redirect'] ?? '')) ? trim($_POST['redirect']) : '/jobs';
         $_SESSION['flash_toast'] = [
-            'message' => 'Lowongan dihapus dari daftar simpan.',
+            'message' => 'Job removed from saved list.',
             'undo' => [
                 'label' => 'Undo',
                 'url' => BASE_URL . '/index.php?url=jobs/save',

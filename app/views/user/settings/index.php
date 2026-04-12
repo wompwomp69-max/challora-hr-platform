@@ -1,253 +1,309 @@
 <?php
-$maritalLabels = ['single' => 'Belum menikah', 'married' => 'Menikah', 'divorced' => 'Cerai', 'widowed' => 'Duda/Janda'];
-$religionLabels = ['islam' => 'Islam', 'katolik' => 'Katolik', 'kristen' => 'Kristen', 'hindu' => 'Hindu', 'buddha' => 'Buddha', 'konghucu' => 'Konghucu', 'lainnya' => 'Lainnya'];
-$genderLabels = ['male' => 'Laki-laki', 'female' => 'Perempuan', 'other' => 'Lainnya'];
+$maritalLabels = ['single' => 'single', 'married' => 'married', 'divorced' => 'divorced', 'widowed' => 'widowed'];
+$religionLabels = ['islam' => 'islam', 'katolik' => 'catholic', 'kristen' => 'christian', 'hindu' => 'hindu', 'buddha' => 'buddhist', 'konghucu' => 'confucian', 'lainnya' => 'other'];
+$genderLabels = ['male' => 'male', 'female' => 'female', 'other' => 'other'];
 $genderLabel = $genderLabels[(string) ($user['gender'] ?? '')] ?? '-';
 $profileAvatarSrc = currentUserAvatarImgSrc();
 $profileInitial = mb_strtoupper(mb_substr($user['name'] ?? 'U', 0, 1));
 $formatDocUploadedAt = static function (?string $relativePath): string {
-    if (empty($relativePath)) {
-        return '-';
-    }
+    if (empty($relativePath)) return '-';
     $fullPath = BASE_PATH . '/' . ltrim($relativePath, '/');
-    if (!is_file($fullPath)) {
-        return '-';
-    }
+    if (!is_file($fullPath)) return '-';
     $ts = @filemtime($fullPath);
-    if ($ts === false) {
-        return '-';
-    }
+    if ($ts === false) return '-';
     return date('d/m/Y H:i', $ts);
 };
 ?>
+<style>
+/* Brutalist Settings Overrides */
+.brutalist-title {
+    font-size: 56px;
+    font-weight: 600;
+    letter-spacing: -2px;
+    color: var(--color-text-muted);
+    margin-bottom: 40px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--color-border);
+}
+.brutalist-block {
+    background: transparent;
+    border: 1px solid var(--color-border);
+    padding: 32px;
+    margin-bottom: 32px;
+}
+.brutalist-block-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--color-border);
+    padding-bottom: 16px;
+    margin-bottom: 32px;
+}
+.brutalist-block-title {
+    font-size: 24px;
+    font-weight: 500;
+    color: var(--color-text);
+    text-transform: lowercase;
+}
+.brutalist-btn {
+    display: inline-block;
+    background: var(--color-accent);
+    color: var(--color-surface);
+    padding: 8px 16px;
+    font-weight: 600;
+    font-size: 14px;
+    text-transform: lowercase;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+.brutalist-btn:hover { background: var(--color-accent-hover); color: var(--color-surface); }
+.brutalist-btn-outline {
+    background: transparent;
+    color: var(--color-text);
+    border: 1px solid var(--color-text);
+}
+.brutalist-btn-outline:hover {
+    background: var(--color-text);
+    color: var(--color-surface);
+}
+.brutalist-avatar-wrap {
+    width: 120px;
+    height: 120px;
+    background: var(--color-text);
+    color: var(--color-surface);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 48px;
+    font-weight: bold;
+    position: relative;
+    border-radius: 0;
+}
+.brutalist-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+}
+.brutalist-label {
+    font-size: 12px;
+    color: var(--color-text-muted);
+    margin-bottom: 4px;
+    text-transform: lowercase;
+}
+.brutalist-value {
+    font-size: 18px;
+    font-weight: 500;
+    color: var(--color-text);
+    text-transform: lowercase;
+}
+.brutalist-timeline-item {
+    border-left: 2px solid var(--color-accent);
+    padding-left: 24px;
+    margin-bottom: 32px;
+    position: relative;
+}
+.brutalist-timeline-item::before {
+    content: '';
+    position: absolute;
+    left: -6px;
+    top: 0;
+    width: 10px;
+    height: 10px;
+    background: var(--color-accent);
+}
+.brutalist-doc-card {
+    border: 1px solid var(--color-border);
+    padding: 24px;
+    background: #161616;
+}
+@media (max-width: 768px) {
+    .brutalist-grid { grid-template-columns: 1fr; }
+    .brutalist-block { padding: 20px; }
+}
+</style>
 
-<div class="max-w-5xl mx-auto">
-    <div class="bg-surface rounded-2xl shadow-sm border border-muted p-5 md:p-8">
-        <!-- Header profil -->
-        <div class="flex flex-col md:flex-row gap-5">
-            <div class="flex-shrink-0">
-                <form
-                    method="post"
-                    action="<?= BASE_URL ?>/index.php?url=user/settings/avatar"
-                    enctype="multipart/form-data"
-                    class="group relative inline-block"
-                >
-                    <label
-                        for="settings-avatar-input"
-                        class="block cursor-pointer relative w-24 h-24 md:w-28 md:h-28 rounded-full overflow-hidden shadow-sm ring-2 ring-transparent hover:ring-primary/50 focus-within:ring-2 focus-within:ring-primary transition"
-                        title="Klik untuk mengganti foto profil"
-                    >
+<div class="lowercase">
+    <h1 class="brutalist-title">settings</h1>
+
+    <div class="brutalist-block">
+        <div class="brutalist-block-header">
+            <h2 class="brutalist-block-title">my profile</h2>
+            <a href="<?= BASE_URL ?>/user/settings/edit" class="brutalist-btn brutalist-btn-outline">edit profile</a>
+        </div>
+        
+        <div class="flex flex-col md:flex-row gap-8 items-start">
+            <div class="shrink-0">
+                <form method="post" action="<?= BASE_URL ?>/index.php?url=user/settings/avatar" enctype="multipart/form-data" class="group relative inline-block">
+                    <label for="settings-avatar-input" class="cursor-pointer brutalist-avatar-wrap inline-flex items-center justify-center">
                         <?php if ($profileAvatarSrc): ?>
-                            <img src="<?= e($profileAvatarSrc) ?>" alt="" class="w-full h-full object-cover" width="112" height="112">
+                            <img src="<?= e($profileAvatarSrc) ?>" alt="" class="w-full h-full object-cover">
                         <?php else: ?>
-                            <div class="w-full h-full bg-primary flex items-center justify-center text-secondary text-3xl font-semibold"><?= e($profileInitial) ?></div>
+                            <?= e($profileInitial) ?>
                         <?php endif; ?>
-                        <span class="absolute inset-0 flex items-center justify-center bg-black/50 text-white text-[11px] font-semibold opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none text-center px-1 leading-tight">Ganti foto</span>
+                        <div class="absolute inset-0 bg-black/60 text-white text-sm font-bold flex items-center justify-center opacity-0 group-hover:opacity-100 transition">
+                            upload
+                        </div>
                     </label>
-                    <input
-                        type="file"
-                        id="settings-avatar-input"
-                        name="avatar"
-                        accept=".jpg,.jpeg,.png,image/jpeg,image/png"
-                        class="sr-only"
-                        onchange="if (this.files.length) this.form.submit()"
-                    >
+                    <input type="file" id="settings-avatar-input" name="avatar" accept=".jpg,.jpeg,.png" class="sr-only" onchange="if (this.files.length) this.form.submit()">
                 </form>
-                <p class="text-[10px] text-muted mt-1.5 max-w-[7rem] md:max-w-[8.75rem] text-center">JPG/PNG, maks. 1 MB</p>
             </div>
-            <div class="flex-1 flex flex-col gap-2 min-w-0">
-                <div class="flex flex-wrap items-start gap-2 justify-between">
-                    <div class="min-w-0">
-                        <h1 class="text-xl md:text-2xl font-semibold text-default"><?= e($user['name']) ?></h1>
-                        <?php if (!empty($user['user_summary'])): ?>
-                            <p class="text-sm text-muted mt-1 leading-relaxed"><?= nl2br(e($user['user_summary'])) ?></p>
-                        <?php else: ?>
-                            <p class="text-sm text-muted mt-1">Belum ada perkenalan singkat. <a href="<?= BASE_URL ?>/user/settings/edit" class="text-primary hover:underline">Tambahkan di pengaturan</a>.</p>
-                        <?php endif; ?>
+            
+            <div class="flex-1 w-full relative">
+                <div class="brutalist-grid">
+                    <div>
+                        <div class="brutalist-label">full name</div>
+                        <div class="brutalist-value text-2xl mb-4"><?= e($user['name']) ?></div>
                     </div>
-                    <a href="<?= BASE_URL ?>/user/settings/edit" class="text-xs font-medium text-accent hover:underline shrink-0">Ubah data diri</a>
-                </div>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mt-3 text-xs md:text-sm text-default">
-                    <div class="space-y-1">
-                        <div><span class="font-semibold text-default">WhatsApp:</span> <?= e($user['phone'] ?? '-') ?></div>
-                        <div><span class="font-semibold text-default">Lokasi:</span> <?= e($user['address'] ?? '-') ?></div>
-                        <div><span class="font-semibold text-default">Agama:</span> <?= e(!empty($user['religion']) ? ($religionLabels[$user['religion']] ?? $user['religion']) : '-') ?></div>
+                    <div>
+                        <div class="brutalist-label">summary</div>
+                        <div class="brutalist-value" style="font-size:15px; color:var(--color-text-muted);">
+                            <?= empty($user['user_summary']) ? 'no summary provided.' : nl2br(e($user['user_summary'])) ?>
+                        </div>
                     </div>
-                    <div class="space-y-1">
-                        <div><span class="font-semibold text-default">Email:</span> <?= e($user['email']) ?></div>
-                        <div><span class="font-semibold text-default">Usia, Jenis kelamin:</span>
+                    <div>
+                        <div class="brutalist-label">email</div>
+                        <div class="brutalist-value"><?= e($user['email']) ?></div>
+                    </div>
+                    <div>
+                        <div class="brutalist-label">phone</div>
+                        <div class="brutalist-value"><?= e($user['phone'] ?? '-') ?></div>
+                    </div>
+                    <div>
+                        <div class="brutalist-label">location</div>
+                        <div class="brutalist-value"><?= e($user['address'] ?? '-') ?></div>
+                    </div>
+                    <div>
+                        <div class="brutalist-label">demographics</div>
+                        <div class="brutalist-value">
                             <?php
                             $age = '-';
                             if (!empty($user['birth_date'])) {
                                 try {
                                     $b = new DateTime((string) $user['birth_date']);
-                                    $age = $b->diff(new DateTime())->y . ' tahun';
-                                } catch (Throwable $e) {
-                                    $age = '-';
-                                }
+                                    $age = $b->diff(new DateTime())->y . ' y.o';
+                                } catch (Throwable $e) {}
                             }
                             ?>
-                            <?= e($age) ?>, <?= e($genderLabel) ?>
-                        </div>
-                        <div><span class="font-semibold text-default">Status pernikahan:</span> <?= e(!empty($user['marital_status']) ? ($maritalLabels[$user['marital_status']] ?? $user['marital_status']) : '-') ?></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Pengalaman kerja -->
-        <div class="border-t border-muted pt-6 mt-6">
-            <div class="flex items-center justify-between gap-2 mb-3">
-                <h2 class="text-sm font-semibold tracking-wide text-default">PENGALAMAN KERJA</h2>
-                <a href="<?= BASE_URL ?>/user/settings/edit#work-experiences" class="text-xs font-medium text-primary hover:underline uppercase shrink-0">Tambah</a>
-            </div>
-            <?php if (empty($workExperiences)): ?>
-                <p class="text-sm text-muted">Belum ada pengalaman kerja.</p>
-            <?php else: ?>
-                <div class="space-y-4">
-                    <?php foreach ($workExperiences as $we): ?>
-                        <div class="flex gap-3">
-                            <div class="flex flex-col items-center pt-1 shrink-0">
-                                <div class="w-2 h-2 rounded-full bg-accent"></div>
-                                <div class="flex-1 w-px bg-accent min-h-[1rem] mt-1"></div>
-                            </div>
-                            <div class="flex-1 min-w-0 pb-1">
-                                <div class="font-semibold text-sm text-default"><?= e($we['title']) ?></div>
-                                <div class="text-xs text-muted"><?= e($we['company_name'] ?? '') ?></div>
-                                <div class="text-xs text-muted"><?= e($we['year_start']) ?> – <?= e($we['year_end']) ?></div>
-                                <?php if (!empty($we['description'])): ?>
-                                    <div class="text-xs text-default mt-1"><?= nl2br(e($we['description'])) ?></div>
-                                <?php endif; ?>
-                            </div>
-                        </div>
-                    <?php endforeach; ?>
-                </div>
-            <?php endif; ?>
-        </div>
-
-        <!-- Pendidikan -->
-        <div class="border-t border-muted pt-6 mt-6">
-            <div class="flex items-center justify-between gap-2 mb-3">
-                <h2 class="text-sm font-semibold tracking-wide text-default">PENDIDIKAN</h2>
-                <a href="<?= BASE_URL ?>/user/settings/edit#education" class="text-xs font-medium text-primary hover:underline uppercase shrink-0">Ubah</a>
-            </div>
-            <?php if (empty($user['education_level']) && empty($user['education_university'])): ?>
-                <p class="text-sm text-muted">Belum ada data pendidikan.</p>
-            <?php else: ?>
-                <div class="flex gap-3">
-                    <div class="flex flex-col items-center pt-1 shrink-0">
-                        <div class="w-2 h-2 rounded-full bg-accent"></div>
-                    </div>
-                    <div class="min-w-0">
-                        <div class="font-semibold text-sm text-default"><?= e($user['education_university'] ?? '-') ?></div>
-                        <div class="text-xs text-muted"><?= e($user['education_major'] ?? '') ?></div>
-                        <div class="text-xs text-muted">
-                            <?= e($user['education_level'] ?? '') ?><?= !empty($user['graduation_year']) ? ' • Lulus ' . e($user['graduation_year']) : '' ?>
+                            <?= e($age) ?> / <?= e($genderLabel) ?> / <?= e(!empty($user['marital_status']) ? ($maritalLabels[$user['marital_status']] ?? $user['marital_status']) : '-') ?>
                         </div>
                     </div>
                 </div>
-            <?php endif; ?>
-        </div>
-
-        <!-- Pencapaian -->
-        <div class="border-t border-muted pt-6 mt-6">
-            <div class="flex items-center justify-between gap-2 mb-3">
-                <h2 class="text-sm font-semibold tracking-wide text-default">PENCAPAIAN</h2>
-                <a href="<?= BASE_URL ?>/user/settings/edit#data-pencapaian" class="text-xs font-medium text-primary hover:underline uppercase shrink-0">Ubah</a>
             </div>
-            <?php if (empty($achievements)): ?>
-                <p class="text-sm text-muted">Belum ada pencapaian.</p>
-            <?php else: ?>
-                <div class="space-y-4">
-                    <?php foreach ($achievements as $ach): ?>
-                        <div class="flex gap-3">
-                            <div class="flex flex-col items-center pt-1 shrink-0">
-                                <div class="w-2 h-2 rounded-full bg-accent"></div>
-                                <div class="flex-1 w-px bg-accent min-h-[1rem] mt-1"></div>
-                            </div>
-                            <div class="flex-1 min-w-0 pb-1">
-                                <div class="font-semibold text-sm text-default"><?= e($ach['title'] ?? '-') ?></div>
-                                <div class="text-xs text-muted">
-                                    <?= e($ach['type'] ?? '-') ?>
-                                    <?= !empty($ach['year']) ? ' • ' . e($ach['year']) : '' ?>
-                                    <?= !empty($ach['level']) ? ' • ' . e($ach['level']) : '' ?>
-                                </div>
-                                <?php if (!empty($ach['organizer'])): ?>
-                                    <div class="text-xs text-muted"><?= e($ach['organizer']) ?></div>
-                                <?php endif; ?>
-                                <?php if (!empty($ach['description'])): ?>
-                                    <div class="text-xs text-default mt-1"><?= nl2br(e($ach['description'])) ?></div>
-                                <?php endif; ?>
-                            </div>
-                        </div>
-                    <?php endforeach; ?>
+        </div>
+    </div>
+
+    <div class="brutalist-block">
+        <div class="brutalist-block-header">
+            <h2 class="brutalist-block-title">work experience</h2>
+            <a href="<?= BASE_URL ?>/user/settings/edit#work-experiences" class="brutalist-btn brutalist-btn-outline">manage</a>
+        </div>
+        
+        <?php if (empty($workExperiences)): ?>
+            <p class="text-gray-500 font-medium">no work experience listed.</p>
+        <?php else: ?>
+            <div class="mt-6">
+                <?php foreach ($workExperiences as $we): ?>
+                    <div class="brutalist-timeline-item">
+                        <div class="brutalist-value" style="font-size:24px;"><?= e($we['title']) ?></div>
+                        <div class="brutalist-label" style="font-size:16px; margin:4px 0 12px;"><?= e($we['company_name'] ?? '') ?> &nbsp;|&nbsp; <?= e($we['year_start']) ?> – <?= e($we['year_end']) ?></div>
+                        <?php if (!empty($we['description'])): ?>
+                            <div class="brutalist-value" style="font-size:15px; color:var(--color-text-muted);"><?= nl2br(e($we['description'])) ?></div>
+                        <?php endif; ?>
+                    </div>
+                <?php endforeach; ?>
+            </div>
+        <?php endif; ?>
+    </div>
+
+    <!-- PENDIDIKAN & PENCAPAIAN Dihilangkan untuk simpel, atau dimuat format serupa timeline -->
+    <div class="brutalist-block">
+        <div class="brutalist-block-header">
+            <h2 class="brutalist-block-title">education & achievements</h2>
+            <a href="<?= BASE_URL ?>/user/settings/edit#education" class="brutalist-btn brutalist-btn-outline">manage</a>
+        </div>
+        
+        <?php if (!empty($user['education_level']) || !empty($user['education_university'])): ?>
+            <div class="brutalist-timeline-item">
+                <div class="brutalist-value" style="font-size:20px;"><?= e($user['education_university'] ?? '-') ?></div>
+                <div class="brutalist-label" style="font-size:16px; margin-top:4px;">
+                    <?= e($user['education_major'] ?? '') ?> &nbsp;|&nbsp; <?= e($user['education_level'] ?? '') ?> 
+                    <?= !empty($user['graduation_year']) ? ' (class of ' . e($user['graduation_year']) . ')' : '' ?>
                 </div>
-            <?php endif; ?>
-        </div>
-
-        <!-- Dokumen lamaran -->
-        <div class="border-t border-muted pt-6 mt-6">
-            <div class="flex items-center justify-between gap-2 mb-3">
-                <h2 class="text-sm font-semibold tracking-wide text-default">DOKUMEN LAMARAN</h2>
-                <span class="text-xs text-muted">Dipakai otomatis saat melamar</span>
             </div>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
-                <form method="post" action="<?= BASE_URL ?>/index.php?url=user/settings/cv" enctype="multipart/form-data" class="rounded-xl border border-muted p-3">
-                    <div class="text-xs font-semibold text-default mb-2">CV (PDF/DOCX)</div>
-                    <div class="text-[11px] text-muted mb-2">
-                        <?php if (!empty($user['cv_path'])): ?>
-                            <span class="block text-[10px] uppercase tracking-wide text-muted/80">Terakhir ditambahkan</span>
-                            <?= e($formatDocUploadedAt((string) $user['cv_path'])) ?>
-                        <?php else: ?>
-                            Belum diunggah
-                        <?php endif; ?>
-                    </div>
-                    <input type="file" name="cv" accept=".pdf,.docx" class="block w-full text-xs border border-default rounded-md px-2 py-1.5 mb-2" required>
-                    <div class="flex items-center gap-2">
-                        <button type="submit" class="flex-1 px-3 py-1.5 rounded-full bg-accent text-primary text-xs font-semibold">Upload CV</button>
-                        <?php if (!empty($user['cv_path'])): ?>
-                            <a href="<?= BASE_URL ?>/index.php?url=download/user-file&type=cv" target="_blank" rel="noopener noreferrer" class="px-3 py-1.5 rounded-full border border-default text-xs font-semibold text-default hover:bg-muted">Preview</a>
-                        <?php endif; ?>
-                    </div>
-                </form>
-                <form method="post" action="<?= BASE_URL ?>/index.php?url=user/settings/diploma" enctype="multipart/form-data" class="rounded-xl border border-muted p-3">
-                    <div class="text-xs font-semibold text-default mb-2">Ijazah (PDF/DOCX)</div>
-                    <div class="text-[11px] text-muted mb-2">
-                        <?php if (!empty($user['diploma_path'])): ?>
-                            <span class="block text-[10px] uppercase tracking-wide text-muted/80">Terakhir ditambahkan</span>
-                            <?= e($formatDocUploadedAt((string) $user['diploma_path'])) ?>
-                        <?php else: ?>
-                            Belum diunggah
-                        <?php endif; ?>
-                    </div>
-                    <input type="file" name="diploma" accept=".pdf,.docx" class="block w-full text-xs border border-default rounded-md px-2 py-1.5 mb-2" required>
-                    <div class="flex items-center gap-2">
-                        <button type="submit" class="flex-1 px-3 py-1.5 rounded-full bg-accent text-primary text-xs font-semibold">Upload Ijazah</button>
-                        <?php if (!empty($user['diploma_path'])): ?>
-                            <a href="<?= BASE_URL ?>/index.php?url=download/user-file&type=diploma" target="_blank" rel="noopener noreferrer" class="px-3 py-1.5 rounded-full border border-default text-xs font-semibold text-default hover:bg-muted">Preview</a>
-                        <?php endif; ?>
-                    </div>
-                </form>
-                <form method="post" action="<?= BASE_URL ?>/index.php?url=user/settings/photo" enctype="multipart/form-data" class="rounded-xl border border-muted p-3">
-                    <div class="text-xs font-semibold text-default mb-2">Pas Foto (JPG/PNG)</div>
-                    <div class="text-[11px] text-muted mb-2">
-                        <?php if (!empty($user['photo_path'])): ?>
-                            <span class="block text-[10px] uppercase tracking-wide text-muted/80">Terakhir ditambahkan</span>
-                            <?= e($formatDocUploadedAt((string) $user['photo_path'])) ?>
-                        <?php else: ?>
-                            Belum diunggah
-                        <?php endif; ?>
-                    </div>
-                    <input type="file" name="photo" accept=".jpg,.jpeg,.png" class="block w-full text-xs border border-default rounded-md px-2 py-1.5 mb-2" required>
-                    <div class="flex items-center gap-2">
-                        <button type="submit" class="flex-1 px-3 py-1.5 rounded-full bg-accent text-primary text-xs font-semibold">Upload Pas Foto</button>
-                        <?php if (!empty($user['photo_path'])): ?>
-                            <a href="<?= BASE_URL ?>/index.php?url=download/user-file&type=photo" target="_blank" rel="noopener noreferrer" class="px-3 py-1.5 rounded-full border border-default text-xs font-semibold text-default hover:bg-muted">Preview</a>
-                        <?php endif; ?>
-                    </div>
-                </form>
-            </div>
-        </div>
+        <?php else: ?>
+            <p class="text-gray-500 font-medium mb-8">no education info listed.</p>
+        <?php endif; ?>
 
+        <!-- achievements -->
+        <?php if (!empty($achievements)): ?>
+            <div class="mt-8">
+                <?php foreach ($achievements as $ach): ?>
+                    <div class="brutalist-timeline-item">
+                        <div class="brutalist-value" style="font-size:20px;"><?= e($ach['title'] ?? '-') ?></div>
+                        <div class="brutalist-label" style="font-size:14px; margin:4px 0;">
+                            <?= e($ach['type'] ?? '-') ?> / <?= !empty($ach['level']) ? e($ach['level']) . ' / ' : '' ?> <?= !empty($ach['year']) ? e($ach['year']) : '' ?>
+                        </div>
+                        <?php if (!empty($ach['organizer'])): ?>
+                            <div class="brutalist-label">by <?= e($ach['organizer']) ?></div>
+                        <?php endif; ?>
+                    </div>
+                <?php endforeach; ?>
+            </div>
+        <?php endif; ?>
+    </div>
+
+    <div class="brutalist-block">
+        <div class="brutalist-block-header">
+            <h2 class="brutalist-block-title">documents (resume / cv)</h2>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- CV -->
+            <form method="post" action="<?= BASE_URL ?>/index.php?url=user/settings/cv" enctype="multipart/form-data" class="brutalist-doc-card">
+                <div class="brutalist-value mb-2">resume / cv <span class="text-xs text-gray-500">(pdf/docx)</span></div>
+                <div class="brutalist-label mb-4">
+                    last updated: <span style="color:var(--color-text);"><?= e($formatDocUploadedAt((string) $user['cv_path'])) ?></span>
+                </div>
+                <input type="file" name="cv" accept=".pdf,.docx" class="block w-full text-sm border border-[#444] bg-[#111] text-white px-3 py-2 mb-4" required>
+                <div class="flex gap-2">
+                    <button type="submit" class="brutalist-btn w-full">upload cv</button>
+                    <?php if (!empty($user['cv_path'])): ?>
+                        <a href="<?= BASE_URL ?>/index.php?url=download/user-file&type=cv" target="_blank" rel="noopener noreferrer" class="brutalist-btn brutalist-btn-outline w-full text-center">preview</a>
+                    <?php endif; ?>
+                </div>
+            </form>
+
+            <!-- Diploma -->
+            <form method="post" action="<?= BASE_URL ?>/index.php?url=user/settings/diploma" enctype="multipart/form-data" class="brutalist-doc-card">
+                <div class="brutalist-value mb-2">diploma <span class="text-xs text-gray-500">(pdf/docx)</span></div>
+                <div class="brutalist-label mb-4">
+                    last updated: <span style="color:var(--color-text);"><?= e($formatDocUploadedAt((string) $user['diploma_path'])) ?></span>
+                </div>
+                <input type="file" name="diploma" accept=".pdf,.docx" class="block w-full text-sm border border-[#444] bg-[#111] text-white px-3 py-2 mb-4" required>
+                <div class="flex gap-2">
+                    <button type="submit" class="brutalist-btn w-full">upload</button>
+                    <?php if (!empty($user['diploma_path'])): ?>
+                        <a href="<?= BASE_URL ?>/index.php?url=download/user-file&type=diploma" target="_blank" rel="noopener noreferrer" class="brutalist-btn brutalist-btn-outline w-full text-center">preview</a>
+                    <?php endif; ?>
+                </div>
+            </form>
+
+            <!-- Photo -->
+            <form method="post" action="<?= BASE_URL ?>/index.php?url=user/settings/photo" enctype="multipart/form-data" class="brutalist-doc-card">
+                <div class="brutalist-value mb-2">photo ID <span class="text-xs text-gray-500">(jpg/png)</span></div>
+                <div class="brutalist-label mb-4">
+                    last updated: <span style="color:var(--color-text);"><?= e($formatDocUploadedAt((string) $user['photo_path'])) ?></span>
+                </div>
+                <input type="file" name="photo" accept=".jpg,.jpeg,.png" class="block w-full text-sm border border-[#444] bg-[#111] text-white px-3 py-2 mb-4" required>
+                <div class="flex gap-2">
+                    <button type="submit" class="brutalist-btn w-full">upload photo</button>
+                    <?php if (!empty($user['photo_path'])): ?>
+                        <a href="<?= BASE_URL ?>/index.php?url=download/user-file&type=photo" target="_blank" rel="noopener noreferrer" class="brutalist-btn brutalist-btn-outline w-full text-center">preview</a>
+                    <?php endif; ?>
+                </div>
+            </form>
+        </div>
     </div>
 </div>

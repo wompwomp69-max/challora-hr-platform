@@ -3,61 +3,127 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lupa Password - Challora</title>
+    <title>Forgot Password - Challora</title>
 
     <link rel="stylesheet" href="<?= BASE_URL ?>/assets/css/design-tokens.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { font-family: var(--font-sans); background: var(--color-surface); color: var(--color-text); }
+        .brutalist-card {
+            border: 2px solid var(--color-border);
+            box-shadow: 8px 8px 0 rgba(0,0,0,1);
+            background: #0a0a0a;
+            border-radius: 0;
+            padding: 32px;
+        }
+        .brutalist-input {
+            background: #111;
+            border: 2px solid var(--color-border);
+            border-radius: 0;
+            color: var(--color-text);
+            padding: 14px 16px;
+            width: 100%;
+            transition: all 0.2s ease;
+            box-shadow: 2px 2px 0 rgba(0,0,0,0.5);
+            text-transform: lowercase;
+            font-size: 16px;
+        }
+        .brutalist-input:focus {
+            border-color: var(--color-accent);
+            box-shadow: 4px 4px 0 var(--color-accent);
+            outline: none;
+            transform: translate(-2px, -2px);
+        }
+        .brutalist-btn {
+            display: inline-block;
+            width: 100%;
+            background: var(--color-accent);
+            color: var(--color-surface);
+            padding: 16px 24px;
+            font-weight: 800;
+            font-size: 16px;
+            text-transform: lowercase;
+            text-decoration: none;
+            text-align: center;
+            border: 2px solid var(--color-border);
+            border-radius: 0;
+            cursor: pointer;
+            box-shadow: 4px 4px 0 rgba(0,0,0,1);
+            transition: all 0.2s ease;
+        }
+        .brutalist-btn:hover {
+            transform: translate(-2px, -2px);
+            box-shadow: 6px 6px 0 rgba(0,0,0,1);
+        }
+        .brutalist-btn:active {
+            transform: translate(2px, 2px);
+            box-shadow: 0px 0px 0 rgba(0,0,0,1);
+        }
+        .brutalist-label {
+            text-transform: lowercase;
+            font-weight: 600;
+            font-size: 14px;
+            margin-bottom: 8px;
+            display: block;
+        }
+        .brutalist-alert {
+            background: var(--color-accent);
+            color: var(--color-surface);
+            padding: 16px;
+            border: 2px solid var(--color-border);
+            font-weight: bold;
+            font-size: 14px;
+            text-transform: lowercase;
+            margin-bottom: 24px;
+            box-shadow: 4px 4px 0 rgba(0,0,0,1);
+        }
+    </style>
 </head>
 
-<body class="min-h-screen bg-primary text-secondary" style="font-family: var(--font-sans);">
-<div class="min-h-screen flex items-center justify-center p-4">
-    <div class="w-full max-w-md rounded-2xl bg-surface border border-muted shadow-lg p-6">
-        <div class="text-center mb-6">
-            <div class="w-11 h-11 mx-auto rounded-xl bg-secondary text-accent flex items-center justify-center font-bold text-lg mb-3">C</div>
-            <h1 class="text-2xl font-bold text-secondary">Lupa Password</h1>
-            <p class="text-sm text-secondary/80 mt-1">Masukkan email untuk menerima tautan reset password.</p>
+<body class="min-h-screen lowercase flex items-center justify-center p-4">
+    <div class="w-full max-w-lg brutalist-card">
+        <div class="mb-8">
+            <h1 class="text-4xl font-bold mb-2" style="letter-spacing: -2px;">forgot password</h1>
+            <p class="font-semibold opacity-75">enter your email to receive a reset link.</p>
         </div>
 
         <?php if (!empty($error)): ?>
-            <div class="mb-4 rounded-xl bg-danger-soft text-danger text-sm px-4 py-3">
+            <div class="brutalist-alert bg-red-600 text-white">
                 <?= e($error) ?>
             </div>
         <?php elseif (!empty($success)): ?>
-            <div class="mb-4 rounded-xl bg-success-soft text-success text-sm px-4 py-3">
+            <div class="brutalist-alert bg-green-600 text-white">
                 <?= e($success) ?>
             </div>
             <?php if (!empty($link)): ?>
-                <div class="mt-3 rounded-xl bg-info-soft text-info text-sm px-4 py-3 break-all">
-                    <a href="<?= e($link) ?>" target="_blank" class="underline"><?= e($link) ?></a>
+                <div class="brutalist-alert bg-blue-600 text-white mt-4 break-all">
+                    copy this link: <a href="<?= e($link) ?>" target="_blank" class="underline"><?= e($link) ?></a>
                 </div>
             <?php endif; ?>
         <?php endif; ?>
 
-        <form method="post" action="<?= BASE_URL ?>/index.php?url=auth/forgot" class="space-y-4">
+        <form method="post" action="<?= BASE_URL ?>/index.php?url=auth/forgot" class="space-y-6">
             <div>
-                <label class="block text-sm font-semibold mb-1 text-secondary">Alamat Email</label>
+                <label class="brutalist-label">email address</label>
                 <input
                     type="email"
                     name="email"
-                    placeholder="Masukkan email"
+                    placeholder="john.doe@gmail.com"
                     required
-                    class="w-full rounded-xl border border-default bg-surface px-4 py-3 text-sm text-secondary focus:outline-none focus:ring-2 focus:ring-primary/40"
+                    class="brutalist-input"
                 >
             </div>
 
-            <button type="submit" class="w-full rounded-xl bg-accent text-secondary py-3 font-semibold hover:bg-accent-hover transition">
-                Kirim Link Reset
+            <button type="submit" class="brutalist-btn">
+                send reset link
             </button>
 
-            <p class="text-sm text-secondary/80 text-center">
-                Sudah ingat password?
-                <a href="<?= BASE_URL ?>/auth/login" class="font-semibold text-secondary hover:underline">Masuk</a>
+            <p class="text-sm text-center font-semibold pt-2">
+                remembered your password?
+                <a href="<?= BASE_URL ?>/auth/login" class="text-accent underline hover:text-white transition" style="text-underline-offset: 4px;">sign in</a>
             </p>
         </form>
     </div>
-</div>
 </body>
 </html>

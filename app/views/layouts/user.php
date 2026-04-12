@@ -1,251 +1,163 @@
 <?php require APP_PATH . '/views/layouts/header.php'; ?>
-<?php $activeUserPath = currentRoutePath('jobs'); ?>
+<?php
+$activeUserPath = currentRoutePath('jobs');
+?>
 <style>
-html,body{-ms-overflow-style:none;scrollbar-width:none;}
-html::-webkit-scrollbar,body::-webkit-scrollbar{width:0;height:0;display:none;}
-.user-shell{min-height:100vh;background:var(--color-surface);--user-content-pad-x:10vw;--user-bar-pad-x:5vw;display:flex;flex-direction:column;}
-/* Stacking: must sit above in-page sticky bars (e.g. .jobs-search-sticky z-index:40) so avatar dropdown is not covered */
-.user-topnav{position:relative;z-index:50;overflow:visible;background:var(--color-secondary);color:var(--color-on-secondary);border-bottom:1px solid rgba(255,255,255,.28);}
-.user-topnav-inner{width:100%;padding:0 var(--user-bar-pad-x);min-height:84px;display:flex;align-items:stretch;justify-content:space-between;gap:22px;overflow:visible;}
-.user-brand{display:flex;align-items:center;font-size:28px;font-weight:700;line-height:1;color:var(--color-primary);text-decoration:none;letter-spacing:.4px;}
-.user-mainnav{display:flex;align-items:stretch;gap:8px;flex-grow:1;}
-.user-mainnav-link{display:flex;align-items:center;padding:0 22px;color:#edf3f8;text-decoration:none;font-weight:400;font-size:18px;border-bottom:5px solid transparent;}
-.user-mainnav-link.active{border-bottom-color:#fff;font-weight:600;}
-.user-mainnav-link:hover{color:#fff;background:rgba(255,255,255,.04);}
-.user-avatar-btn{width:40px;height:40px;border-radius:999px;background:#fff;color:var(--color-secondary);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;border:none;}
-.user-main-wrap{width:100%;padding:16px var(--user-content-pad-x) 24px;flex:1 0 auto;}
-#user-menu-root{position:relative;z-index:9998;}
-#user-menu-dropdown{
-    position:absolute;
-    top:calc(100% + 8px);
-    right:0;
-    min-width:220px;
-    z-index:9999 !important;
-    padding:0;
-    margin:0;
-    background:var(--color-secondary);
-    border:1px solid color-mix(in srgb,var(--color-surface) 22%,transparent);
-    box-shadow:var(--shadow-lg);
-}
-.user-menu-dropdown-link{
-    display:flex;
-    align-items:center;
-    gap:14px;
-    color:var(--gray-100);
-    font-size:16px;
-    font-weight:400;
-    line-height:1.25;
-    text-decoration:none;
-    padding:20px 18px;
-    border-bottom:1px solid color-mix(in srgb,var(--color-surface) 20%,transparent);
-    transition:background-color .18s ease,color .18s ease;
-}
-.user-menu-dropdown-link:last-child{border-bottom:0;}
-.user-menu-dropdown-link:hover{
-    background:color-mix(in srgb,var(--color-surface) 10%,transparent);
-    color:#fff;
-}
-.user-menu-dropdown-link i{font-size:14px;line-height:1;flex-shrink:0;opacity:.95;}
-.user-footer{margin-top:24px;border-top:1px solid color-mix(in srgb,var(--color-secondary) 15%,transparent);background:var(--color-secondary);}
-.user-footer-inner{width:100%;padding:16px var(--user-content-pad-x);display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;}
-.user-footer-copy{font-size:13px;color:var(--color-text-muted);}
-.user-footer-copy strong{color:var(--color-accent);font-weight:700;}
-.user-footer-links{display:flex;align-items:center;gap:16px;flex-wrap:wrap;}
-.user-footer-link{font-size:13px;color:var(--color-accent);text-decoration:none;transition:color .2s ease;}
-.user-footer-link:hover{color:var(--color-accent-hover);text-decoration:underline;}
-@media (max-width:992px){
-    .user-shell{--user-content-pad-x:6vw;--user-bar-pad-x:4vw;}
-}
-@media (max-width:768px){
-    .user-footer-inner{justify-content:center;text-align:center;}
-}
+    /* Brutalist Basic Overrides */
+    html,
+    body {
+        background-color: var(--color-primary);
+        color: var(--color-text);
+        font-family: var(--font-sans);
+        overflow-x: hidden;
+    }
+
+    .brutalist-nav {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 24px 40px;
+        background-color: transparent;
+        border-bottom: 1px solid var(--color-border);
+    }
+
+    .brutalist-brand {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 20px;
+        font-weight: 700;
+        color: var(--color-text);
+        text-decoration: none;
+        letter-spacing: -0.5px;
+    }
+
+    .brutalist-links {
+        display: flex;
+        gap: 32px;
+    }
+
+    .brutalist-link {
+        font-size: 14px;
+        font-weight: 500;
+        color: var(--color-text-muted);
+        text-decoration: none;
+        transition: color 0.2s ease;
+    }
+
+    .brutalist-link:hover,
+    .brutalist-link.active {
+        color: var(--color-text);
+    }
+
+    .brutalist-link.active {
+        border-bottom: 2px solid var(--color-text);
+        padding-bottom: 4px;
+    }
+
+    .brutalist-profile {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: var(--color-text-muted);
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+    }
+
+    .brutalist-profile:hover {
+        color: var(--color-text);
+    }
+
+    .brutalist-main {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 40px;
+        width: 100%;
+    }
 </style>
-<div class="user-shell">
-<header class="user-topnav">
-    <div class="user-topnav-inner">
-        <a href="<?= BASE_URL ?>/jobs" class="user-brand">CHALLORA</a>
-        <nav class="user-mainnav flex-grow-1">
-            <a class="user-mainnav-link ml-20 <?= str_starts_with($activeUserPath, 'jobs') && !str_starts_with($activeUserPath, 'jobs/saved') ? 'active' : '' ?>" href="<?= BASE_URL ?>/jobs">Lowongan</a>
-            <a class="user-mainnav-link <?= str_contains($activeUserPath, 'applications') ? 'active' : '' ?>" href="<?= BASE_URL ?>/applications">Sudah Dilamar</a>
-            <a class="user-mainnav-link <?= str_starts_with($activeUserPath, 'jobs/saved') ? 'active' : '' ?>" href="<?= BASE_URL ?>/jobs/saved">Lowongan Tersimpan</a>
+<div class="user-shell min-h-screen flex flex-col">
+    <header class="brutalist-nav">
+        <!-- Logo -->
+        <a href="<?= BASE_URL ?>/jobs" class="brutalist-brand lowercase">
+            challora
+        </a>
+
+        <!-- Navigation -->
+        <nav class="hidden md:flex brutalist-links lowercase">
+            <a href="<?= BASE_URL ?>/jobs"
+                class="brutalist-link <?= str_starts_with($activeUserPath, 'jobs') && !str_starts_with($activeUserPath, 'jobs/saved') ? 'active' : '' ?>">job
+                lists</a>
+            <a href="<?= BASE_URL ?>/applications"
+                class="brutalist-link <?= str_contains($activeUserPath, 'applications') ? 'active' : '' ?>">applied jobs</a>
+            <a href="<?= BASE_URL ?>/jobs/saved"
+                class="brutalist-link <?= str_contains($activeUserPath, 'jobs/saved') ? 'active' : '' ?>">saved jobs</a>
         </nav>
-        <div class="flex items-center gap-3">
+
+        <!-- Right User Area -->
+        <div class="flex items-center gap-6">
             <?php if (isLoggedIn() && currentRole() === 'user'): ?>
-                <?php
-                $initial = mb_strtoupper(mb_substr($_SESSION['user_name'] ?? 'U', 0, 1));
-                $headerAvatarSrc = currentUserAvatarImgSrc();
-                ?>
-                <div class="relative" id="user-menu-root">
-                    <button type="button" id="user-menu-toggle" class="user-avatar-btn">
-                        <?php if ($headerAvatarSrc): ?>
-                            <img src="<?= e($headerAvatarSrc) ?>" alt="" class="w-full h-full rounded-full object-cover" width="40" height="40">
+                <div class="relative group" id="user-menu-root">
+                    <button type="button" id="user-menu-toggle" class="brutalist-profile lowercase"
+                        style="display:flex; align-items:center; gap:8px;">
+                        <?php if (!empty($_SESSION['user_avatar_path'])): ?>
+                            <img src="<?= BASE_URL . '/download/avatar?v=' . e((string) ($_SESSION['user_avatar_ver'] ?? '')) ?>"
+                                style="width:24px; height:24px; border-radius:50%; object-fit:cover; border:1px solid var(--color-border);"
+                                alt="">
                         <?php else: ?>
-                            <?= e($initial) ?>
+                            <div
+                                style="width:24px; height:24px; border-radius:50%; background:var(--color-text); color:var(--color-surface); display:flex; align-items:center; justify-content:center; font-weight:bold; font-size:14px; text-transform:uppercase;">
+                                <?= e(substr($_SESSION['user_name'] ?? 'U', 0, 1)) ?>
+                            </div>
                         <?php endif; ?>
+                        <span><?= e($_SESSION['user_name'] ?? 'my profile') ?></span>
                     </button>
-                    <div id="user-menu-dropdown" class="hidden">
-                        <a href="<?= BASE_URL ?>/user/settings" class="user-menu-dropdown-link">
-                            <i class="bi bi-gear" aria-hidden="true"></i>
-                            <span>Pengaturan user</span>
-                        </a>
-                        <a href="<?= BASE_URL ?>/auth/logout" class="user-menu-dropdown-link">
-                            <i class="bi bi-box-arrow-right" aria-hidden="true"></i>
-                            <span>Logout</span>
-                        </a>
+                    <!-- Dropdown -->
+                    <div id="user-menu-dropdown"
+                        style="background: var(--color-surface); border: 1px solid var(--color-border); border-radius: 0;"
+                        class="absolute right-0 mt-3 w-40 shadow-xl hidden z-50 text-left">
+                        <a href="<?= BASE_URL ?>/user/settings" style="color: var(--color-text-muted);"
+                            class="block px-4 py-3 text-sm hover:bg-[#1a1a1a] hover:text-white transition-colors lowercase">settings</a>
+                        <a href="<?= BASE_URL ?>/auth/logout"
+                            style="color: var(--color-accent); border-top: 1px solid var(--color-border);"
+                            class="block px-4 py-3 text-sm hover:bg-[#1a1a1a] transition-colors lowercase">logout</a>
                     </div>
                 </div>
-            <?php elseif (!isLoggedIn()): ?>
-                <a href="<?= BASE_URL ?>/auth/login" class="text-xs text-muted hover:text-default">Login</a>
+            <?php else: ?>
+                <a href="<?= BASE_URL ?>/auth/login" class="brutalist-link lowercase">login</a>
             <?php endif; ?>
         </div>
-    </div>
-</header>
-<main class="user-main-wrap">
+    </header>
 
-    <?php if (!empty($_SESSION['flash']) && empty($_SESSION['flash_toast'])): ?>
+    <!-- Global Alerts -->
+    <?php if (!empty($_SESSION['flash'])): ?>
         <?php
-        $flashType = (string) ($_SESSION['flash_type'] ?? 'success');
-        $flashClass = $flashType === 'error' ? 'danger' : ($flashType === 'info' ? 'info' : 'success');
+        $flashClass = ($_SESSION['flash_type'] ?? 'success') === 'error' ? 'bg-[#ff4500] text-white' : 'bg-green-600 text-white';
         ?>
-        <div class="alert alert-<?= e($flashClass) ?>"><?= e($_SESSION['flash']) ?></div>
-        <?php unset($_SESSION['flash']); ?>
-        <?php unset($_SESSION['flash_type']); ?>
+        <div class="mx-10 mt-6 px-4 py-3 <?= $flashClass ?> text-sm font-bold lowercase"><?= e($_SESSION['flash']) ?></div>
+        <?php unset($_SESSION['flash'], $_SESSION['flash_type']); ?>
     <?php endif; ?>
-    <?php if (!empty($_SESSION['flash_error'])): ?>
-        <div class="alert alert-danger"><?= e($_SESSION['flash_error']) ?></div>
-        <?php unset($_SESSION['flash_error']); ?>
-    <?php endif; ?>
-    <?php if (isLoggedIn() && currentRole() === 'user' && !($hideProfileBar ?? false) && !isProfileComplete()): ?>
-        <div class="alert alert-warning d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
-            <span>Datamu belum dilengkapi, lengkapi agar HR semakin yakin untuk menerima mu.</span>
-            <a href="<?= BASE_URL ?>/user/settings/edit" class="btn btn-warning btn-sm">Lengkapi Data</a>
-        </div>
-    <?php endif; ?>
-    <?= $content ?? '' ?>
-</main>
-<footer class="user-footer" aria-label="Footer user">
-    <div class="user-footer-inner">
-        <p class="user-footer-copy mb-0">
-            <strong>CHALLORA</strong> &copy; <?= date('Y') ?>. Semua hak dilindungi.
-        </p>
-        <nav class="user-footer-links" aria-label="Tautan cepat">
-            <a class="user-footer-link" href="<?= BASE_URL ?>/jobs">Lowongan</a>
-            <a class="user-footer-link" href="<?= BASE_URL ?>/applications">Lamaran</a>
-            <a class="user-footer-link" href="<?= BASE_URL ?>/jobs/saved">Tersimpan</a>
-        </nav>
-    </div>
-</footer>
+
+    <main class="brutalist-main flex-1 w-full min-h-0">
+        <?= $content ?? '' ?>
+    </main>
 </div>
-<?php if (isLoggedIn() && currentRole() === 'user' && !empty($_SESSION['flash_toast'])): ?>
-<?php
-$toast = $_SESSION['flash_toast'];
-unset($_SESSION['flash_toast']);
-$toastMessage = is_array($toast) ? (string) ($toast['message'] ?? '') : '';
-$toastUndo = is_array($toast) && !empty($toast['undo']) && is_array($toast['undo']) ? $toast['undo'] : null;
-?>
-<?php if ($toastMessage !== ''): ?>
-<div id="toast-user" class="toast-user" role="alert">
-    <div class="toast-user-inner">
-        <span class="toast-user-msg"><?= e($toastMessage) ?></span>
-        <div class="toast-user-actions">
-            <?php if (!empty($toastUndo['url'])): ?>
-            <form id="toast-undo-form" method="post" action="<?= e((string) $toastUndo['url']) ?>" class="d-inline">
-                <?php foreach (($toastUndo['fields'] ?? []) as $k => $v): ?>
-                <input type="hidden" name="<?= e($k) ?>" value="<?= e($v) ?>">
-                <?php endforeach; ?>
-                <button type="submit" class="btn btn-link btn-sm p-0 text-decoration-none fw-bold toast-undo-btn"><?= e((string) ($toastUndo['label'] ?? 'Undo')) ?></button>
-            </form>
-            <span class="toast-user-sep">|</span>
-            <?php endif; ?>
-            <button type="button" class="btn btn-link btn-sm p-0 text-decoration-none fw-bold toast-close-btn" aria-label="Tutup">&times;</button>
-        </div>
-    </div>
-</div>
-<style>
-.toast-user {
-    position: fixed;
-    bottom: 1rem;
-    right: 1rem;
-    z-index: 1050;
-    min-width: 280px;
-    max-width: 400px;
-    padding: 1rem 1.25rem;
-    background: var(--color-secondary-hover);
-    color: var(--color-surface);
-    border-radius: 0.5rem;
-    box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.25);
-    animation: toastSlideIn 0.3s ease-out;
-}
-.toast-user.toast-out {
-    animation: toastSlideOut 0.3s ease-in forwards;
-}
-.toast-user-inner {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 1rem;
-}
-.toast-user-msg {
-    flex: 1;
-}
-.toast-user-actions {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    flex-shrink: 0;
-}
-.toast-user-sep {
-    opacity: 0.6;
-}
-.toast-close-btn, .toast-undo-btn {
-    color: var(--color-surface) !important;
-    text-decoration: none !important;
-    font-weight: bold;
-    opacity: 0.9;
-}
-.toast-close-btn:hover, .toast-undo-btn:hover {
-    opacity: 1;
-}
-@keyframes toastSlideIn {
-    from { transform: translateX(100%); opacity: 0; }
-    to { transform: translateX(0); opacity: 1; }
-}
-@keyframes toastSlideOut {
-    from { transform: translateX(0); opacity: 1; }
-    to { transform: translateX(100%); opacity: 0; }
-}
-</style>
+
 <script>
-(function() {
-    var toast = document.getElementById('toast-user');
-    if (!toast) return;
-    var close = toast.querySelector('.toast-close-btn');
-    var undoForm = document.getElementById('toast-undo-form');
-    function dismiss() {
-        toast.classList.add('toast-out');
-        setTimeout(function() { toast.remove(); }, 300);
-    }
-    if (close) close.addEventListener('click', dismiss);
-    setTimeout(dismiss, 5000);
-})();
-</script>
-<?php endif; ?>
-<?php endif; ?>
-<script>
-// simple user dropdown (selalu aktif untuk user)
-document.addEventListener('DOMContentLoaded', function () {
-    var toggle = document.getElementById('user-menu-toggle');
-    var dropdown = document.getElementById('user-menu-dropdown');
-    if (!toggle || !dropdown) return;
-    toggle.addEventListener('click', function (e) {
-        e.stopPropagation();
-        dropdown.classList.toggle('hidden');
+    document.addEventListener('DOMContentLoaded', function () {
+        var toggle = document.getElementById('user-menu-toggle');
+        var dropdown = document.getElementById('user-menu-dropdown');
+        if (!toggle || !dropdown) return;
+        toggle.addEventListener('click', function (e) {
+            e.stopPropagation();
+            dropdown.classList.toggle('hidden');
+        });
+        document.addEventListener('click', function () {
+            if (!dropdown.classList.contains('hidden')) {
+                dropdown.classList.add('hidden');
+            }
+        });
     });
-    document.addEventListener('click', function () {
-        if (!dropdown.classList.contains('hidden')) {
-            dropdown.classList.add('hidden');
-        }
-    });
-});
 </script>
+
 <?php require APP_PATH . '/views/layouts/footer.php'; ?>

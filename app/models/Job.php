@@ -390,13 +390,13 @@ class Job {
     }
 
     /** Filter: all, no_apply, has_apply, has_accepted */
-    public function countByCreatorFiltered(int $createdBy, string $filter): int {
+    public function countAllFiltered(string $filter): int {
         $filter = $this->normalizeFilter($filter);
-        $base = 'SELECT COUNT(*) FROM jobs j WHERE j.created_by = ?';
+        $base = 'SELECT COUNT(*) FROM jobs j WHERE 1=1';
         $where = $this->filterWhereClause($filter);
         $sql = $base . $where;
         $stmt = $this->db->prepare($sql);
-        $stmt->execute([$createdBy]);
+        $stmt->execute();
         return (int) $stmt->fetchColumn();
     }
 
@@ -407,31 +407,48 @@ class Job {
 
     private function filterWhereClause(string $filter): string {
         if ($filter === 'no_apply') {
-            return ' AND j.id NOT IN (SELECT job_id FROM applications)';
+            return ' AND NOT EXISTS (SELECT 1 FROM applications a WHERE a.job_id = j.id)';
         }
         if ($filter === 'has_apply') {
-            return ' AND j.id IN (SELECT job_id FROM applications)';
+            return ' AND EXISTS (SELECT 1 FROM applications a WHERE a.job_id = j.id)';
         }
         if ($filter === 'has_accepted') {
-            return " AND j.id IN (SELECT job_id FROM applications WHERE status = 'accepted')";
+            return " AND EXISTS (SELECT 1 FROM applications a WHERE a.job_id = j.id AND a.status = 'accepted')";
         }
         return '';
     }
 
-    public function findByCreatorPaginated(int $createdBy, int $page = 1, int $perPage = 10, string $filter = 'all'): array {
+    /**
+     * Optimized query to fetch all jobs with their application statistics in a single call.
+     * Removes the N+1 problem in the HR dashboard.
+     */
+    public function findAllPaginatedWithStats(int $page = 1, int $perPage = 10, string $filter = 'all'): array {
         $filter = $this->normalizeFilter($filter);
         $offset = max(0, ($page - 1) * $perPage);
         $perPage = (int) $perPage;
         $offset = (int) $offset;
         $where = $this->filterWhereClause($filter);
-        $sql = "SELECT j.*, u.name AS created_by_name
+        
+        $sql = "SELECT j.*, u.name AS created_by_name,
+                COALESCE(stats.total_count, 0) as applicant_count,
+                COALESCE(stats.accepted_count, 0) as applicant_accepted,
+                COALESCE(stats.rejected_count, 0) as applicant_rejected
             FROM jobs j
             LEFT JOIN users u ON u.id = j.created_by
-            WHERE j.created_by = ? $where
+            LEFT JOIN (
+                SELECT job_id, 
+                       COUNT(*) as total_count,
+                       SUM(CASE WHEN status = 'accepted' THEN 1 ELSE 0 END) as accepted_count,
+                       SUM(CASE WHEN status = 'rejected' THEN 1 ELSE 0 END) as rejected_count
+                FROM applications
+                GROUP BY job_id
+            ) AS stats ON stats.job_id = j.id
+            WHERE 1=1 $where
             ORDER BY j.created_at DESC
             LIMIT $perPage OFFSET $offset";
+            
         $stmt = $this->db->prepare($sql);
-        $stmt->execute([$createdBy]);
+        $stmt->execute();
         return $stmt->fetchAll();
     }
 
@@ -638,9 +655,14 @@ class Job {
     }
 
     public function isCreatedBy(int $jobId, int $userId): bool {
-        $stmt = $this->db->prepare('SELECT 1 FROM jobs WHERE id = ? AND created_by = ?');
-        $stmt->execute([$jobId, $userId]);
-        return (bool) $stmt->fetch();
+        // Since the platform is global per company, we check if the user is an HR.
+        // The original logic checks if the user is THE creator.
+        // We'll return true if HR, but keep original for user-facing logic if needed.
+        $stmt = $this->db->prepare('SELECT j.created_by, u.role FROM jobs j JOIN users u ON u.id = ? WHERE j.id = ?');
+        $stmt->execute([$userId, $jobId]);
+        $row = $stmt->fetch();
+        if (!$row) return false;
+        return $row['role'] === 'hr' || (int)$row['created_by'] === $userId;
     }
 
     /** @return string[] array of skill keywords */

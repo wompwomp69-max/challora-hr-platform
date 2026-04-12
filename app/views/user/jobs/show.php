@@ -1,142 +1,295 @@
-<div class="max-w-3xl mx-auto bg-surface rounded-2xl shadow-sm p-5 md:p-7">
-    <div class="mb-4">
-        <?php if (!empty($job['is_urgent'])): ?><span class="inline-flex items-center px-3 py-1 rounded-full bg-danger-soft text-danger text-xs font-semibold mb-2">Urgent</span><?php endif; ?>
-        <h1 class="text-xl md:text-2xl font-semibold mb-1"><?= e($job['title']) ?></h1>
-        <p class="text-sm text-muted">Lokasi: <?= e($job['location'] ?? '-') ?> | Gaji: <?= e($job['salary_range'] ?? '-') ?></p>
-        <?php
-        $jobSkills = !empty($job['skills_json']) ? json_decode($job['skills_json'], true) : [];
-        $jobBenefits = !empty($job['benefits_json']) ? json_decode($job['benefits_json'], true) : [];
-        $renderSaveToggle = static function (bool $saved, int $jobId, string $redirect, string $saveButtonClass, ?string $unsaveButtonClass = null, string $saveText = 'Simpan lowongan', string $unsaveText = 'Hapus dari simpan'): void {
-            $action = $saved ? '/jobs/unsave' : '/jobs/save';
-            $label = $saved ? $unsaveText : $saveText;
-            $buttonClass = $saved ? ($unsaveButtonClass ?? $saveButtonClass) : $saveButtonClass;
-            ?>
-            <form method="post" action="<?= BASE_URL . $action ?>" class="inline mb-0">
-                <input type="hidden" name="job_id" value="<?= $jobId ?>">
-                <input type="hidden" name="redirect" value="<?= e($redirect) ?>">
-                <button type="submit" class="<?= e($buttonClass) ?>"><?= e($label) ?></button>
-            </form>
-            <?php
-        };
-        ?>
-        <?php if (is_array($jobSkills) && !empty($jobSkills)): ?>
-        <div class="mb-1 text-sm">
-            <span class="font-semibold">Skill:</span>
-            <?php foreach ($jobSkills as $s): ?><span class="inline-flex items-center px-2 py-0.5 rounded-full bg-muted text-default text-xs mr-1 mb-1"><?= e($s) ?></span><?php endforeach; ?>
-        </div>
-        <?php endif; ?>
-        <?php if (is_array($jobBenefits) && !empty($jobBenefits)): ?>
-        <div class="mb-3 text-sm">
-            <span class="font-semibold">Benefit:</span>
-            <?php foreach ($jobBenefits as $b): ?><span class="inline-flex items-center px-2 py-0.5 rounded-full bg-sky-soft text-sky text-xs mr-1 mb-1"><?= e($b) ?></span><?php endforeach; ?>
-        </div>
-        <?php endif; ?>
-        <p class="font-semibold mb-1 mt-3 text-sm">Deskripsi</p>
-        <div class="mb-5 text-sm leading-relaxed text-default"><?= nl2br(e($job['description'])) ?></div>
-        <?php if (isLoggedIn() && currentRole() === 'user'): ?>
-            <?php if ($alreadyApplied): ?>
-                <div class="mb-4 flex flex-wrap items-center gap-2 text-sm">
-                    <?php $renderSaveToggle((bool) ($isSaved ?? false), (int) $job['id'], '/jobs/show?id=' . (int) $job['id'], 'px-3 py-1.5 rounded-full bg-primary text-secondary text-xs font-medium hover:bg-primary-hover', 'px-3 py-1.5 rounded-full bg-muted text-default text-xs font-medium hover:bg-muted'); ?>
-                    <span class="text-muted">Anda sudah melamar lowongan ini.</span>
-                </div>
-            <?php elseif ($canApply): ?>
-                <form id="apply-job-form" method="post" action="<?= BASE_URL ?>/index.php?url=jobs/apply">
-                    <input type="hidden" name="job_id" value="<?= (int)$job['id'] ?>">
-                </form>
-                <?php if (!($hasRequiredDocs ?? true)): ?>
-                    <div class="mb-3 rounded-xl border border-warning/30 bg-warning-soft px-3 py-2 text-xs text-warning">
-                        Lengkapi dokumen di Pengaturan terlebih dahulu: <?= e(implode(', ', $missingDocs ?? [])) ?>.
-                        <a href="<?= BASE_URL ?>/user/settings" class="font-semibold underline">Buka Pengaturan</a>
+<?php
+$companies = ['qclay studio', 'malvah', 'motto', 'netflix', 'google'];
+$companyIndex = ((int) ($job['id'] ?? 1)) % count($companies);
+$companyName = $companies[$companyIndex];
+$companyInitial = mb_substr($companyName, 0, 1);
+?>
+<style>
+    /* Brutalist Detail Overrides */
+    .brutalist-back {
+        display: inline-flex;
+        align-items: center;
+        color: var(--color-text);
+        text-decoration: none;
+        font-size: 16px;
+        font-weight: 500;
+        margin-bottom: 40px;
+        letter-spacing: -0.5px;
+        transition: color 0.2s;
+    }
+
+    .brutalist-back:hover {
+        color: var(--color-text-muted);
+    }
+
+    .brutalist-layout {
+        display: grid;
+        grid-template-columns: 1fr 340px;
+        gap: 60px;
+        align-items: start;
+    }
+
+    @media (max-width: 992px) {
+        .brutalist-layout {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    .brutalist-content-head {
+        margin-bottom: 32px;
+    }
+
+    .brutalist-detail-title {
+        font-size: 48px;
+        font-weight: 500;
+        color: var(--color-text-muted);
+        letter-spacing: -1.5px;
+        margin-bottom: 16px;
+        line-height: 1.1;
+    }
+
+    .brutalist-detail-company {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-size: 24px;
+        font-weight: 600;
+        color: var(--color-text);
+        letter-spacing: -0.5px;
+    }
+
+    .brutalist-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-bottom: 48px;
+    }
+
+    .brutalist-tag {
+        padding: 6px 16px;
+        border: 1px solid var(--color-border);
+        font-size: 14px;
+        font-weight: 500;
+        color: var(--color-text);
+    }
+
+    .brutalist-section {
+        margin-bottom: 48px;
+    }
+
+    .brutalist-h3 {
+        font-size: 24px;
+        font-weight: 500;
+        color: var(--color-text);
+        margin-bottom: 16px;
+        letter-spacing: -0.5px;
+    }
+
+    .brutalist-text {
+        font-size: 16px;
+        line-height: 1.6;
+        color: var(--color-text-muted);
+    }
+
+    .brutalist-text ul {
+        list-style-type: disc;
+        padding-left: 20px;
+        margin-top: 12px;
+    }
+
+    .brutalist-text li {
+        margin-bottom: 8px;
+    }
+
+    .brutalist-sidebar {
+        background-color: #161616;
+        padding: 32px;
+        border: 1px solid var(--color-border);
+    }
+
+    .brutalist-sidebar-salary {
+        font-size: 32px;
+        font-weight: 600;
+        color: var(--color-accent);
+        margin-bottom: 24px;
+        letter-spacing: -1px;
+    }
+
+    .brutalist-sidebar-meta {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        font-size: 15px;
+        color: var(--color-text-muted);
+        margin-bottom: 32px;
+    }
+
+    .brutalist-sidebar-meta strong {
+        color: var(--color-text);
+        font-weight: 500;
+    }
+
+    .brutalist-btn {
+        display: block;
+        width: 100%;
+        background-color: var(--color-accent);
+        color: var(--color-surface);
+        text-align: center;
+        padding: 16px;
+        font-size: 18px;
+        font-weight: 600;
+        text-decoration: none;
+        border: none;
+        cursor: pointer;
+        transition: background-color 0.2s;
+    }
+
+    .brutalist-btn:hover {
+        background-color: var(--color-accent-hover);
+    }
+
+    .brutalist-btn-alt {
+        background-color: #222;
+        color: var(--color-text) !important;
+    }
+
+    .brutalist-btn-alt:hover {
+        background-color: #333;
+    }
+</style>
+
+<div class="lowercase">
+    <a href="<?= BASE_URL ?>/jobs" class="brutalist-back">
+        <i class="bi bi-arrow-left mr-2"></i> back
+    </a>
+
+    <div class="brutalist-layout">
+        <!-- Main Content -->
+        <div>
+            <div class="brutalist-content-head">
+                <h1 class="brutalist-detail-title"><?= e($job['title']) ?></h1>
+                <div class="brutalist-detail-company">
+                    <div
+                        class="brutalist-company-icon w-8 h-8 rounded-full bg-white text-black flex items-center justify-center text-sm font-bold">
+                        <?php if ($companyIndex === 3)
+                            echo '<i class="bi bi-netflix text-[#e50914] bg-transparent"></i>';
+                        else if ($companyIndex === 4)
+                            echo '<i class="bi bi-google text-[#4285F4] bg-transparent"></i>';
+                        else
+                            echo e($companyInitial);
+                        ?>
                     </div>
-                <?php endif; ?>
-                <div class="flex flex-wrap gap-2 mb-4 items-center">
-                    <?php if (($hasRequiredDocs ?? true)): ?>
-                        <button type="button" id="open-apply-confirm" class="px-4 py-2 rounded-full bg-accent text-primary text-sm font-semibold">Lamar Sekarang</button>
+                    <?= e($companyName) ?>
+                </div>
+            </div>
+
+            <div class="brutalist-tags">
+                <span class="brutalist-tag">full-time</span>
+                <span class="brutalist-tag">remote possible</span>
+                <span class="brutalist-tag">english required</span>
+                <span class="brutalist-tag">senior level</span>
+            </div>
+
+            <div class="brutalist-section">
+                <h3 class="brutalist-h3">description</h3>
+                <div class="brutalist-text">
+                    <?= nl2br(e($job['description'])) ?>
+                </div>
+            </div>
+
+            <div class="brutalist-section">
+                <h3 class="brutalist-h3">responsibilities</h3>
+                <div class="brutalist-text">
+                    <ul>
+                        <li>own the design process from research to final handoff</li>
+                        <li>collaborate with product managers, engineers, and other designers</li>
+                        <li>create wireframes, user flows, and high-fidelity mockups</li>
+                        <li>conduct usability testing and apply insights to improve ux</li>
+                        <li>maintain and evolve our design system</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="brutalist-section">
+                <h3 class="brutalist-h3">requirements</h3>
+                <div class="brutalist-text">
+                    <ul>
+                        <li>6+ years of experience in product/ui/ux design</li>
+                        <li>strong portfolio demonstrating product thinking and craft</li>
+                        <li>proficiency in figma and prototyping tools</li>
+                        <li>understanding of html/css is a plus</li>
+                        <li>leadership or mentoring experience is a bonus</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar Actions -->
+        <div>
+            <div class="brutalist-sidebar">
+                <div class="brutalist-sidebar-salary"><?= e($job['salary_range'] ? $job['salary_range'] : '$1400') ?>
+                </div>
+
+                <div class="brutalist-sidebar-meta">
+                    <div>company: <strong><?= e($companyName) ?></strong></div>
+                    <div>location: <strong><?= e($job['location'] ?: 'london') ?></strong></div>
+                    <div>experience required: <strong>6+ years</strong></div>
+                    <div>job type: <strong>full-time</strong></div>
+                    <div>posted on: <strong>27 may 2026</strong></div>
+                </div>
+
+                <?php if (isLoggedIn() && currentRole() === 'user'): ?>
+                    <?php if ($alreadyApplied): ?>
+                        <div class="brutalist-btn brutalist-btn-alt cursor-not-allowed text-center">already applied</div>
+                    <?php elseif (!$hasRequiredDocs): ?>
+                        <button type="button" class="brutalist-btn"
+                            onclick="showMissingDocsToast(<?= htmlspecialchars(json_encode($missingDocs), ENT_QUOTES, 'UTF-8') ?>)">apply
+                            now</button>
                     <?php else: ?>
-                        <a href="<?= BASE_URL ?>/user/settings" class="px-4 py-2 rounded-full bg-primary text-secondary text-sm font-semibold hover:bg-primary-hover">Lengkapi Dokumen</a>
+                        <form method="post" action="<?= BASE_URL ?>/index.php?url=jobs/apply">
+                            <input type="hidden" name="job_id" value="<?= (int) $job['id'] ?>">
+                            <button type="submit" class="brutalist-btn">apply now</button>
+                        </form>
                     <?php endif; ?>
-                    <?php $renderSaveToggle((bool) ($isSaved ?? false), (int) $job['id'], '/jobs/show?id=' . (int) $job['id'], 'px-4 py-2 rounded-full bg-primary text-secondary text-sm font-semibold', 'px-4 py-2 rounded-full bg-muted text-default text-sm font-semibold hover:bg-muted'); ?>
-                </div>
-                <?php if (($hasRequiredDocs ?? true)): ?>
-                    <div id="apply-confirm-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/50 px-4">
-                        <div class="w-full max-w-md rounded-2xl border border-muted bg-surface p-4 shadow-lg">
-                            <p class="text-sm text-default mb-4">
-                                Kamu akan melamar <span class="font-semibold"><?= e($job['title']) ?></span>
-                            </p>
-                            <div class="flex justify-end gap-1">
-                                <button type="button" id="close-apply-confirm" class="px-4 py-2 rounded-full border border-default text-sm text-default hover:bg-muted">Batal</button>
-                                <button type="submit" form="apply-job-form" class="px-4 py-2 rounded-full bg-accent text-primary text-sm font-semibold">Ya, kirim lamaran</button>
-                            </div>
-                        </div>
-                    </div>
-                    <script>
-                    (function () {
-                        const openBtn = document.getElementById('open-apply-confirm');
-                        const closeBtn = document.getElementById('close-apply-confirm');
-                        const modal = document.getElementById('apply-confirm-modal');
-                        if (!openBtn || !closeBtn || !modal) return;
-                        openBtn.addEventListener('click', function () {
-                            modal.classList.remove('hidden');
-                            modal.classList.add('flex');
-                        });
-                        closeBtn.addEventListener('click', function () {
-                            modal.classList.add('hidden');
-                            modal.classList.remove('flex');
-                        });
-                        modal.addEventListener('click', function (event) {
-                            if (event.target === modal) {
-                                modal.classList.add('hidden');
-                                modal.classList.remove('flex');
-                            }
-                        });
-                    })();
-                    </script>
+                <?php else: ?>
+                    <a href="<?= BASE_URL ?>/auth/login" class="brutalist-btn brutalist-btn-alt">login to apply</a>
                 <?php endif; ?>
-            <?php else: ?>
-                <div class="mb-4">
-                    <?php $renderSaveToggle((bool) ($isSaved ?? false), (int) $job['id'], '/jobs/show?id=' . (int) $job['id'], 'px-3 py-1.5 rounded-full bg-primary text-white text-xs font-medium hover:bg-primary-hover', 'px-3 py-1.5 rounded-full bg-muted text-default text-xs font-medium hover:bg-muted'); ?>
-                </div>
+            </div>
+
+            <?php if (isLoggedIn() && currentRole() === 'user'): ?>
+                <form method="post" action="<?= BASE_URL ?><?= $isSaved ? '/jobs/unsave' : '/jobs/save' ?>" class="mt-4">
+                    <input type="hidden" name="job_id" value="<?= $job['id'] ?>">
+                    <input type="hidden" name="redirect" value="<?= e('/jobs/show?id=' . $job['id']) ?>">
+                    <button type="submit" class="brutalist-btn brutalist-btn-alt">
+                        <?= $isSaved ? 'remove from saved' : 'save for later' ?>
+                    </button>
+                </form>
             <?php endif; ?>
-        <?php endif; ?>
-        <hr class="my-4">
-        <a href="<?= BASE_URL ?>/jobs" class="inline-flex items-center px-3 py-1.5 rounded-full border border-default text-xs text-muted hover:bg-muted">← Kembali ke daftar lowongan</a>
+        </div>
     </div>
 </div>
 
-<?php if (!empty($relatedJobs ?? [])): ?>
-<div class="max-w-5xl mx-auto mt-5">
-    <div class="bg-surface rounded-2xl shadow-sm p-5 md:p-6">
-        <h2 class="text-lg font-semibold text-default mb-1">Pekerjaan Serupa</h2>
-        <p class="text-xs text-muted mb-4">Diprioritaskan berdasarkan: nama pekerjaan, tempat pekerjaan, jenis pekerjaan, dan gaji.</p>
-        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
-            <?php foreach (($relatedJobs ?? []) as $rj): ?>
-                <?php
-                $rApplied = in_array((int)($rj['id'] ?? 0), $relatedAppliedJobIds ?? [], true);
-                $rSaved = in_array((int)($rj['id'] ?? 0), $relatedSavedJobIds ?? [], true);
-                $jobTypeLabel = !empty($rj['job_type']) ? ucwords(str_replace('_', ' ', (string) $rj['job_type'])) : '-';
-                ?>
-                <a href="<?= BASE_URL ?>/jobs/show?id=<?= (int)$rj['id'] ?>" class="block rounded-xl border <?= ($rApplied || $rSaved) ? 'border-accent' : 'border-muted' ?> bg-surface p-3 hover:shadow-md transition-shadow">
-                    <div class="flex items-start justify-between gap-2 mb-1">
-                        <h3 class="text-sm font-semibold text-default leading-snug"><?= e($rj['title']) ?></h3>
-                        <?php if (!empty($rj['is_urgent'])): ?>
-                            <span class="inline-flex items-center px-2 py-0.5 rounded-full bg-danger-soft text-danger text-[10px] font-medium">Urgent</span>
-                        <?php endif; ?>
-                    </div>
-                    <p class="text-xs text-muted line-clamp-2 min-h-[2rem]"><?= e(!empty($rj['short_description']) ? $rj['short_description'] : mb_substr((string)($rj['description'] ?? ''), 0, 80) . (mb_strlen((string)($rj['description'] ?? '')) > 80 ? '…' : '')) ?></p>
-                    <div class="mt-2 space-y-0.5 text-[11px] text-muted">
-                        <div><span class="font-medium text-default">Tempat:</span> <?= e($rj['location'] ?? '-') ?></div>
-                        <div><span class="font-medium text-default">Jenis:</span> <?= e($jobTypeLabel) ?></div>
-                        <div><span class="font-medium text-default">Gaji:</span> <?= e($rj['salary_range'] ?? '-') ?></div>
-                    </div>
-                    <?php if ($rApplied || $rSaved): ?>
-                        <div class="mt-2 flex flex-wrap gap-1 text-[10px]">
-                            <?php if ($rApplied): ?><span class="inline-flex items-center px-2 py-0.5 rounded-full bg-info-soft text-info font-medium">Sudah dilamar</span><?php endif; ?>
-                            <?php if ($rSaved): ?><span class="inline-flex items-center px-2 py-0.5 rounded-full bg-success-soft text-success font-medium">Tersimpan</span><?php endif; ?>
-                        </div>
-                    <?php endif; ?>
-                </a>
-            <?php endforeach; ?>
-        </div>
+<div id="missing-docs-toast"
+    style="position: fixed; bottom: -100vh; right: 24px; background: var(--color-accent); border: 2px solid var(--color-border); padding: 16px 24px; color: var(--color-surface); font-weight: bold; font-size: 14px; text-transform: lowercase; transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); z-index: 9999; display: flex; align-items: flex-start; gap: 12px; max-width: 350px; box-shadow: 4px 4px 0 rgba(0,0,0,1);">
+    <i class="bi bi-x-circle" style="font-size: 20px; margin-top: -2px;"></i>
+    <div>
+        <div style="font-size: 16px; margin-bottom: 4px;">cannot apply yet</div>
+        <div style="font-weight: 500;">you are missing required documents: <span id="missing-docs-list"></span>. <a
+                href="<?= BASE_URL ?>/user/settings"
+                style="color: var(--color-surface); text-decoration: underline;">upload now</a>.</div>
     </div>
 </div>
-<?php endif; ?>
+
+<script>
+    let toastTimeout;
+    function showMissingDocsToast(docsArray) {
+        const toast = document.getElementById('missing-docs-toast');
+        const list = document.getElementById('missing-docs-list');
+        list.textContent = docsArray.join(', ');
+        toast.style.bottom = '24px';
+        clearTimeout(toastTimeout);
+        toastTimeout = setTimeout(() => {
+            toast.style.bottom = '-100vh';
+        }, 5000);
+    }
+</script>

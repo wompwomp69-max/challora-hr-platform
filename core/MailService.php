@@ -6,6 +6,7 @@
 class MailService {
     private array $config;
     private $mailer = null;
+    private ?string $lastError = null;
 
     public function __construct() {
         $configPath = BASE_PATH . '/config/email.php';
@@ -45,7 +46,9 @@ class MailService {
     }
 
     private function send(string $toEmail, string $toName, string $subject, string $bodyText): bool {
+        $this->lastError = null;
         if (!class_exists('PHPMailer\PHPMailer\PHPMailer')) {
+            $this->lastError = 'PHPMailer tidak ditemukan.';
             return false;
         }
         try {
@@ -58,16 +61,28 @@ class MailService {
             $mail->Password = $this->config['smtp_pass'] ?? '';
             $mail->SMTPSecure = $this->config['smtp_secure'] ?? 'tls';
             $mail->Port = (int) ($this->config['smtp_port'] ?? 587);
+            if (!empty($this->config['debug'])) {
+                $mail->SMTPDebug = 2;
+                $mail->Debugoutput = function ($str, $level) {
+                    error_log('PHPMailer: ' . trim($str));
+                };
+            }
             $mail->setFrom($this->config['from_email'] ?? 'noreply@localhost', $this->config['from_name'] ?? 'HR');
             $mail->addAddress($toEmail, $toName);
+            $mail->isHTML(true);
             $mail->Subject = $subject;
             $mail->Body = nl2br($bodyText);
             $mail->AltBody = $bodyText;
             $mail->send();
             return true;
         } catch (\Exception $e) {
+            $this->lastError = $e->getMessage();
             error_log('MailService: ' . $e->getMessage());
             return false;
         }
+    }
+
+    public function getLastError(): ?string {
+        return $this->lastError;
     }
 }

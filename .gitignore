@@ -1,2 +1,4 @@
 # Local update bundles / staging (not tracked)
 update_files/
+temp_files/
+database/

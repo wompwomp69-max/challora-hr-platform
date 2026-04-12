@@ -1,258 +1,396 @@
-<div class="d-flex flex-column flex-grow-1 overflow-auto" style="min-height: 0;">
 <?php
 $stats = $stats ?? ['total' => 0, 'accepted' => 0, 'rejected' => 0, 'pending' => 0];
-$totalJobs = (int) ($totalJobs ?? 0);
-$filter = $filter ?? 'all';
-$totalApplicants = (int) ($stats['total'] ?? 0);
-$accepted = (int) ($stats['accepted'] ?? 0);
-$rejected = (int) ($stats['rejected'] ?? 0);
-$pending = (int) ($stats['pending'] ?? 0);
-$underReview = $pending;
-$completionRate = $totalApplicants > 0 ? (int) round((($accepted + $rejected) / $totalApplicants) * 100) : 0;
-$callbackRate = $totalApplicants > 0 ? (int) round((($underReview + $accepted) / $totalApplicants) * 100) : 0;
+$totalJobs        = (int) ($totalJobs ?? 0);
+$totalApplicants  = (int) ($stats['total'] ?? 0);
+$accepted         = (int) ($stats['accepted'] ?? 0);
+$rejected         = (int) ($stats['rejected'] ?? 0);
+$pending          = (int) ($stats['pending'] ?? 0);
+$topRegions       = $topRegions ?? [];
+$monthlyTrend     = $monthlyTrend ?? [];
+$jobsByApplicants = $jobsByApplicants ?? [];
+$sortApplicants   = $sortApplicants ?? 'desc';
+
+$hiringRate          = $totalApplicants > 0 ? (int) round(($accepted / $totalApplicants) * 100) : 0;
+$callbackRate        = $totalApplicants > 0 ? (int) round((($pending + $accepted) / $totalApplicants) * 100) : 0;
 $offerAcceptanceRate = ($accepted + $rejected) > 0 ? (int) round(($accepted / ($accepted + $rejected)) * 100) : 0;
-$hiringRate = $totalApplicants > 0 ? (int) round(($accepted / $totalApplicants) * 100) : 0;
-$jobTypeLabels = [
-    'full_time' => 'Full Time',
-    'part_time' => 'Part Time',
-    'freelance' => 'Freelance',
-    'volunteer' => 'Volunteer',
-    'internship' => 'Internship',
-];
+
+$trendLabels = $trendTotal = $trendAccepted = [];
+foreach ($monthlyTrend as $m) {
+    $trendLabels[]   = $m['month_label'];
+    $trendTotal[]    = (int) $m['total'];
+    $trendAccepted[] = (int) $m['accepted'];
+}
+
+$jobTypeLabels = ['full_time' => 'Full Time', 'part_time' => 'Part Time', 'freelance' => 'Freelance', 'volunteer' => 'Volunteer', 'internship' => 'Internship'];
 ?>
 <style>
-.hr-inner{display:flex;flex-direction:column;gap:10px;}
-.hr-chip{background:#3f5b56;color:#e8f2ee;border:0;border-radius:8px;font-size:12px;padding:8px 10px;min-width:180px;}
-.hr-kpi-card{background:#fff;border-radius:10px;padding:10px 14px;}
-.hr-kpi-title{font-size:14px;font-weight:700;color:#1f2937;line-height:1.2;}
-.hr-kpi-value{font-size:44px;font-weight:700;color:#111827;line-height:1;margin-top:8px;}
-.hr-kpi-delta{font-size:12px;color:#9ca3af;display:flex;align-items:flex-start;gap:6px;}
-.hr-kpi-delta-up{color:#78b39f;}
-.hr-kpi-delta-down{color:#d99292;}
-.hr-panel{background:#fff;border-radius:10px;padding:12px 14px;}
-.hr-panel-title{font-size:18px;font-weight:700;color:#1f2937;}
-.hr-funnel-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:8px;}
-.hr-funnel-item{border-right:1px solid var(--gray-200);padding:4px 8px;}
-.hr-funnel-item:last-child{border-right:0;}
-.hr-funnel-num{font-size:48px;font-weight:700;line-height:1;color:#111827;}
-.hr-funnel-label{font-size:17px;font-weight:600;color:#1f2937;}
-.hr-funnel-sub{font-size:11px;color:#9ca3af;}
-.hr-vacancy-head{display:flex;justify-content:space-between;align-items:center;margin-top:6px;}
-.hr-vacancy-title{font-size:42px;font-weight:700;color:#f8fafc;line-height:1;}
-.hr-vacancy-view{color:#d8e7e2;font-size:13px;text-decoration:none;font-weight:600;}
-.hr-vacancy-board{background:#fff;border-radius:10px;padding:2px 0;}
-.hr-v-row{display:grid;grid-template-columns:minmax(220px,2.3fr) minmax(90px,1fr) minmax(90px,.8fr) minmax(100px,.9fr) minmax(120px,1fr) minmax(180px,1.3fr) 56px;border-bottom:1px solid var(--gray-200);}
-.hr-v-row:last-child{border-bottom:0;}
-.hr-v-col{padding:12px 14px;border-right:1px solid var(--gray-200);display:flex;align-items:center;font-size:12px;color:#4b5563;}
-.hr-v-col:last-child{border-right:0;justify-content:center;}
-.hr-v-title{font-size:15px;font-weight:700;color:#111827;line-height:1.2;}
-.hr-v-meta{font-size:12px;color:#6b7280;margin-top:2px;}
-.hr-v-tag{display:inline-flex;padding:3px 10px;border-radius:6px;background:#cbf3ec;color:#1f5553;font-size:12px;font-weight:600;}
-.hr-v-date{display:flex;flex-direction:column;gap:2px;font-size:12px;color:#6b7280;}
-.hr-v-date strong{color:#374151;}
-.hr-v-progress{width:95px;height:6px;border-radius:999px;background:#edf1f2;overflow:hidden;}
-.hr-v-progress-bar{height:100%;border-radius:999px;}
-.hr-v-days{font-size:14px;color:#6b7280;min-width:72px;text-align:right;}
-.hr-stages{background:#fff;border-radius:0 0 10px 10px;border-top:1px solid var(--gray-200);display:grid;grid-template-columns:repeat(7,1fr);padding:10px 8px;gap:8px;}
-.hr-stage-item{text-align:center;}
-.hr-stage-name{font-size:12px;color:#6b7280;margin-bottom:6px;}
-.hr-stage-val{font-size:18px;font-weight:600;color:#374151;}
+:root {
+    --db-bg:        var(--color-primary-muted);
+    --db-card:      var(--color-secondary-muted);
+    --db-card-2:    var(--color-secondary);
+    --db-border:    var(--color-border);
+    --db-border2:   var(--color-primary-hover);
+    --db-text:      var(--color-text);
+    --db-muted:     var(--color-text-muted);
+    --db-dim:       var(--gray-600);
+    --db-accent:    var(--color-accent);
+    --db-acc-hov:   var(--color-accent-hover);
+    --db-acc-muted: var(--color-accent-muted);
+    --db-on-acc:    var(--color-on-accent);
+    --db-green:     #4ade80;
+    --db-green-bg:  rgba(74,222,128,0.07);
+    --db-red:       #f87171;
+    --db-red-bg:    rgba(248,113,113,0.07);
+    --db-amber:     #fbbf24;
+    --db-amber-bg:  rgba(251,191,36,0.07);
+}
+
+.db-grid-4 { display: grid; grid-template-columns: repeat(4,1fr); gap: 14px; margin-bottom: 20px; }
+.db-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 20px; }
+.db-full   { margin-bottom: 20px; }
+
+.db-card { background: var(--db-card); border: 1px solid var(--db-border); border-radius: var(--radius-md); overflow: hidden; }
+.db-card-header { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px 0; }
+.db-card-title  { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.8px; color: var(--db-dim); }
+.db-card-body   { padding: 12px 16px 16px; }
+
+.kpi-card {
+    background: var(--db-card); border: 1px solid var(--db-border);
+    border-radius: var(--radius-md); padding: 16px; position: relative; overflow: hidden;
+    transition: border-color 0.2s, transform 0.2s;
+}
+.kpi-card::after { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: var(--kpi-accent, var(--db-border)); }
+.kpi-card:hover { border-color: var(--db-card-2); transform: translateY(-1px); }
+.kpi-card-label { font-size: 11px; font-weight: 600; color: var(--db-dim); text-transform: uppercase; letter-spacing: 0.7px; margin-bottom: 8px; }
+.kpi-card-value { font-size: 40px; font-weight: 700; color: var(--db-text); line-height: 1; letter-spacing: -1.5px; }
+.kpi-card-sub   { font-size: 11px; color: var(--db-dim); margin-top: 6px; }
+.kpi-card-badge { display: inline-flex; align-items: center; gap: 3px; font-size: 11px; font-weight: 600; padding: 2px 7px; border-radius: 20px; margin-top: 6px; }
+
+.section-link { font-size: 12px; color: var(--db-dim); text-decoration: none; display: flex; align-items: center; gap: 4px; transition: color 0.15s; }
+.section-link:hover { color: var(--db-accent); }
+
+.funnel-row { display: grid; grid-template-columns: repeat(3,1fr); }
+.funnel-item { padding: 16px; border-right: 1px solid var(--db-border); }
+.funnel-item:last-child { border-right: none; }
+.funnel-num   { font-size: 48px; font-weight: 700; color: var(--db-text); line-height: 1; letter-spacing: -2px; }
+.funnel-label { font-size: 13px; font-weight: 600; color: var(--db-muted); margin-top: 4px; }
+.funnel-pct   { font-size: 11px; color: var(--db-dim); margin-top: 2px; }
+
+.chart-wrap { position: relative; height: 200px; }
+
+.donut-wrap { display: flex; align-items: center; gap: 20px; padding: 8px 0; }
+.donut-legend { flex: 1; }
+.donut-legend-item { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; font-size: 12px; }
+.donut-legend-dot   { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.donut-legend-label { color: var(--db-muted); }
+.donut-legend-value { margin-left: auto; font-weight: 700; color: var(--db-text); }
+
+.rank-table { width: 100%; border-collapse: collapse; }
+.rank-table thead th { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: var(--db-dim); padding: 8px 12px; border-bottom: 1px solid var(--db-border2); text-align: left; }
+.rank-table thead th.num { text-align: right; }
+.rank-table tbody tr { border-bottom: 1px solid var(--db-border2); transition: background 0.15s; }
+.rank-table tbody tr:hover { background: var(--db-card-2); }
+.rank-table tbody tr:last-child { border-bottom: none; }
+.rank-table tbody td { padding: 10px 12px; font-size: 13px; color: var(--db-muted); vertical-align: middle; }
+.rank-table tbody td.title { color: var(--db-text); font-weight: 500; }
+.rank-table tbody td.num { text-align: right; font-weight: 700; color: var(--db-text); font-size: 15px; }
+.rank-table .tag { display: inline-flex; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; background: var(--db-acc-muted); color: var(--db-accent); border: 1px solid rgba(255,69,0,0.2); }
+
+.region-list { display: flex; flex-direction: column; gap: 8px; }
+.region-item { display: flex; align-items: center; gap: 10px; }
+.region-name { font-size: 13px; color: var(--db-muted); flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.region-bar-wrap { flex: 2; height: 6px; background: var(--db-border2); border-radius: 999px; overflow: hidden; }
+.region-bar { height: 100%; background: linear-gradient(90deg, var(--db-accent), var(--db-acc-hov)); border-radius: 999px; transition: width 0.6s ease; }
+.region-count { font-size: 13px; font-weight: 700; color: var(--db-text); width: 28px; text-align: right; flex-shrink: 0; }
+
+.cta-strip {
+    display: flex; align-items: center; justify-content: space-between;
+    background: var(--db-acc-muted);
+    border: 1px solid rgba(255,69,0,0.15);
+    border-radius: var(--radius-md); padding: 14px 20px; margin-bottom: 20px;
+}
+.cta-strip-text { font-size: 13px; color: var(--db-muted); }
+.cta-strip-text strong { color: var(--db-text); }
+.cta-btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 8px 16px; border-radius: var(--radius-sm);
+    font-size: 13px; font-weight: 600;
+    text-decoration: none; cursor: pointer; border: none;
+    transition: all 0.15s; font-family: var(--font-sans);
+}
+.cta-btn-primary { background: var(--db-accent); color: var(--db-on-acc); box-shadow: var(--shadow-sm); }
+.cta-btn-primary:hover { background: var(--db-acc-hov); color: var(--db-on-acc); transform: translateY(-1px); }
+.cta-btn-outline { background: transparent; color: var(--db-muted); border: 1px solid var(--db-border); }
+.cta-btn-outline:hover { border-color: var(--db-card-2); color: var(--db-text); }
+
+.see-more-row { text-align: center; margin-top: 10px; }
+.see-more-btn {
+    font-size: 12px; color: var(--db-dim); text-decoration: none;
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 6px 14px; border-radius: var(--radius-sm);
+    border: 1px solid var(--db-border2); transition: all 0.15s;
+}
+.see-more-btn:hover { border-color: var(--db-border); color: var(--db-muted); background: var(--db-card-2); }
+
+@media (max-width: 1200px) { .db-grid-4 { grid-template-columns: repeat(2,1fr); } }
+@media (max-width: 768px)  { .db-grid-2, .db-grid-4 { grid-template-columns: 1fr; } }
 </style>
 
-<div class="hr-inner">
-    <form method="get" action="<?= BASE_URL ?>/hr/jobs" class="d-flex align-items-center gap-2 flex-wrap">
-        <select class="hr-chip" name="filter" onchange="this.form.submit()">
-            <option value="all" <?= $filter === 'all' ? 'selected' : '' ?>>All Division</option>
-            <option value="no_apply" <?= $filter === 'no_apply' ? 'selected' : '' ?>>No Applicant</option>
-            <option value="has_apply" <?= $filter === 'has_apply' ? 'selected' : '' ?>>Has Applicant</option>
-            <option value="has_accepted" <?= $filter === 'has_accepted' ? 'selected' : '' ?>>Has Accepted</option>
-        </select>
-        <select class="hr-chip" name="per_page" onchange="this.form.submit()">
-            <option value="10" <?= ($perPage ?? 20) == 10 ? 'selected' : '' ?>>10 / halaman</option>
-            <option value="20" <?= ($perPage ?? 20) == 20 ? 'selected' : '' ?>>20 / halaman</option>
-            <option value="50" <?= ($perPage ?? 20) == 50 ? 'selected' : '' ?>>50 / halaman</option>
-            <option value="100" <?= ($perPage ?? 20) == 100 ? 'selected' : '' ?>>100 / halaman</option>
-        </select>
-        <input type="hidden" name="page" value="1">
-        <a href="<?= BASE_URL ?>/hr/jobs/create" class="btn bg-accent text-secondary fw-semibold ms-auto">+ Buat Lowongan</a>
-    </form>
-
-    <div class="row g-3">
-        <div class="col-xl-3 col-md-6">
-            <div class="hr-kpi-card">
-                <div class="hr-kpi-title">Application Completion Rate</div>
-                <div class="d-flex align-items-end justify-content-between mt-2">
-                    <div class="hr-kpi-value"><?= $completionRate ?>%</div>
-                    <div class="hr-kpi-delta"><span>Live</span></div>
-                </div>
-            </div>
-        </div>
-        <div class="col-xl-3 col-md-6">
-            <div class="hr-kpi-card">
-                <div class="hr-kpi-title">Candidate Call Back Rate</div>
-                <div class="d-flex align-items-end justify-content-between mt-2">
-                    <div class="hr-kpi-value"><?= $callbackRate ?>%</div>
-                    <div class="hr-kpi-delta"><span>Live</span></div>
-                </div>
-            </div>
-        </div>
-        <div class="col-xl-3 col-md-6">
-            <div class="hr-kpi-card">
-                <div class="hr-kpi-title">Offer Acceptance Rate</div>
-                <div class="d-flex align-items-end justify-content-between mt-2">
-                    <div class="hr-kpi-value"><?= $offerAcceptanceRate ?>%</div>
-                    <div class="hr-kpi-delta"><span>Live</span></div>
-                </div>
-            </div>
-        </div>
-        <div class="col-xl-3 col-md-6">
-            <div class="hr-kpi-card">
-                <div class="hr-kpi-title">Hiring Rate</div>
-                <div class="d-flex align-items-end justify-content-between mt-2">
-                    <div class="hr-kpi-value"><?= $hiringRate ?>%</div>
-                    <div class="hr-kpi-delta"><span>Live</span></div>
-                </div>
-            </div>
-        </div>
+<!-- ── CTA Strip ─────────────────────────────────────────── -->
+<div class="cta-strip">
+    <div class="cta-strip-text">
+        <strong><?= $pending ?></strong> applicants awaiting review &nbsp;·&nbsp; <strong><?= $totalJobs ?></strong> active job postings
     </div>
-
-    <div class="row g-3">
-        <div class="col-lg-6">
-            <div class="hr-panel">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div class="hr-panel-title">Recuiting Funnel</div>
-                    <span class="text-muted">›</span>
-                </div>
-                <div class="hr-funnel-grid">
-                    <div class="hr-funnel-item">
-                        <div class="hr-funnel-num"><?= $totalApplicants ?></div>
-                        <div class="hr-funnel-label">Application</div>
-                    </div>
-                    <div class="hr-funnel-item">
-                        <div class="hr-funnel-num"><?= $underReview ?></div>
-                        <div class="hr-funnel-label">Under Review <span class="hr-funnel-sub">(<?= $totalApplicants > 0 ? (int) round(($underReview / $totalApplicants) * 100) : 0 ?>%)</span></div>
-                    </div>
-                    <div class="hr-funnel-item">
-                        <div class="hr-funnel-num"><?= $accepted ?></div>
-                        <div class="hr-funnel-label">Hired <span class="hr-funnel-sub">(<?= $totalApplicants > 0 ? (int) round(($accepted / $totalApplicants) * 100) : 0 ?>%)</span></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-lg-6">
-            <div class="hr-panel">
-                <div class="hr-panel-title mb-2">Time to Hire</div>
-                <div class="text-muted small">
-                    Data time-to-hire belum tersedia. Panel ini akan diaktifkan setelah metrik waktu proses rekrutmen ditambahkan dari backend.
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="hr-vacancy-head">
-        <div class="hr-vacancy-title">Active Vacancy</div>
-        <a href="<?= BASE_URL ?>/hr/jobs" class="hr-vacancy-view">view all ›</a>
-    </div>
-
-    <?php if (empty($jobs)): ?>
-        <div class="hr-vacancy-board">
-            <div class="p-3 text-muted">Tidak ada lowongan untuk filter ini.</div>
-        </div>
-    <?php else: ?>
-        <div class="hr-vacancy-board">
-            <?php foreach ($jobs as $j): ?>
-                <?php
-                $jobTypeKey = (string) ($j['job_type'] ?? '');
-                $jobTypeLabel = $jobTypeLabels[$jobTypeKey] ?? ($jobTypeKey !== '' ? ucwords(str_replace('_', ' ', $jobTypeKey)) : '-');
-                $createdAtLabel = !empty($j['created_at']) ? date('d/m/Y', strtotime((string) $j['created_at'])) : '-';
-                $deadlineLabel = !empty($j['deadline']) ? date('d/m/Y', strtotime((string) $j['deadline'])) : '-';
-                $daysLeftNum = null;
-                $daysLeftText = '-';
-                if (!empty($j['deadline'])) {
-                    try {
-                        $diff = (new DateTime('today'))->diff(new DateTime((string) $j['deadline']));
-                        $daysLeftNum = (($diff->invert ? -1 : 1) * (int) $diff->days);
-                        $daysLeftText = $daysLeftNum . ' days left';
-                    } catch (Throwable $e) {
-                        $daysLeftText = '-';
-                    }
-                }
-                $progressWidth = 65;
-                if ($daysLeftNum !== null) {
-                    $clamped = max(0, min(30, $daysLeftNum));
-                    $progressWidth = (int) max(20, min(100, ($clamped / 30) * 100));
-                }
-                $barColor = '#78b39f';
-                if ($daysLeftNum !== null && $daysLeftNum <= 7) $barColor = '#be6b74';
-                elseif ($daysLeftNum !== null && $daysLeftNum <= 14) $barColor = '#d3b36d';
-                $isClosed = $daysLeftNum !== null && $daysLeftNum < 0;
-                $stage = $isClosed ? 'Closed' : 'Active';
-                ?>
-                <div class="hr-v-row">
-                    <div class="hr-v-col">
-                        <div>
-                            <div class="hr-v-title"><?= e($j['title']) ?></div>
-                            <div class="hr-v-meta"><?= e($j['location'] ?? '-') ?></div>
-                        </div>
-                    </div>
-                    <div class="hr-v-col"><?= e($jobTypeLabel) ?></div>
-                    <div class="hr-v-col"><?= (int) ($j['applicant_accepted'] ?? 0) ?> Hires</div>
-                    <div class="hr-v-col"><?= (int) ($j['applicant_count'] ?? 0) ?> Applied</div>
-                    <div class="hr-v-col"><span class="hr-v-tag"><?= e($stage) ?></span></div>
-                    <div class="hr-v-col justify-content-between gap-2">
-                        <div class="hr-v-date">
-                            <span>Start <strong><?= e($createdAtLabel) ?></strong></span>
-                            <span>Deadline <strong><?= e($deadlineLabel) ?></strong></span>
-                        </div>
-                        <div class="d-flex align-items-center gap-2">
-                            <div class="hr-v-progress"><div class="hr-v-progress-bar" style="width:<?= (int) $progressWidth ?>%;background:<?= e($barColor) ?>;"></div></div>
-                            <div class="hr-v-days"><?= e($daysLeftText) ?></div>
-                        </div>
-                    </div>
-                    <div class="hr-v-col">
-                        <div class="dropdown">
-                            <button class="btn btn-sm btn-light border" data-bs-toggle="dropdown">⌄</button>
-                            <ul class="dropdown-menu dropdown-menu-end">
-                                <li><a class="dropdown-item" href="<?= BASE_URL ?>/hr/jobs/edit?id=<?= (int) $j['id'] ?>">Edit</a></li>
-                                <li>
-                                    <form method="post" action="<?= BASE_URL ?>/hr/jobs/delete" onsubmit="return confirm('Hapus lowongan ini?');">
-                                        <input type="hidden" name="id" value="<?= (int) $j['id'] ?>">
-                                        <button type="submit" class="dropdown-item text-danger">Hapus</button>
-                                    </form>
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-            <?php endforeach; ?>
-        </div>
-    <?php endif; ?>
-
-    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mt-1">
-        <a href="<?= BASE_URL ?>/hr/applications/accepted" class="btn btn-outline-light btn-sm">Lihat Pelamar Diterima</a>
-        <?php if (($totalPages ?? 1) > 1): ?>
-            <nav>
-                <ul class="pagination pagination-sm mb-0">
-                    <?php
-                    $currentPage = (int) ($page ?? 1);
-                    $baseUrl = BASE_URL . '/hr/jobs';
-                    $currentFilter = $filter ?? 'all';
-                    ?>
-                    <li class="page-item <?= $currentPage <= 1 ? 'disabled' : '' ?>">
-                        <a class="page-link" href="<?= $baseUrl ?>?page=<?= $currentPage - 1 ?>&per_page=<?= (int) ($perPage ?? 20) ?>&filter=<?= urlencode($currentFilter) ?>">«</a>
-                    </li>
-                    <?php for ($i = 1; $i <= ($totalPages ?? 1); $i++): ?>
-                        <li class="page-item <?= $i === $currentPage ? 'active' : '' ?>">
-                            <a class="page-link" href="<?= $baseUrl ?>?page=<?= $i ?>&per_page=<?= (int) ($perPage ?? 20) ?>&filter=<?= urlencode($currentFilter) ?>"><?= $i ?></a>
-                        </li>
-                    <?php endfor; ?>
-                    <li class="page-item <?= $currentPage >= ($totalPages ?? 1) ? 'disabled' : '' ?>">
-                        <a class="page-link" href="<?= $baseUrl ?>?page=<?= min($currentPage + 1, $totalPages ?? 1) ?>&per_page=<?= (int) ($perPage ?? 20) ?>&filter=<?= urlencode($currentFilter) ?>">»</a>
-                    </li>
-                </ul>
-            </nav>
-        <?php endif; ?>
+    <div style="display:flex;gap:8px;align-items:center">
+        <a href="<?= BASE_URL ?>/hr/applications" class="cta-btn cta-btn-primary">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="width:14px;height:14px">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+            </svg>
+            View Pending Applicants
+        </a>
+        <a href="<?= BASE_URL ?>/hr/jobs/create" class="cta-btn cta-btn-outline">+ Post a Job</a>
     </div>
 </div>
+
+<!-- ── KPI Cards ─────────────────────────────────────────── -->
+<div class="db-grid-4">
+    <div class="kpi-card" style="--kpi-accent:var(--color-accent)">
+        <div class="kpi-card-label">Total Applicants</div>
+        <div class="kpi-card-value"><?= $totalApplicants ?></div>
+        <div class="kpi-card-sub"><?= $totalJobs ?> jobs posted</div>
+        <span class="kpi-card-badge" style="background:var(--db-acc-muted);color:var(--db-accent);border:1px solid rgba(255,69,0,.2)">● Live</span>
+    </div>
+    <div class="kpi-card" style="--kpi-accent:#4ade80">
+        <div class="kpi-card-label">Hired</div>
+        <div class="kpi-card-value"><?= $accepted ?></div>
+        <div class="kpi-card-sub">Hiring Rate: <?= $hiringRate ?>%</div>
+        <span class="kpi-card-badge" style="background:var(--db-green-bg);color:var(--db-green);border:1px solid rgba(74,222,128,.2)">● Live</span>
+    </div>
+    <div class="kpi-card" style="--kpi-accent:#fbbf24">
+        <div class="kpi-card-label">In Review</div>
+        <div class="kpi-card-value"><?= $pending ?></div>
+        <div class="kpi-card-sub">Callback Rate: <?= $callbackRate ?>%</div>
+        <span class="kpi-card-badge" style="background:var(--db-amber-bg);color:var(--db-amber);border:1px solid rgba(251,191,36,.2)">● Live</span>
+    </div>
+    <div class="kpi-card" style="--kpi-accent:#f87171">
+        <div class="kpi-card-label">Rejected</div>
+        <div class="kpi-card-value"><?= $rejected ?></div>
+        <div class="kpi-card-sub">Offer Acceptance: <?= $offerAcceptanceRate ?>%</div>
+        <span class="kpi-card-badge" style="background:var(--db-red-bg);color:var(--db-red);border:1px solid rgba(248,113,113,.2)">● Live</span>
+    </div>
 </div>
 
+<!-- ── Charts ────────────────────────────────────────────── -->
+<div class="db-grid-2">
+    <div class="db-card">
+        <div class="db-card-header"><span class="db-card-title">Applicant Trend (6 Months)</span></div>
+        <div class="db-card-body"><div class="chart-wrap"><canvas id="trendChart"></canvas></div></div>
+    </div>
+    <div class="db-card">
+        <div class="db-card-header"><span class="db-card-title">Applicant Status</span></div>
+        <div class="db-card-body">
+            <div class="donut-wrap">
+                <canvas id="donutChart" width="130" height="130" style="flex-shrink:0"></canvas>
+                <div class="donut-legend">
+                    <div class="donut-legend-item">
+                        <div class="donut-legend-dot" style="background:var(--color-accent)"></div>
+                        <span class="donut-legend-label">In Review</span>
+                        <span class="donut-legend-value"><?= $pending ?></span>
+                    </div>
+                    <div class="donut-legend-item">
+                        <div class="donut-legend-dot" style="background:#4ade80"></div>
+                        <span class="donut-legend-label">Hired</span>
+                        <span class="donut-legend-value"><?= $accepted ?></span>
+                    </div>
+                    <div class="donut-legend-item">
+                        <div class="donut-legend-dot" style="background:#f87171"></div>
+                        <span class="donut-legend-label">Rejected</span>
+                        <span class="donut-legend-value"><?= $rejected ?></span>
+                    </div>
+                    <div class="donut-legend-item" style="margin-top:16px;padding-top:10px;border-top:1px solid var(--db-border2)">
+                        <div class="donut-legend-dot" style="background:var(--color-accent)"></div>
+                        <span class="donut-legend-label" style="color:var(--db-text);font-weight:600">Total</span>
+                        <span class="donut-legend-value" style="color:var(--color-accent)"><?= $totalApplicants ?></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ── Funnel + Top Regions ──────────────────────────────── -->
+<div class="db-grid-2">
+    <div class="db-card">
+        <div class="db-card-header"><span class="db-card-title">Recruiting Funnel</span></div>
+        <div class="funnel-row">
+            <div class="funnel-item">
+                <div class="funnel-num"><?= $totalApplicants ?></div>
+                <div class="funnel-label">Applications</div>
+                <div class="funnel-pct">100%</div>
+            </div>
+            <div class="funnel-item">
+                <div class="funnel-num"><?= $pending ?></div>
+                <div class="funnel-label">Under Review</div>
+                <div class="funnel-pct"><?= $totalApplicants > 0 ? (int)round(($pending/$totalApplicants)*100) : 0 ?>%</div>
+            </div>
+            <div class="funnel-item">
+                <div class="funnel-num"><?= $accepted ?></div>
+                <div class="funnel-label">Hired</div>
+                <div class="funnel-pct"><?= $totalApplicants > 0 ? (int)round(($accepted/$totalApplicants)*100) : 0 ?>%</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="db-card">
+        <div class="db-card-header">
+            <span class="db-card-title">Top Applicant Regions</span>
+            <a href="<?= BASE_URL ?>/hr/applications" class="section-link">
+                View all
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="width:12px;height:12px"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+            </a>
+        </div>
+        <div class="db-card-body">
+            <?php if (empty($topRegions)): ?>
+                <p style="font-size:13px;color:var(--db-dim);text-align:center;padding:20px 0">No regional data yet</p>
+            <?php else: ?>
+                <?php $maxR = max(array_column($topRegions,'total') ?: [1]); ?>
+                <div class="region-list">
+                    <?php foreach (array_slice($topRegions,0,5) as $r): ?>
+                        <div class="region-item">
+                            <span class="region-name" title="<?= e($r['region']) ?>"><?= e($r['region']) ?></span>
+                            <div class="region-bar-wrap"><div class="region-bar" style="width:<?= $maxR>0?round(($r['total']/$maxR)*100):0 ?>%"></div></div>
+                            <span class="region-count"><?= (int)$r['total'] ?></span>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+                <?php if (count($topRegions) > 5): ?>
+                    <div class="see-more-row">
+                        <a href="#" class="see-more-btn" id="toggleRegions">View <?= count($topRegions)-5 ?> more ↓</a>
+                    </div>
+                    <div id="moreRegions" style="display:none;margin-top:8px" class="region-list">
+                        <?php foreach (array_slice($topRegions,5) as $r): ?>
+                            <div class="region-item">
+                                <span class="region-name" title="<?= e($r['region']) ?>"><?= e($r['region']) ?></span>
+                                <div class="region-bar-wrap"><div class="region-bar" style="width:<?= $maxR>0?round(($r['total']/$maxR)*100):0 ?>%"></div></div>
+                                <span class="region-count"><?= (int)$r['total'] ?></span>
+                            </div>
+                        <?php endforeach; ?>
+                    </div>
+                <?php endif; ?>
+            <?php endif; ?>
+        </div>
+    </div>
+</div>
+
+<!-- ── Jobs by Applicants ─────────────────────────────────→ -->
+<div class="db-full">
+    <div class="db-card">
+        <div class="db-card-header" style="padding:14px 16px">
+            <span class="db-card-title">Jobs by Applicant Count</span>
+            <a href="<?= BASE_URL ?>/hr/jobs?sort_applicants=<?= $sortApplicants === 'desc' ? 'asc' : 'desc' ?>"
+               style="display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;color:<?= $sortApplicants==='desc' ? 'var(--color-accent)' : 'var(--db-dim)' ?>;text-decoration:none">
+                <?= $sortApplicants === 'desc' ? '↓ Most First' : '↑ Least First' ?>
+            </a>
+        </div>
+        <table class="rank-table">
+            <thead>
+                <tr>
+                    <th style="width:28px">#</th>
+                    <th>Position</th>
+                    <th>Type</th>
+                    <th>Deadline</th>
+                    <th class="num">Applicants</th>
+                    <th class="num">Hired</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php if (empty($jobsByApplicants)): ?>
+                    <tr><td colspan="6" style="text-align:center;color:var(--db-dim);padding:24px">No job postings yet</td></tr>
+                <?php else: ?>
+                    <?php foreach ($jobsByApplicants as $i => $jb): ?>
+                        <?php
+                        $dlLabel   = !empty($jb['deadline']) ? date('d M Y', strtotime($jb['deadline'])) : '—';
+                        $typeLabel = $jobTypeLabels[$jb['job_type'] ?? ''] ?? ($jb['job_type'] ? ucfirst($jb['job_type']) : '—');
+                        ?>
+                        <tr>
+                            <td style="color:var(--db-dim);font-weight:700;font-size:12px"><?= $i+1 ?></td>
+                            <td class="title">
+                                <?= e($jb['title']) ?>
+                                <?php if (!empty($jb['location'])): ?><div style="font-size:11px;color:var(--db-dim);margin-top:1px"><?= e($jb['location']) ?></div><?php endif; ?>
+                            </td>
+                            <td><span class="tag"><?= e($typeLabel) ?></span></td>
+                            <td style="font-size:12px"><?= e($dlLabel) ?></td>
+                            <td class="num"><?= (int)$jb['applicant_count'] ?></td>
+                            <td class="num" style="color:var(--db-green)"><?= (int)$jb['accepted_count'] ?></td>
+                        </tr>
+                    <?php endforeach; ?>
+                <?php endif; ?>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
+<script>
+(function() {
+    var style     = getComputedStyle(document.documentElement);
+    var accent    = style.getPropertyValue('--color-accent').trim()          || '#ff4500';
+    var surface   = style.getPropertyValue('--color-secondary-muted').trim() || '#151515';
+    var border    = style.getPropertyValue('--color-primary-hover').trim()   || '#2a2a2a';
+    var textMuted = style.getPropertyValue('--color-text-muted').trim()      || '#9ca3af';
+
+    var trendLabels   = <?= json_encode($trendLabels) ?>;
+    var trendTotal    = <?= json_encode($trendTotal) ?>;
+    var trendAccepted = <?= json_encode($trendAccepted) ?>;
+    var donutData     = [<?= $pending ?>, <?= $accepted ?>, <?= $rejected ?>];
+
+    Chart.defaults.font.family = style.getPropertyValue('--font-sans').trim() || 'sans-serif';
+    Chart.defaults.color = textMuted;
+
+    var trendCtx = document.getElementById('trendChart');
+    if (trendCtx) {
+        new Chart(trendCtx, {
+            type: 'line',
+            data: {
+                labels: trendLabels.length ? trendLabels : ['—'],
+                datasets: [
+                    { label: 'Total Applicants', data: trendTotal.length ? trendTotal : [0], borderColor: accent, backgroundColor: 'rgba(255,69,0,0.07)', borderWidth: 2, pointRadius: 3, pointBackgroundColor: accent, fill: true, tension: 0.4 },
+                    { label: 'Hired', data: trendAccepted.length ? trendAccepted : [0], borderColor: '#4ade80', backgroundColor: 'rgba(74,222,128,0.06)', borderWidth: 2, pointRadius: 3, pointBackgroundColor: '#4ade80', fill: true, tension: 0.4 }
+                ]
+            },
+            options: {
+                responsive: true, maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'bottom', labels: { boxWidth: 10, padding: 16, font: { size: 11 } } },
+                    tooltip: { mode: 'index', intersect: false, backgroundColor: surface, borderColor: border, borderWidth: 1 }
+                },
+                scales: {
+                    x: { grid: { color: border }, ticks: { font: { size: 11 } } },
+                    y: { grid: { color: border }, ticks: { font: { size: 11 }, stepSize: 1, precision: 0 }, beginAtZero: true }
+                }
+            }
+        });
+    }
+
+    var donutCtx = document.getElementById('donutChart');
+    if (donutCtx) {
+        new Chart(donutCtx, {
+            type: 'doughnut',
+            data: { datasets: [{ data: donutData, backgroundColor: [accent, '#4ade80', '#f87171'], borderColor: surface, borderWidth: 3, hoverOffset: 4 }] },
+            options: { responsive: false, cutout: '72%', plugins: { legend: { display: false }, tooltip: { backgroundColor: surface, borderColor: border, borderWidth: 1 } } }
+        });
+    }
+
+    var toggleBtn = document.getElementById('toggleRegions');
+    var moreDiv   = document.getElementById('moreRegions');
+    if (toggleBtn && moreDiv) {
+        toggleBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            var open = moreDiv.style.display !== 'none';
+            moreDiv.style.display = open ? 'none' : 'flex';
+            moreDiv.style.flexDirection = 'column';
+            toggleBtn.textContent = open ? 'View more ↓' : 'Collapse ↑';
+        });
+    }
+})();
+</script>

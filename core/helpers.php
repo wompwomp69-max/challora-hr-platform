@@ -84,6 +84,18 @@ function applicationStatusOptions(): array {
     ];
 }
 
+/** Create subject and content for application status emails */
+function applicationStatusEmailTemplate(string $name, string $jobTitle, string $status): array {
+    $subject = 'Application Result: ' . $jobTitle . ' - ' . ($status === 'accepted' ? 'Hired' : 'Not Accepted');
+    if ($status === 'accepted') {
+        $body = "Dear {$name},\n\nCongratulations! You have PASSED the selection process for the position of {$jobTitle}.\n\nPlease contact us for the next steps.\n\nThank you.";
+    } else {
+        $body = "Dear {$name},\n\nThank you for applying for the position of {$jobTitle}.\n\nWe regret to inform you that we are unable to move forward with your application for this position at this time.\n\nKeep up the spirit and thank you.";
+    }
+    return ['subject' => $subject, 'body' => $body];
+}
+
+
 /** URL img avatar untuk user yang login; null jika tidak ada foto profil */
 function currentUserAvatarImgSrc(): ?string {
     if (!isLoggedIn() || currentRole() !== 'user') {
@@ -123,7 +135,7 @@ function render_view(string $view, array $data = []): void {
     require APP_PATH . '/views/' . $view . '.php';
     $content = ob_get_clean();
     $layout = (strpos($view, 'hr/') === 0) ? 'hr' : (
-        in_array($view, ['auth/login', 'auth/forgot', 'auth/register'], true) ? 'auth' : 'user'
+        in_array($view, ['auth/login', 'auth/forgot', 'auth/register', 'auth/reset'], true) ? 'auth' : 'user'
     );
     require APP_PATH . '/views/layouts/' . $layout . '.php';
 }

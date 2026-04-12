@@ -25,9 +25,104 @@ $achLevelJson = json_encode($achLevels, JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | 
 if ($achLevelJson === false) $achLevelJson = '{}';
 ?>
 
-<div class="max-w-7xl mx-auto px-4 md:px-6 py-4 md:py-6">
+<style>
+/* Brutalist Edit Form Overrides */
+.brutalist-title {
+    font-size: 56px;
+    font-weight: 600;
+    letter-spacing: -2px;
+    color: var(--color-text);
+    margin-bottom: 32px;
+    padding-bottom: 16px;
+    border-bottom: 4px solid var(--color-border);
+    text-transform: lowercase;
+}
+input, select, textarea {
+    background: #111 !important;
+    border: 2px solid var(--color-border) !important;
+    border-radius: 0 !important;
+    color: var(--color-text) !important;
+    text-transform: lowercase;
+    transition: all 0.2s ease !important;
+    box-shadow: 2px 2px 0 rgba(0,0,0,0.5) !important;
+}
+input:focus, select:focus, textarea:focus {
+    border-color: var(--color-accent) !important;
+    box-shadow: 4px 4px 0 var(--color-accent) !important;
+    outline: none !important;
+    transform: translate(-2px, -2px) !important;
+}
+.brutalist-btn {
+    display: inline-block;
+    background: var(--color-accent) !important;
+    color: var(--color-surface) !important;
+    padding: 12px 24px !important;
+    font-weight: 800 !important;
+    font-size: 16px !important;
+    text-transform: lowercase;
+    text-decoration: none;
+    border: 2px solid var(--color-border) !important;
+    border-radius: 0 !important;
+    cursor: pointer;
+    box-shadow: 4px 4px 0 rgba(0,0,0,1) !important;
+    transition: all 0.2s ease;
+}
+.brutalist-btn:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 6px 6px 0 rgba(0,0,0,1) !important;
+}
+.brutalist-btn:active {
+    transform: translate(2px, 2px);
+    box-shadow: 0px 0px 0 rgba(0,0,0,1) !important;
+}
+.brutalist-btn-outline {
+    background: #111 !important;
+    color: var(--color-text) !important;
+    border: 2px solid var(--color-text) !important;
+}
+.brutalist-btn-outline:hover {
+    background: var(--color-text) !important;
+    color: var(--color-surface) !important;
+}
+.rounded-3xl, .rounded-2xl, .rounded-xl {
+    border-radius: 0 !important;
+}
+main, aside {
+    background: #0a0a0a !important;
+    border: 2px solid var(--color-border) !important;
+    box-shadow: 6px 6px 0 rgba(0,0,0,1) !important;
+}
+h2 {
+    text-transform: lowercase;
+    color: var(--color-text) !important;
+    font-size: 28px !important;
+    letter-spacing: -1px;
+    border-bottom: 2px dashed var(--color-border);
+    padding-bottom: 12px;
+    margin-bottom: 24px !important;
+}
+label {
+    text-transform: lowercase;
+    color: var(--color-text) !important;
+    font-weight: 600 !important;
+    font-size: 14px !important;
+}
+.settings-nav-link {
+    border: 2px solid transparent;
+    transition: all 0.2s;
+}
+.settings-nav-link:hover, .settings-nav-link.text-accent {
+    border: 2px solid var(--color-border);
+    background: var(--color-accent) !important;
+    color: var(--color-surface) !important;
+    box-shadow: 4px 4px 0 rgba(0,0,0,1);
+    transform: translate(-2px, -2px);
+}
+</style>
 
-    <div class="grid grid-cols-1 lg:grid-cols-[220px_minmax(0,1fr)] gap-4 md:gap-6">
+<div class="max-w-7xl mx-auto px-4 md:px-6 py-4 md:py-6 lowercase">
+    <h1 class="brutalist-title" style="margin-top:0;">edit profile</h1>
+    <div class="grid grid-cols-1 lg:grid-cols-[220px_minmax(0,1fr)] gap-4 md:gap-6 mt-8">
         <aside class="bg-surface rounded-3xl p-4 border border-muted h-fit lg:sticky lg:top-20">
             <nav class="space-y-2 text-sm">
                 <a href="#data-pribadi" class="settings-nav-link block px-3 py-2 rounded-xl text-accent font-semibold">Data Pribadi</a>
@@ -139,7 +234,7 @@ if ($achLevelJson === false) $achLevelJson = '{}';
                 <section id="data-pendidikan" class="scroll-mt-24 border-t border-muted pt-6">
                     <div class="flex items-center justify-between mb-3">
                         <h2 class="text-base md:text-lg font-semibold text-default">Data Pendidikan</h2>
-                        <button type="button" class="px-3 py-1.5 rounded-full bg-accent text-primary text-xs font-semibold" id="add-education">Ubah Data</button>
+                        <button type="button" class="brutalist-btn" id="add-education">Ubah Data</button>
                     </div>
                     <p class="text-xs text-muted mb-3">Sistem saat ini menyimpan 1 data pendidikan utama. Jika diubah, data sebelumnya akan diganti.</p>
                     <div id="education-card" class="space-y-3"></div>
@@ -149,7 +244,7 @@ if ($achLevelJson === false) $achLevelJson = '{}';
                 <section id="data-pengalaman" class="scroll-mt-24 border-t border-muted pt-6">
                     <div class="flex items-center justify-between mb-3">
                         <h2 class="text-base md:text-lg font-semibold text-default">Data Pengalaman Kerja</h2>
-                        <button type="button" class="px-3 py-1.5 rounded-full bg-accent text-primary text-xs font-semibold" id="add-work-exp">+ Tambah</button>
+                        <button type="button" class="brutalist-btn" id="add-work-exp">+ Tambah</button>
                     </div>
                     <div id="work-experiences" class="space-y-3"></div>
                     <div id="work-experiences-inputs" class="hidden"></div>
@@ -158,7 +253,7 @@ if ($achLevelJson === false) $achLevelJson = '{}';
                 <section id="data-pencapaian" class="scroll-mt-24 border-t border-muted pt-6">
                     <div class="flex items-center justify-between mb-3">
                         <h2 class="text-base md:text-lg font-semibold text-default">Data Pencapaian</h2>
-                        <button type="button" class="px-3 py-1.5 rounded-full bg-accent text-primary text-xs font-semibold" id="add-achievement">+ Tambah</button>
+                        <button type="button" class="brutalist-btn" id="add-achievement">+ Tambah</button>
                     </div>
                     <div id="achievements" class="space-y-3"></div>
                     <div id="achievements-inputs" class="hidden"></div>
@@ -167,9 +262,9 @@ if ($achLevelJson === false) $achLevelJson = '{}';
                 <?php if (!empty($error)): ?>
                     <p class="text-sm text-danger"><?= e($error) ?></p>
                 <?php endif; ?>
-                <div class="flex items-center gap-2 pt-2">
-                    <button type="submit" class="px-4 py-2 rounded-full bg-accent text-primary text-sm font-semibold">Simpan</button>
-                    <a href="<?= BASE_URL ?>/user/settings" class="px-4 py-2 rounded-full border border-default text-sm text-default hover:bg-muted">Batal</a>
+                <div class="flex items-center gap-2 pt-2 mt-6">
+                    <button type="submit" class="brutalist-btn">Simpan</button>
+                    <a href="<?= BASE_URL ?>/user/settings" class="brutalist-btn brutalist-btn-outline">Batal</a>
                 </div>
             </form>
         </main>

@@ -17,34 +17,45 @@ class HrJobController {
 
     public function index(): void {
         $this->requireHr();
-        $hrId = currentUserId();
         $perPage = (int) ($_GET['per_page'] ?? 20);
         $perPage = in_array($perPage, [10, 20, 50, 100], true) ? $perPage : 20;
         $filter = $_GET['filter'] ?? 'all';
         $page = max(1, (int) ($_GET['page'] ?? 1));
-        $totalJobs = $this->jobModel->countByCreatorFiltered($hrId, $filter);
+        $sortApplicants = in_array($_GET['sort_applicants'] ?? 'desc', ['asc', 'desc'], true)
+            ? ($_GET['sort_applicants'] ?? 'desc') : 'desc';
+        
+        // GLOBAL VIEW: Fetch all jobs for the company
+        $totalJobs = $this->jobModel->countAllFiltered($filter);
         $totalPages = $totalJobs > 0 ? (int) ceil($totalJobs / $perPage) : 1;
         $page = min($page, $totalPages);
-        $list = $this->jobModel->findByCreatorPaginated($hrId, $page, $perPage, $filter);
-        foreach ($list as &$j) {
-            $counts = $this->appModel->getCountsByJobId((int) $j['id']);
-            $j['applicant_count'] = $counts['total'];
-            $j['applicant_accepted'] = $counts['accepted'];
-            $j['applicant_rejected'] = $counts['rejected'];
-        }
-        unset($j);
-        $stats = $this->appModel->getCountsByHrJobs($hrId);
+        
+        // SQL OPTIMIZATION: One query for jobs + applicant counts
+        $list = $this->jobModel->findAllPaginatedWithStats($page, $perPage, $filter);
+        
+        // GLOBAL STATS: Summary for all applications
+        $stats = $this->appModel->getCountsByHrJobs();
+
+        // Dashboard extras
+        $topRegions    = $this->appModel->getTopRegions(10);
+        $monthlyTrend  = $this->appModel->getMonthlyTrend(6);
+        $jobsByApplicants = $this->appModel->getJobsOrderedByApplicantCount($sortApplicants, 20);
+        
         render_view('hr/jobs/index', [
-            'jobs' => $list,
-            'pageTitle' => 'Dashboard HR',
-            'stats' => $stats,
-            'totalJobs' => $totalJobs,
-            'page' => $page,
-            'perPage' => $perPage,
-            'totalPages' => $totalPages,
-            'filter' => $filter,
+            'jobs'             => $list,
+            'pageTitle'        => 'HR Dashboard',
+            'stats'            => $stats,
+            'totalJobs'        => $totalJobs,
+            'page'             => $page,
+            'perPage'          => $perPage,
+            'totalPages'       => $totalPages,
+            'filter'           => $filter,
+            'topRegions'       => $topRegions,
+            'monthlyTrend'     => $monthlyTrend,
+            'jobsByApplicants' => $jobsByApplicants,
+            'sortApplicants'   => $sortApplicants,
         ]);
     }
+
 
     public function create(): void {
         $this->requireHr();
@@ -76,7 +87,7 @@ class HrJobController {
             $selectedSkills = array_values(array_filter(array_map('trim', (array) ($_POST['skills'] ?? []))));
             $selectedBenefits = array_values(array_filter(array_map('trim', (array) ($_POST['benefits'] ?? []))));
             if ($old['title'] === '' || $old['description'] === '') {
-                $error = 'Judul dan deskripsi lengkap wajib diisi.';
+                $error = 'Job title and full description are required.';
             } else {
                 $deadlineVal = $old['deadline'] !== '' ? str_replace('T', ' ', $old['deadline']) . ':00' : null;
                 if ($deadlineVal && strlen($deadlineVal) <= 10) $deadlineVal .= ' 23:59:59';
@@ -100,7 +111,7 @@ class HrJobController {
                     'benefits' => $selectedBenefits,
                     'created_by' => currentUserId(),
                 ]);
-                $_SESSION['flash'] = 'Lowongan berhasil ditambahkan.';
+                $_SESSION['flash'] = 'Job posting added successfully.';
                 redirect('/hr/jobs');
             }
         }
@@ -109,7 +120,7 @@ class HrJobController {
             'old' => $old,
             'selectedSkills' => $selectedSkills,
             'selectedBenefits' => $selectedBenefits,
-            'pageTitle' => 'Buat Lowongan',
+            'pageTitle' => 'Create Job Posting',
         ]);
     }
 
@@ -117,7 +128,7 @@ class HrJobController {
         $this->requireHr();
         $id = (int) ($_GET['id'] ?? 0);
         if ($id < 1 || !$this->jobModel->isCreatedBy($id, currentUserId())) {
-            $_SESSION['flash_error'] = 'Lowongan tidak ditemukan.';
+            $_SESSION['flash_error'] = 'Job posting not found.';
             redirect('/hr/jobs');
         }
         $job = $this->jobModel->findById($id);
@@ -160,7 +171,7 @@ class HrJobController {
             $selectedSkills = array_values(array_filter(array_map('trim', (array) ($_POST['skills'] ?? []))));
             $selectedBenefits = array_values(array_filter(array_map('trim', (array) ($_POST['benefits'] ?? []))));
             if ($old['title'] === '' || $old['description'] === '') {
-                $error = 'Judul dan deskripsi lengkap wajib diisi.';
+                $error = 'Job title and full description are required.';
             } else {
                 $deadlineVal = $old['deadline'] !== '' ? str_replace('T', ' ', $old['deadline']) . ':00' : null;
                 if ($deadlineVal && strlen($deadlineVal) <= 10) $deadlineVal .= ' 23:59:59';
@@ -169,7 +180,7 @@ class HrJobController {
                     'skills' => $selectedSkills,
                     'benefits' => $selectedBenefits,
                 ]));
-                $_SESSION['flash'] = 'Lowongan berhasil diperbarui.';
+                $_SESSION['flash'] = 'Job posting updated successfully.';
                 redirect('/hr/jobs');
             }
         }
@@ -179,7 +190,7 @@ class HrJobController {
             'job' => $job,
             'selectedSkills' => $selectedSkills,
             'selectedBenefits' => $selectedBenefits,
-            'pageTitle' => 'Edit Lowongan',
+            'pageTitle' => 'Edit Job Posting',
         ]);
     }
 
@@ -190,11 +201,11 @@ class HrJobController {
         }
         $id = (int) ($_POST['id'] ?? 0);
         if ($id < 1 || !$this->jobModel->isCreatedBy($id, currentUserId())) {
-            $_SESSION['flash_error'] = 'Lowongan tidak ditemukan.';
+            $_SESSION['flash_error'] = 'Job posting not found.';
             redirect('/hr/jobs');
         }
         $this->jobModel->delete($id);
-        $_SESSION['flash'] = 'Lowongan telah dihapus.';
+        $_SESSION['flash'] = 'Job posting deleted successfully.';
         redirect('/hr/jobs');
     }
 }
