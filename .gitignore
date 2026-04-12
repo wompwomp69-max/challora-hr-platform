@@ -1,4 +1,8 @@
 # Local update bundles / staging (not tracked)
 update_files/
-temp_files/
+.superpowers/
 database/
+.env
+.env.local
+storage/
+.vscode/
