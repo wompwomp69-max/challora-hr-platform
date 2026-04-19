@@ -88,6 +88,10 @@ class HrJobController {
             $selectedBenefits = array_values(array_filter(array_map('trim', (array) ($_POST['benefits'] ?? []))));
             if ($old['title'] === '' || $old['description'] === '') {
                 $error = 'Job title and full description are required.';
+            } elseif (($err = validate_length($old['title'], 200, 'Judul pekerjaan')) !== null) {
+                $error = $err;
+            } elseif (($err = validate_length($old['description'], 10000, 'Deskripsi pekerjaan')) !== null) {
+                $error = $err;
             } else {
                 $deadlineVal = $old['deadline'] !== '' ? str_replace('T', ' ', $old['deadline']) . ':00' : null;
                 if ($deadlineVal && strlen($deadlineVal) <= 10) $deadlineVal .= ' 23:59:59';

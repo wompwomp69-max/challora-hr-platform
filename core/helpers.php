@@ -183,3 +183,20 @@ function validatePasswordStrength(string $password): ?string {
     }
     return null;
 }
+
+/**
+ * XSS Protection / Sanitization
+ */
+function s(?string $input): string {
+    return htmlspecialchars((string) $input, ENT_QUOTES, 'UTF-8');
+}
+
+/**
+ * Validate string length
+ */
+function validate_length(string $input, int $max, string $field): ?string {
+    if (mb_strlen($input) > $max) {
+        return "$field tidak boleh lebih dari $max karakter.";
+    }
+    return null;
+}

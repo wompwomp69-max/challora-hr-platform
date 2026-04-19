@@ -24,6 +24,16 @@ class Application {
         return (bool) $stmt->fetch();
     }
 
+    /** Bulk check which jobs a user has applied to */
+    public function getAppliedJobIds(int $userId, array $jobIds): array {
+        if (empty($jobIds)) return [];
+        $placeholders = implode(',', array_fill(0, count($jobIds), '?'));
+        $stmt = $this->db->prepare("SELECT job_id FROM applications WHERE user_id = ? AND job_id IN ($placeholders)");
+        $params = array_merge([$userId], $jobIds);
+        $stmt->execute($params);
+        return array_map(fn($row) => (int)$row['job_id'], $stmt->fetchAll(PDO::FETCH_ASSOC));
+    }
+
     /** Daftar applicant per job (untuk HR) - termasuk profil lengkap */
     public function getByJobId(int $jobId): array {
         $stmt = $this->db->prepare('
@@ -224,7 +234,7 @@ class Application {
     /** Top N daerah (kota) berdasarkan jumlah pelamar */
     public function getTopRegions(int $limit = 5): array {
         $limit = max(1, min(50, $limit));
-        $stmt = $this->db->prepare("
+        $sql = "
             SELECT COALESCE(NULLIF(TRIM(u.kota),''), NULLIF(TRIM(u.address),''), 'Tidak diketahui') AS region,
                    COUNT(*) AS total
             FROM applications a
@@ -232,8 +242,8 @@ class Application {
             GROUP BY region
             ORDER BY total DESC
             LIMIT :limit
-        ");
-        $stmt = $this->db->prepare($sql); // Fixed: assign to variable before bind
+        ";
+        $stmt = $this->db->prepare($sql);
         $stmt->bindValue(':limit', (int) $limit, PDO::PARAM_INT);
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -243,7 +253,7 @@ class Application {
     public function getJobsOrderedByApplicantCount(string $order = 'desc', int $limit = 50): array {
         $order = strtolower($order) === 'asc' ? 'ASC' : 'DESC';
         $limit = max(1, min(200, $limit));
-        $stmt = $this->db->prepare("
+        $sql = "
             SELECT j.id, j.title, j.location, j.job_type, j.deadline,
                    COALESCE(cnt.total, 0) AS applicant_count,
                    COALESCE(cnt.accepted, 0) AS accepted_count
@@ -255,8 +265,8 @@ class Application {
             ) AS cnt ON cnt.job_id = j.id
             ORDER BY applicant_count $order
             LIMIT :limit
-        ");
-        $stmt = $this->db->prepare($sql); // Fixed: assign to variable before bind
+        ";
+        $stmt = $this->db->prepare($sql);
         $stmt->bindValue(':limit', (int) $limit, PDO::PARAM_INT);
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);

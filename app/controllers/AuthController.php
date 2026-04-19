@@ -16,31 +16,23 @@ class AuthController {
             $email = trim($_POST['email'] ?? '');
             $password = $_POST['password'] ?? '';
 
-            // Simple Rate Limiting
             $ip = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
-            $limitFile = BASE_PATH . '/storage/logs/login_attempts.json';
-            $attempts = file_exists($limitFile) ? json_decode(file_get_contents($limitFile), true) : [];
-            $now = time();
-            $attemptData = $attempts[$ip] ?? ['count' => 0, 'last' => 0];
+            $rateKey = "login:$ip";
 
-            if ($attemptData['count'] >= 5 && ($now - $attemptData['last']) < 300) {
+            if (!RateLimiter::attempt($rateKey, 5, 300)) {
                 $error = 'Terlalu banyak percobaan login. Silakan coba lagi dalam 5 menit.';
             } else {
                 if ($email === '' || $password === '') {
                     $error = 'Email dan password wajib diisi.';
+                } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                    $error = 'Format email tidak valid.';
                 } else {
                     $user = $this->userModel->findByEmail($email);
                     if (!$user || !$this->userModel->verifyPassword($password, $user['password'])) {
                         $error = 'Email atau password salah.';
-                        // Increment attempts
-                        $attemptData['count']++;
-                        $attemptData['last'] = $now;
-                        $attempts[$ip] = $attemptData;
-                        file_put_contents($limitFile, json_encode($attempts));
                     } else {
-                        // Success: Reset attempts
-                        unset($attempts[$ip]);
-                        file_put_contents($limitFile, json_encode($attempts));
+                        // Success: Clear rate limit
+                        RateLimiter::clear($rateKey);
 
                         session_regenerate_id(true);
                         $_SESSION['user_id'] = (int) $user['id'];
@@ -70,12 +62,9 @@ class AuthController {
 
             // Registration Rate Limiting
             $ip = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
-            $limitFile = BASE_PATH . '/storage/logs/registration_attempts.json';
-            $attempts = file_exists($limitFile) ? json_decode(file_get_contents($limitFile), true) : [];
-            $now = time();
-            $attemptData = $attempts[$ip] ?? ['count' => 0, 'last' => 0];
+            $rateKey = "register:$ip";
 
-            if ($attemptData['count'] >= 5 && ($now - $attemptData['last']) < 3600) {
+            if (!RateLimiter::attempt($rateKey, 5, 3600)) {
                 $error = 'Terlalu banyak percobaan registrasi. Silakan coba lagi dalam 1 jam.';
             } else {
                 $old['name'] = trim($_POST['name'] ?? '');
@@ -89,21 +78,17 @@ class AuthController {
 
                 if ($old['name'] === '' || $old['email'] === '' || $password === '') {
                     $error = 'Nama, email, dan password wajib diisi.';
+                } elseif (!filter_var($old['email'], FILTER_VALIDATE_EMAIL)) {
+                    $error = 'Format email tidak valid.';
                 } elseif ($passwordError) {
                     $error = $passwordError;
                 } elseif ($password !== $password_confirm) {
                     $error = 'Konfirmasi password tidak cocok.';
                 } elseif ($this->userModel->findByEmail($old['email'])) {
                     $error = 'Email sudah terdaftar.';
-                    // Track attempt for existing email as well to prevent discovery spam
-                    $attemptData['count']++;
-                    $attemptData['last'] = $now;
-                    $attempts[$ip] = $attemptData;
-                    @file_put_contents($limitFile, json_encode($attempts));
                 } else {
-                    // Success: Reset attempts for this IP
-                    unset($attempts[$ip]);
-                    @file_put_contents($limitFile, json_encode($attempts));
+                    // Success: Clear rate limit
+                    RateLimiter::clear($rateKey);
 
                     $this->userModel->create($old['name'], $old['email'], $password, 'user', $old['phone'] ?: null, $old['address'] ?: null);
                     $_SESSION['flash'] = 'Registrasi berhasil. Silakan login.';

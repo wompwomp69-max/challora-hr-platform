@@ -9,6 +9,31 @@ define('APP_PATH', BASE_PATH . '/app');
 require_once BASE_PATH . '/core/Env.php';
 Env::load(BASE_PATH . '/.env');
 
+// 2. Global Logging & Error Handling
+require_once BASE_PATH . '/core/Logger.php';
+set_exception_handler(function ($e) {
+    Logger::error('Uncaught Exception: ' . $e->getMessage(), [
+        'file' => $e->getFile(),
+        'line' => $e->getLine(),
+        'trace' => $e->getTraceAsString()
+    ]);
+    if (Env::get('APP_DEBUG', false)) {
+        die('Uncaught Exception: ' . $e->getMessage() . ' in ' . $e->getFile() . ' on line ' . $e->getLine());
+    } else {
+        http_response_code(500);
+        die('A server error occurred. Please try again later.');
+    }
+});
+
+set_error_handler(function ($errno, $errstr, $errfile, $errline) {
+    if (!(error_reporting() & $errno)) return false;
+    Logger::error("PHP Error [$errno]: $errstr", ['file' => $errfile, 'line' => $errline]);
+    if (Env::get('APP_DEBUG', false)) {
+        die("PHP Error [$errno]: $errstr in $errfile on line $errline");
+    }
+    return true;
+});
+
 define('BASE_URL', Env::get('APP_URL_PATH', '/challorav2/public'));
 define('STORAGE_CV', BASE_PATH . '/storage/cv');
 define('STORAGE_DIPLOMA', BASE_PATH . '/storage/diplomas');

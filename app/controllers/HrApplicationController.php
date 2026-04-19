@@ -25,15 +25,10 @@ class HrApplicationController {
             $_SESSION['flash_error'] = 'Job posting not found.';
             redirect('/hr/jobs');
         }
-        $job = $this->jobModel->findById($jobId);
         $applicants = $this->appModel->getByJobId($jobId);
-        $workExpByUser = [];
-        $achievementsByUser = [];
-        foreach ($applicants as $a) {
-            $uid = (int) $a['user_id'];
-            $workExpByUser[$uid] = $this->userModel->getWorkExperiences($uid);
-            $achievementsByUser[$uid] = $this->userModel->getAchievements($uid);
-        }
+        $uids = array_unique(array_map(fn($a) => (int)$a['user_id'], $applicants));
+        $workExpByUser = $this->userModel->getWorkExperiencesForUsers($uids);
+        $achievementsByUser = $this->userModel->getAchievementsForUsers($uids);
         $manualMailto = $_SESSION['manual_mailto'] ?? null;
         if ($manualMailto) {
             unset($_SESSION['manual_mailto']);
@@ -63,13 +58,10 @@ class HrApplicationController {
 
         $applicants = $this->appModel->getApplicantsForHr($status ?: null, $searchQuery ?: null, $jobId ?: null, $page, $perPage);
         $jobs = $this->jobModel->all(); // Show all jobs for filter
-        $workExpByUser = [];
-        $achievementsByUser = [];
-        foreach ($applicants as $a) {
-            $uid = (int) $a['user_id'];
-            $workExpByUser[$uid] = $this->userModel->getWorkExperiences($uid);
-            $achievementsByUser[$uid] = $this->userModel->getAchievements($uid);
-        }
+        
+        $uids = array_unique(array_map(fn($a) => (int)$a['user_id'], $applicants));
+        $workExpByUser = $this->userModel->getWorkExperiencesForUsers($uids);
+        $achievementsByUser = $this->userModel->getAchievementsForUsers($uids);
         $manualMailto = $_SESSION['manual_mailto'] ?? null;
         if ($manualMailto) {
             unset($_SESSION['manual_mailto']);

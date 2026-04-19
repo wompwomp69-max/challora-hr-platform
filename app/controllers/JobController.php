@@ -58,10 +58,9 @@ class JobController {
         if (isLoggedIn() && currentRole() === 'user') {
             $appModel = new Application();
             $savedJobIds = $this->savedJobModel->getSavedJobIds($userId);
-            foreach ($jobs as $j) {
-                if ($appModel->hasApplied($userId, (int)$j['id'])) {
-                    $appliedJobIds[] = (int)$j['id'];
-                }
+            if (!empty($jobs)) {
+                $jobIds = array_map(fn($j) => (int)$j['id'], $jobs);
+                $appliedJobIds = $appModel->getAppliedJobIds($userId, $jobIds);
             }
             
             $u = (new User())->findById($userId);
@@ -112,12 +111,13 @@ class JobController {
             $canApply = !$alreadyApplied;
             $isSaved = $this->savedJobModel->isSaved(currentUserId(), $id);
             $savedJobIds = $this->savedJobModel->getSavedJobIds(currentUserId());
+            if (!empty($relatedJobs)) {
+                $relatedJobIds = array_map(fn($rj) => (int)$rj['id'], $relatedJobs);
+                $relatedAppliedJobIds = $appModel->getAppliedJobIds(currentUserId(), $relatedJobIds);
+            }
             foreach ($relatedJobs as $rj) {
                 $rid = (int) ($rj['id'] ?? 0);
                 if ($rid < 1) continue;
-                if ($appModel->hasApplied(currentUserId(), $rid)) {
-                    $relatedAppliedJobIds[] = $rid;
-                }
                 if (in_array($rid, $savedJobIds, true)) {
                     $relatedSavedJobIds[] = $rid;
                 }
@@ -207,11 +207,9 @@ class JobController {
         $jobs = $this->savedJobModel->getByUserId(currentUserId());
 
         $appModel = new Application();
-        $appliedJobIds = [];
-        foreach ($jobs as $j) {
-            if ($appModel->hasApplied(currentUserId(), (int)$j['id'])) {
-                $appliedJobIds[] = (int)$j['id'];
-            }
+        if (!empty($jobs)) {
+            $jobIds = array_map(fn($j) => (int)$j['id'], $jobs);
+            $appliedJobIds = $appModel->getAppliedJobIds(currentUserId(), $jobIds);
         }
         $savedJobIds = $this->savedJobModel->getSavedJobIds(currentUserId());
 

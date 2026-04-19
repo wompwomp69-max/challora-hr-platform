@@ -2,7 +2,7 @@
 class Job {
     private PDO $db;
     /** @var array<string,bool>|null */
-    private ?array $jobsColumnMap = null;
+    private static ?array $jobsColumnMap = null;
 
     public function __construct() {
         $this->db = getDB();
@@ -470,35 +470,44 @@ class Job {
     }
 
     public function create(array $data): int {
-        $skillsJson = $this->encodeSkillsBenefits($data['skills'] ?? []);
-        $benefitsJson = $this->encodeSkillsBenefits($data['benefits'] ?? []);
-        $stmt = $this->db->prepare('
-            INSERT INTO jobs (title, description, short_description, location, salary_range, min_salary, max_salary,
-                job_type, min_education, is_urgent, provinsi, kota, kecamatan,
-                deadline, max_applicants, skills_json, benefits_json, created_by)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        ');
-        $stmt->execute([
-            $data['title'],
-            $data['description'],
-            !empty($data['short_description']) ? mb_substr(trim($data['short_description']), 0, 255) : null,
-            $data['location'] ?? null,
-            $data['salary_range'] ?? null,
-            !empty($data['min_salary']) ? (int) $data['min_salary'] : null,
-            !empty($data['max_salary']) ? (int) $data['max_salary'] : null,
-            !empty($data['job_type']) ? $data['job_type'] : null,
-            !empty($data['min_education']) ? $data['min_education'] : null,
-            !empty($data['is_urgent']) ? 1 : 0,
-            !empty($data['provinsi']) ? $data['provinsi'] : null,
-            !empty($data['kota']) ? $data['kota'] : null,
-            !empty($data['kecamatan']) ? $data['kecamatan'] : null,
-            !empty($data['deadline']) ? $data['deadline'] : null,
-            !empty($data['max_applicants']) ? (int) $data['max_applicants'] : null,
-            $skillsJson,
-            $benefitsJson,
-            $data['created_by'],
-        ]);
-        return (int) $this->db->lastInsertId();
+        try {
+            Database::beginTransaction();
+            $skillsJson = $this->encodeSkillsBenefits($data['skills'] ?? []);
+            $benefitsJson = $this->encodeSkillsBenefits($data['benefits'] ?? []);
+            $stmt = $this->db->prepare('
+                INSERT INTO jobs (title, description, short_description, location, salary_range, min_salary, max_salary,
+                    job_type, min_education, is_urgent, provinsi, kota, kecamatan,
+                    deadline, max_applicants, skills_json, benefits_json, created_by)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ');
+            $stmt->execute([
+                $data['title'],
+                $data['description'],
+                !empty($data['short_description']) ? mb_substr(trim($data['short_description']), 0, 255) : null,
+                $data['location'] ?? null,
+                $data['salary_range'] ?? null,
+                !empty($data['min_salary']) ? (int) $data['min_salary'] : null,
+                !empty($data['max_salary']) ? (int) $data['max_salary'] : null,
+                !empty($data['job_type']) ? $data['job_type'] : null,
+                !empty($data['min_education']) ? $data['min_education'] : null,
+                !empty($data['is_urgent']) ? 1 : 0,
+                !empty($data['provinsi']) ? $data['provinsi'] : null,
+                !empty($data['kota']) ? $data['kota'] : null,
+                !empty($data['kecamatan']) ? $data['kecamatan'] : null,
+                !empty($data['deadline']) ? $data['deadline'] : null,
+                !empty($data['max_applicants']) ? (int) $data['max_applicants'] : null,
+                $skillsJson,
+                $benefitsJson,
+                $data['created_by'],
+            ]);
+            $id = (int) $this->db->lastInsertId();
+            Database::commit();
+            return $id;
+        } catch (Throwable $e) {
+            Database::rollBack();
+            Logger::error('Failed to create job: ' . $e->getMessage());
+            throw $e;
+        }
     }
 
     public function update(int $id, array $data): bool {
@@ -645,8 +654,8 @@ class Job {
         if ($column === '') {
             return false;
         }
-        if ($this->jobsColumnMap === null) {
-            $this->jobsColumnMap = [];
+        if (self::$jobsColumnMap === null) {
+            self::$jobsColumnMap = [];
             try {
                 $stmt = $this->db->query("
                     SELECT COLUMN_NAME
@@ -656,14 +665,14 @@ class Job {
                 ");
                 $rows = $stmt ? $stmt->fetchAll(PDO::FETCH_COLUMN) : [];
                 foreach ($rows as $col) {
-                    $this->jobsColumnMap[(string) $col] = true;
+                    self::$jobsColumnMap[(string) $col] = true;
                 }
             } catch (Throwable $e) {
                 // Fail-safe: avoid fatal query by treating optional columns as unavailable.
-                $this->jobsColumnMap = [];
+                self::$jobsColumnMap = [];
             }
         }
-        return isset($this->jobsColumnMap[$column]);
+        return isset(self::$jobsColumnMap[$column]);
     }
 
     public function delete(int $id): bool {

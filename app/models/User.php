@@ -1,7 +1,7 @@
 <?php
 class User {
     private PDO $db;
-    private ?array $usersTableColumns = null;
+    private static ?array $usersTableColumns = null;
 
     public function __construct() {
         $this->db = getDB();
@@ -68,21 +68,21 @@ class User {
     }
 
     private function getUsersTableColumns(): array {
-        if (is_array($this->usersTableColumns)) {
-            return $this->usersTableColumns;
+        if (is_array(self::$usersTableColumns)) {
+            return self::$usersTableColumns;
         }
         try {
             $stmt = $this->db->query('SHOW COLUMNS FROM users');
             $rows = $stmt ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
-            $this->usersTableColumns = array_values(array_filter(array_map(
+            self::$usersTableColumns = array_values(array_filter(array_map(
                 static fn(array $row): string => (string) ($row['Field'] ?? ''),
                 $rows
             )));
-            return $this->usersTableColumns;
+            return self::$usersTableColumns;
         } catch (Throwable $e) {
             // Fallback: don't block update flow if schema inspection fails.
-            $this->usersTableColumns = [];
-            return $this->usersTableColumns;
+            self::$usersTableColumns = [];
+            return self::$usersTableColumns;
         }
     }
 
@@ -104,8 +104,41 @@ class User {
         }
     }
 
+    /** Bulk fetch work experiences for multiple users */
+    public function getWorkExperiencesForUsers(array $userIds): array {
+        if (empty($userIds)) return [];
+        $placeholders = implode(',', array_fill(0, count($userIds), '?'));
+        $stmt = $this->db->prepare("SELECT * FROM user_work_experiences WHERE user_id IN ($placeholders) ORDER BY sort_order, year_start DESC");
+        $stmt->execute($userIds);
+        $results = $stmt->fetchAll();
+        $grouped = [];
+        foreach ($results as $row) {
+            $grouped[(int)$row['user_id']][] = $row;
+        }
+        return $grouped;
+    }
+
+    /** Bulk fetch achievements for multiple users */
+    public function getAchievementsForUsers(array $userIds): array {
+        if (empty($userIds)) return [];
+        $placeholders = implode(',', array_fill(0, count($userIds), '?'));
+        try {
+            $stmt = $this->db->prepare("SELECT * FROM user_achievements WHERE user_id IN ($placeholders) ORDER BY year DESC, id ASC");
+            $stmt->execute($userIds);
+            $results = $stmt->fetchAll();
+            $grouped = [];
+            foreach ($results as $row) {
+                $grouped[(int)$row['user_id']][] = $row;
+            }
+            return $grouped;
+        } catch (PDOException $e) {
+            return [];
+        }
+    }
+
     public function setAchievements(int $userId, array $items): void {
         try {
+            Database::beginTransaction();
             $this->db->prepare('DELETE FROM user_achievements WHERE user_id = ?')->execute([$userId]);
             $stmt = $this->db->prepare('INSERT INTO user_achievements (user_id, type, title, description, organizer, year, rank, level, certificate_link) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)');
             foreach ($items as $row) {
@@ -123,26 +156,35 @@ class User {
                     ]);
                 }
             }
-        } catch (PDOException $e) {
-            // table does not exist yet - ignore
+            Database::commit();
+        } catch (Throwable $e) {
+            Database::rollBack();
+            Logger::error('Failed to set achievements: ' . $e->getMessage());
         }
     }
 
     public function setWorkExperiences(int $userId, array $items): void {
-        $this->db->prepare('DELETE FROM user_work_experiences WHERE user_id = ?')->execute([$userId]);
-        $stmt = $this->db->prepare('INSERT INTO user_work_experiences (user_id, title, company_name, year_start, year_end, description, sort_order) VALUES (?, ?, ?, ?, ?, ?, ?)');
-        foreach ($items as $i => $row) {
-            if (!empty(trim($row['title'] ?? ''))) {
-                $stmt->execute([
-                    $userId,
-                    trim($row['title']),
-                    trim($row['company_name'] ?? ''),
-                    trim($row['year_start'] ?? ''),
-                    trim($row['year_end'] ?? ''),
-                    trim($row['description'] ?? ''),
-                    $i
-                ]);
+        try {
+            Database::beginTransaction();
+            $this->db->prepare('DELETE FROM user_work_experiences WHERE user_id = ?')->execute([$userId]);
+            $stmt = $this->db->prepare('INSERT INTO user_work_experiences (user_id, title, company_name, year_start, year_end, description, sort_order) VALUES (?, ?, ?, ?, ?, ?, ?)');
+            foreach ($items as $i => $row) {
+                if (!empty(trim($row['title'] ?? ''))) {
+                    $stmt->execute([
+                        $userId,
+                        trim($row['title']),
+                        trim($row['company_name'] ?? ''),
+                        trim($row['year_start'] ?? ''),
+                        trim($row['year_end'] ?? ''),
+                        trim($row['description'] ?? ''),
+                        $i
+                    ]);
+                }
             }
+            Database::commit();
+        } catch (Throwable $e) {
+            Database::rollBack();
+            Logger::error('Failed to set work experiences: ' . $e->getMessage());
         }
     }
 
