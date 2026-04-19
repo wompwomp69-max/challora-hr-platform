@@ -135,6 +135,7 @@ label {
 
         <main class="bg-surface rounded-3xl border border-muted p-4 md:p-6">
             <form method="post" action="<?= BASE_URL ?>/index.php?url=user/settings/edit" class="space-y-7">
+                <?= csrf_field() ?>
                 <section id="data-pribadi" class="scroll-mt-24">
                     <h2 class="text-base md:text-lg font-semibold text-default mb-3">Data Pribadi</h2>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-3">

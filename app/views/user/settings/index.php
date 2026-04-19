@@ -136,6 +136,7 @@ $formatDocUploadedAt = static function (?string $relativePath): string {
         <div class="flex flex-col md:flex-row gap-8 items-start">
             <div class="shrink-0">
                 <form method="post" action="<?= BASE_URL ?>/index.php?url=user/settings/avatar" enctype="multipart/form-data" class="group relative inline-block">
+                    <?= csrf_field() ?>
                     <label for="settings-avatar-input" class="cursor-pointer brutalist-avatar-wrap inline-flex items-center justify-center">
                         <?php if ($profileAvatarSrc): ?>
                             <img src="<?= e($profileAvatarSrc) ?>" alt="" class="w-full h-full object-cover">
@@ -262,6 +263,7 @@ $formatDocUploadedAt = static function (?string $relativePath): string {
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <!-- CV -->
             <form method="post" action="<?= BASE_URL ?>/index.php?url=user/settings/cv" enctype="multipart/form-data" class="brutalist-doc-card">
+                <?= csrf_field() ?>
                 <div class="brutalist-value mb-2">resume / cv <span class="text-xs text-gray-500">(pdf/docx)</span></div>
                 <div class="brutalist-label mb-4">
                     last updated: <span style="color:var(--color-text);"><?= e($formatDocUploadedAt((string) $user['cv_path'])) ?></span>
@@ -277,6 +279,7 @@ $formatDocUploadedAt = static function (?string $relativePath): string {
 
             <!-- Diploma -->
             <form method="post" action="<?= BASE_URL ?>/index.php?url=user/settings/diploma" enctype="multipart/form-data" class="brutalist-doc-card">
+                <?= csrf_field() ?>
                 <div class="brutalist-value mb-2">diploma <span class="text-xs text-gray-500">(pdf/docx)</span></div>
                 <div class="brutalist-label mb-4">
                     last updated: <span style="color:var(--color-text);"><?= e($formatDocUploadedAt((string) $user['diploma_path'])) ?></span>
@@ -292,6 +295,7 @@ $formatDocUploadedAt = static function (?string $relativePath): string {
 
             <!-- Photo -->
             <form method="post" action="<?= BASE_URL ?>/index.php?url=user/settings/photo" enctype="multipart/form-data" class="brutalist-doc-card">
+                <?= csrf_field() ?>
                 <div class="brutalist-value mb-2">photo ID <span class="text-xs text-gray-500">(jpg/png)</span></div>
                 <div class="brutalist-label mb-4">
                     last updated: <span style="color:var(--color-text);"><?= e($formatDocUploadedAt((string) $user['photo_path'])) ?></span>

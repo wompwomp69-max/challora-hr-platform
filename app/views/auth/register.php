@@ -123,6 +123,7 @@
                     <?php endif; ?>
 
                     <form method="post" action="<?= BASE_URL ?>/index.php?url=auth/register" class="space-y-5">
+                        <?= csrf_field() ?>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                             <div>
                                 <label for="name" class="brutalist-label">full name</label>
@@ -141,7 +142,7 @@
 
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                             <div>
-                                <label for="password" class="brutalist-label">password (min 6)</label>
+                                <label for="password" class="brutalist-label">password (min 8 chars, mix case, num, spec)</label>
                                 <input type="password" id="password" name="password" placeholder="enter password" required minlength="6" class="brutalist-input">
                             </div>
                             <div>

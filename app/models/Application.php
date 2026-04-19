@@ -80,10 +80,15 @@ class Application {
 
         $perPage = max(1, $perPage);
         $offset = max(0, ($page - 1) * $perPage);
-        $sql .= " ORDER BY a.created_at DESC LIMIT {$perPage} OFFSET {$offset}";
+        $sql .= " ORDER BY a.created_at DESC LIMIT :limit OFFSET :offset";
 
         $stmt = $this->db->prepare($sql);
-        $stmt->execute($params);
+        foreach ($params as $i => $v) {
+            $stmt->bindValue($i + 1, $v);
+        }
+        $stmt->bindValue(':limit', (int) $perPage, PDO::PARAM_INT);
+        $stmt->bindValue(':offset', (int) $offset, PDO::PARAM_INT);
+        $stmt->execute();
         return $stmt->fetchAll();
     }
 
@@ -196,9 +201,12 @@ class Application {
             JOIN jobs j ON j.id = a.job_id
             WHERE a.status = ?
             ORDER BY a.created_at DESC
-            LIMIT $perPage OFFSET $offset";
+            LIMIT :limit OFFSET :offset";
         $stmt = $this->db->prepare($sql);
-        $stmt->execute(['accepted']);
+        $stmt->bindValue(1, 'accepted');
+        $stmt->bindValue(':limit', (int) $perPage, PDO::PARAM_INT);
+        $stmt->bindValue(':offset', (int) $offset, PDO::PARAM_INT);
+        $stmt->execute();
         return $stmt->fetchAll();
     }
 
@@ -223,8 +231,10 @@ class Application {
             JOIN users u ON u.id = a.user_id
             GROUP BY region
             ORDER BY total DESC
-            LIMIT $limit
+            LIMIT :limit
         ");
+        $stmt = $this->db->prepare($sql); // Fixed: assign to variable before bind
+        $stmt->bindValue(':limit', (int) $limit, PDO::PARAM_INT);
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
@@ -244,8 +254,10 @@ class Application {
                 FROM applications GROUP BY job_id
             ) AS cnt ON cnt.job_id = j.id
             ORDER BY applicant_count $order
-            LIMIT $limit
+            LIMIT :limit
         ");
+        $stmt = $this->db->prepare($sql); // Fixed: assign to variable before bind
+        $stmt->bindValue(':limit', (int) $limit, PDO::PARAM_INT);
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }

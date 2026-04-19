@@ -96,10 +96,11 @@
 
         <?php if (!empty($hasValidToken)): ?>
             <form method="post" action="<?= BASE_URL ?>/index.php?url=auth/reset" class="space-y-6">
+                <?= csrf_field() ?>
                 <input type="hidden" name="token" value="<?= e($token) ?>">
                 
                 <div>
-                    <label for="password" class="brutalist-label">new password</label>
+                    <label for="password" class="brutalist-label">new password (min 8 chars, mix case, num, spec)</label>
                     <input type="password" id="password" name="password" placeholder="enter new password" required autocomplete="new-password" class="brutalist-input">
                 </div>
                 

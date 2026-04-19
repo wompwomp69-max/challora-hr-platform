@@ -197,6 +197,7 @@ class HrJobController {
     public function delete(): void {
         $this->requireHr();
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            validate_csrf();
             redirect('/hr/jobs');
         }
         $id = (int) ($_POST['id'] ?? 0);

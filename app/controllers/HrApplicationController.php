@@ -93,17 +93,27 @@ class HrApplicationController {
 
     public function updateStatus(): void {
         $this->requireHr();
+        validate_csrf();
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             redirect('/hr/jobs');
         }
         $appId = (int) ($_POST['application_id'] ?? 0);
         $status = trim($_POST['status'] ?? '');
         $openMailto = !empty($_POST['open_mailto']);
-        $app = $this->appModel->getApplicationForHrJob($appId);
+        
+        $app = $this->appModel->findById($appId);
         if (!$app) {
             $_SESSION['flash_error'] = 'Application data not found.';
             redirect('/hr/jobs');
         }
+
+        // Authorization fix: User MUST be the creator of the job or an HR
+        // The original logic was too permissive. Let's ensure CURRENT user created this job.
+        if (!$this->jobModel->isCreatedBy((int)$app['job_id'], currentUserId())) {
+            $_SESSION['flash_error'] = 'Permission denied.';
+            redirect('/hr/jobs');
+        }
+
         if ($this->appModel->updateStatus($appId, $status)) {
             $_SESSION['flash'] = 'Application status updated.';
             if ($openMailto && in_array($status, ['accepted', 'rejected'], true)) {

@@ -42,9 +42,11 @@ class DownloadController {
         }
 
         $pattern = '#^storage/(cv|diplomas|photos)/[a-zA-Z0-9_.-]+$#';
-        $path = BASE_PATH . '/' . $rel;
-        if (!preg_match($pattern, $rel) || !is_file($path)) {
-            $_SESSION['flash_error'] = 'File tidak ditemukan.';
+        $path = realpath(BASE_PATH . '/' . $rel);
+        $storageRoot = realpath(BASE_PATH . '/storage');
+
+        if (!$path || !$storageRoot || strpos($path, $storageRoot) !== 0 || !is_file($path)) {
+            $_SESSION['flash_error'] = 'File tidak ditemukan atau akses ditolak.';
             redirect('/user/settings');
         }
 
@@ -79,15 +81,25 @@ class DownloadController {
         }
         $uid = currentUserId();
         $role = currentRole();
-        $allowed = ($role === 'hr') || (($role === 'user') && ((int)$app['user_id']) === $uid);
+        
+        $allowed = false;
+        if ($role === 'user' && (int)$app['user_id'] === $uid) {
+            $allowed = true;
+        } elseif ($role === 'hr') {
+            if ($this->jobModel->isCreatedBy((int)$app['job_id'], $uid)) {
+                $allowed = true;
+            }
+        }
+
         if (!$allowed) {
             $_SESSION['flash_error'] = 'Access denied.';
             redirect('/jobs');
         }
-        $path = BASE_PATH . '/' . $app[$pathKey];
-        $pattern = '#^storage/(cv|diplomas|photos)/[a-zA-Z0-9_.-]+$#';
-        if (!preg_match($pattern, $app[$pathKey]) || !is_file($path)) {
-            $_SESSION['flash_error'] = 'File not found.';
+        $path = realpath(BASE_PATH . '/' . $app[$pathKey]);
+        $storageRoot = realpath(BASE_PATH . '/storage');
+
+        if (!$path || !$storageRoot || strpos($path, $storageRoot) !== 0 || !is_file($path)) {
+            $_SESSION['flash_error'] = 'File not found or access denied.';
             redirect('/jobs');
         }
         $mime = mime_content_type($path) ?: 'application/octet-stream';
@@ -119,8 +131,10 @@ class DownloadController {
             http_response_code(404);
             exit;
         }
-        $path = BASE_PATH . '/' . $rel;
-        if (!is_file($path)) {
+        $path = realpath(BASE_PATH . '/' . $rel);
+        $storageRoot = realpath(BASE_PATH . '/storage');
+
+        if (!$path || !$storageRoot || strpos($path, $storageRoot) !== 0 || !is_file($path)) {
             http_response_code(404);
             exit;
         }
@@ -149,7 +163,16 @@ class DownloadController {
         }
         $uid = currentUserId();
         $role = currentRole();
-        $allowed = ($role === 'hr') || (($role === 'user') && ((int)$app['user_id']) === $uid);
+        
+        $allowed = false;
+        if ($role === 'user' && (int)$app['user_id'] === $uid) {
+            $allowed = true;
+        } elseif ($role === 'hr') {
+            if ($this->jobModel->isCreatedBy((int)$app['job_id'], $uid)) {
+                $allowed = true;
+            }
+        }
+
         if (!$allowed) {
             $_SESSION['flash_error'] = 'Access denied.';
             redirect('/jobs');

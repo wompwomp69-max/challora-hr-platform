@@ -132,6 +132,7 @@
                     <?php endif; ?>
 
                     <form method="post" action="<?= BASE_URL ?>/index.php?url=auth/login" class="space-y-6">
+                        <?= csrf_field() ?>
                         <div>
                             <label for="email" class="brutalist-label">email address</label>
                             <input type="email" id="email" name="email" placeholder="john.doe@gmail.com" required autocomplete="email" value="<?= e($_POST['email'] ?? '') ?>" class="brutalist-input">

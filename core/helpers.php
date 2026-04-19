@@ -139,3 +139,47 @@ function render_view(string $view, array $data = []): void {
     );
     require APP_PATH . '/views/layouts/' . $layout . '.php';
 }
+
+/** CSRF: Generate token */
+function csrf_token(): string {
+    if (empty($_SESSION['csrf_token'])) {
+        $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+    }
+    return $_SESSION['csrf_token'];
+}
+
+/** CSRF: Generate hidden field */
+function csrf_field(): string {
+    return '<input type="hidden" name="csrf_token" value="' . e(csrf_token()) . '">';
+}
+
+/** CSRF: Validate token */
+function validate_csrf(): void {
+    if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
+        $token = $_POST['csrf_token'] ?? '';
+        if ($token === '' || !hash_equals(csrf_token(), $token)) {
+            http_response_code(403);
+            die('CSRF token mismatch.');
+        }
+    }
+}
+
+/** Password Policy: min 8 chars, 1 uppercase, 1 lowercase, 1 number */
+function validatePasswordStrength(string $password): ?string {
+    if (strlen($password) < 8) {
+        return 'Password minimal 8 karakter.';
+    }
+    if (!preg_match('/[A-Z]/', $password)) {
+        return 'Password harus mengandung huruf besar.';
+    }
+    if (!preg_match('/[a-z]/', $password)) {
+        return 'Password harus mengandung huruf kecil.';
+    }
+    if (!preg_match('/[0-9]/', $password)) {
+        return 'Password harus mengandung angka.';
+    }
+    if (!preg_match('/[^A-Za-z0-9]/', $password)) {
+        return 'Password harus mengandung karakter spesial.';
+    }
+    return null;
+}

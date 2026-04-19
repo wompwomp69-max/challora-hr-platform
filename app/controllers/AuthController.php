@@ -12,24 +12,47 @@ class AuthController {
         }
         $error = '';
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            validate_csrf();
             $email = trim($_POST['email'] ?? '');
             $password = $_POST['password'] ?? '';
-            if ($email === '' || $password === '') {
-                $error = 'Email dan password wajib diisi.';
+
+            // Simple Rate Limiting
+            $ip = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
+            $limitFile = BASE_PATH . '/storage/logs/login_attempts.json';
+            $attempts = file_exists($limitFile) ? json_decode(file_get_contents($limitFile), true) : [];
+            $now = time();
+            $attemptData = $attempts[$ip] ?? ['count' => 0, 'last' => 0];
+
+            if ($attemptData['count'] >= 5 && ($now - $attemptData['last']) < 300) {
+                $error = 'Terlalu banyak percobaan login. Silakan coba lagi dalam 5 menit.';
             } else {
-                $user = $this->userModel->findByEmail($email);
-                if (!$user || !$this->userModel->verifyPassword($password, $user['password'])) {
-                    $error = 'Email atau password salah.';
+                if ($email === '' || $password === '') {
+                    $error = 'Email dan password wajib diisi.';
                 } else {
-                    $_SESSION['user_id'] = (int) $user['id'];
-                    $_SESSION['role'] = $user['role'];
-                    $_SESSION['user_name'] = $user['name'];
-                    $_SESSION['user_avatar_path'] = !empty($user['avatar_path']) ? (string) $user['avatar_path'] : '';
-                    $_SESSION['user_avatar_ver'] = !empty($user['avatar_path']) ? md5((string) $user['avatar_path']) : '0';
-                    if ($user['role'] === 'hr') {
-                        redirect('/hr/jobs');
+                    $user = $this->userModel->findByEmail($email);
+                    if (!$user || !$this->userModel->verifyPassword($password, $user['password'])) {
+                        $error = 'Email atau password salah.';
+                        // Increment attempts
+                        $attemptData['count']++;
+                        $attemptData['last'] = $now;
+                        $attempts[$ip] = $attemptData;
+                        file_put_contents($limitFile, json_encode($attempts));
+                    } else {
+                        // Success: Reset attempts
+                        unset($attempts[$ip]);
+                        file_put_contents($limitFile, json_encode($attempts));
+
+                        session_regenerate_id(true);
+                        $_SESSION['user_id'] = (int) $user['id'];
+                        $_SESSION['role'] = $user['role'];
+                        $_SESSION['user_name'] = $user['name'];
+                        $_SESSION['user_avatar_path'] = !empty($user['avatar_path']) ? (string) $user['avatar_path'] : '';
+                        $_SESSION['user_avatar_ver'] = !empty($user['avatar_path']) ? md5((string) $user['avatar_path']) : '0';
+                        if ($user['role'] === 'hr') {
+                            redirect('/hr/jobs');
+                        }
+                        redirect('/jobs');
                     }
-                    redirect('/jobs');
                 }
             }
         }
@@ -43,31 +66,57 @@ class AuthController {
         $error = '';
         $old = ['name' => '', 'email' => '', 'phone' => '', 'address' => ''];
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $old['name'] = trim($_POST['name'] ?? '');
-            $old['email'] = trim($_POST['email'] ?? '');
-            $old['phone'] = trim($_POST['phone'] ?? '');
-            $old['address'] = trim($_POST['address'] ?? '');
-            $password = $_POST['password'] ?? '';
-            $password_confirm = $_POST['password_confirm'] ?? '';
-            if ($old['name'] === '' || $old['email'] === '' || $password === '') {
-                $error = 'Nama, email, dan password wajib diisi.';
-            } elseif (strlen($password) < 6) {
-                $error = 'Password minimal 6 karakter.';
-            } elseif ($password !== $password_confirm) {
-                $error = 'Konfirmasi password tidak cocok.';
-            } elseif ($this->userModel->findByEmail($old['email'])) {
-                $error = 'Email sudah terdaftar.';
+            validate_csrf();
+
+            // Registration Rate Limiting
+            $ip = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
+            $limitFile = BASE_PATH . '/storage/logs/registration_attempts.json';
+            $attempts = file_exists($limitFile) ? json_decode(file_get_contents($limitFile), true) : [];
+            $now = time();
+            $attemptData = $attempts[$ip] ?? ['count' => 0, 'last' => 0];
+
+            if ($attemptData['count'] >= 5 && ($now - $attemptData['last']) < 3600) {
+                $error = 'Terlalu banyak percobaan registrasi. Silakan coba lagi dalam 1 jam.';
             } else {
-                $this->userModel->create($old['name'], $old['email'], $password, 'user', $old['phone'] ?: null, $old['address'] ?: null);
-                $_SESSION['flash'] = 'Registrasi berhasil. Silakan login.';
-                $_SESSION['flash_type'] = 'success';
-                redirect('/auth/login');
+                $old['name'] = trim($_POST['name'] ?? '');
+                $old['email'] = trim($_POST['email'] ?? '');
+                $old['phone'] = trim($_POST['phone'] ?? '');
+                $old['address'] = trim($_POST['address'] ?? '');
+                $password = $_POST['password'] ?? '';
+                $password_confirm = $_POST['password_confirm'] ?? '';
+
+                $passwordError = validatePasswordStrength($password);
+
+                if ($old['name'] === '' || $old['email'] === '' || $password === '') {
+                    $error = 'Nama, email, dan password wajib diisi.';
+                } elseif ($passwordError) {
+                    $error = $passwordError;
+                } elseif ($password !== $password_confirm) {
+                    $error = 'Konfirmasi password tidak cocok.';
+                } elseif ($this->userModel->findByEmail($old['email'])) {
+                    $error = 'Email sudah terdaftar.';
+                    // Track attempt for existing email as well to prevent discovery spam
+                    $attemptData['count']++;
+                    $attemptData['last'] = $now;
+                    $attempts[$ip] = $attemptData;
+                    @file_put_contents($limitFile, json_encode($attempts));
+                } else {
+                    // Success: Reset attempts for this IP
+                    unset($attempts[$ip]);
+                    @file_put_contents($limitFile, json_encode($attempts));
+
+                    $this->userModel->create($old['name'], $old['email'], $password, 'user', $old['phone'] ?: null, $old['address'] ?: null);
+                    $_SESSION['flash'] = 'Registrasi berhasil. Silakan login.';
+                    $_SESSION['flash_type'] = 'success';
+                    redirect('/auth/login');
+                }
             }
         }
         render_view('auth/register', ['error' => $error, 'old' => $old, 'pageTitle' => 'Daftar']);
     }
 
     public function logout(): void {
+        session_regenerate_id(true);
         $_SESSION = [];
         if (ini_get('session.use_cookies')) {
             $p = session_get_cookie_params();
@@ -86,6 +135,7 @@ class AuthController {
         $link = '';
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            validate_csrf();
             $email = trim($_POST['email'] ?? '');
             if ($email === '') {
                 $error = 'Email wajib diisi.';
@@ -93,7 +143,7 @@ class AuthController {
                 $user = $this->userModel->findByEmail($email);
                 if ($user) {
                     $token = $this->userModel->createPasswordResetToken((int)$user['id']);
-                    $link  = BASE_URL . '/auth/reset?token=' . urlencode($token);
+                    $link  = BASE_URL . '/index.php?url=auth/reset&token=' . urlencode($token);
 
                     $mail = new MailService();
                     if ($mail->isEnabled()) {
@@ -134,16 +184,20 @@ class AuthController {
         }
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            validate_csrf();
             $password = $_POST['password'] ?? '';
             $confirm  = $_POST['password_confirm'] ?? '';
+            
+            $passwordError = validatePasswordStrength($password);
+
             if (!$hasValidToken) {
                 $error = 'Token tidak valid atau sudah kadaluarsa.';
             } elseif ($password === '' || $confirm === '') {
                 $error = 'Password dan konfirmasi wajib diisi.';
             } elseif ($password !== $confirm) {
                 $error = 'Konfirmasi tidak cocok.';
-            } elseif (strlen($password) < 6) {
-                $error = 'Password minimal 6 karakter.';
+            } elseif ($passwordError) {
+                $error = $passwordError;
             } else {
                 if ($reset) {
                     $this->userModel->updatePassword((int)$reset['user_id'], $password);

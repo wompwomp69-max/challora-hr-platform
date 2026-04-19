@@ -38,6 +38,7 @@ class ApplicationController {
     public function apply(): void {
         requireRole('user');
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            validate_csrf();
             redirect('/jobs');
         }
         $jobId = (int) ($_POST['job_id'] ?? 0);

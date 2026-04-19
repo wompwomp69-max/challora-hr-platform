@@ -63,6 +63,7 @@ $educations = ['sma' => 'High School', 'd3' => 'Associate Degree (D3)', 's1' => 
     <?php if (!empty($error)): ?><div class="jf-error"><?= e($error) ?></div><?php endif; ?>
 
     <form method="post" action="<?= BASE_URL ?>/hr/jobs/edit?id=<?= (int)($job['id'] ?? 0) ?>">
+        <?= csrf_field() ?>
 
         <div class="jf-section">
             <div class="jf-section-title">Core Information</div>

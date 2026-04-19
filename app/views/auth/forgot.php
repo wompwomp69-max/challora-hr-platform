@@ -104,6 +104,7 @@
         <?php endif; ?>
 
         <form method="post" action="<?= BASE_URL ?>/index.php?url=auth/forgot" class="space-y-6">
+            <?= csrf_field() ?>
             <div>
                 <label class="brutalist-label">email address</label>
                 <input

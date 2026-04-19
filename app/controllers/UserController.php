@@ -42,6 +42,7 @@ class UserController {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             redirect('/user/settings');
         }
+        validate_csrf();
         $userId = currentUserId();
         $user = $this->userModel->findById($userId);
         if (!$user) {
@@ -161,6 +162,7 @@ class UserController {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             redirect('/user/settings');
         }
+        validate_csrf();
 
         $userId = currentUserId();
         $user = $this->userModel->findById($userId);
@@ -237,6 +239,7 @@ class UserController {
         $achievements = $this->userModel->getAchievements(currentUserId());
         $error = '';
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            validate_csrf();
             $name = trim($_POST['name'] ?? '');
             $phone = trim($_POST['phone'] ?? '');
             $address = trim($_POST['address'] ?? '');

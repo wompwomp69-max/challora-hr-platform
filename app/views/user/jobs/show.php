@@ -247,6 +247,7 @@ $companyInitial = mb_substr($companyName, 0, 1);
                             now</button>
                     <?php else: ?>
                         <form method="post" action="<?= BASE_URL ?>/index.php?url=jobs/apply">
+                            <?= csrf_field() ?>
                             <input type="hidden" name="job_id" value="<?= (int) $job['id'] ?>">
                             <button type="submit" class="brutalist-btn">apply now</button>
                         </form>
@@ -258,6 +259,7 @@ $companyInitial = mb_substr($companyName, 0, 1);
 
             <?php if (isLoggedIn() && currentRole() === 'user'): ?>
                 <form method="post" action="<?= BASE_URL ?><?= $isSaved ? '/jobs/unsave' : '/jobs/save' ?>" class="mt-4">
+                    <?= csrf_field() ?>
                     <input type="hidden" name="job_id" value="<?= $job['id'] ?>">
                     <input type="hidden" name="redirect" value="<?= e('/jobs/show?id=' . $job['id']) ?>">
                     <button type="submit" class="brutalist-btn brutalist-btn-alt">

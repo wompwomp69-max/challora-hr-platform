@@ -237,6 +237,7 @@ if (!empty($reviewReturnParams)) $reviewReturnTo .= '?' . http_build_query($revi
                     <?php if (!empty($a['phone'])): ?><div style="margin-top:2px"><?= e($a['phone']) ?></div><?php endif; ?>
                 </div>
                 <form method="post" action="<?= BASE_URL ?>/hr/applications/update-status" id="form-<?= (int)$a['id'] ?>">
+                    <?= csrf_field() ?>
                     <input type="hidden" name="application_id" value="<?= (int)$a['id'] ?>">
                     <input type="hidden" name="open_mailto"    value="1">
                     <input type="hidden" name="return_to"      value="<?= e($reviewReturnTo) ?>">
