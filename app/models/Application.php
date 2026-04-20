@@ -90,14 +90,14 @@ class Application {
 
         $perPage = max(1, $perPage);
         $offset = max(0, ($page - 1) * $perPage);
-        $sql .= " ORDER BY a.created_at DESC LIMIT :limit OFFSET :offset";
+        $sql .= " ORDER BY a.created_at DESC LIMIT ? OFFSET ?";
 
         $stmt = $this->db->prepare($sql);
         foreach ($params as $i => $v) {
             $stmt->bindValue($i + 1, $v);
         }
-        $stmt->bindValue(':limit', (int) $perPage, PDO::PARAM_INT);
-        $stmt->bindValue(':offset', (int) $offset, PDO::PARAM_INT);
+        $stmt->bindValue(count($params) + 1, (int) $perPage, PDO::PARAM_INT);
+        $stmt->bindValue(count($params) + 2, (int) $offset, PDO::PARAM_INT);
         $stmt->execute();
         return $stmt->fetchAll();
     }
@@ -211,11 +211,11 @@ class Application {
             JOIN jobs j ON j.id = a.job_id
             WHERE a.status = ?
             ORDER BY a.created_at DESC
-            LIMIT :limit OFFSET :offset";
+            LIMIT ? OFFSET ?";
         $stmt = $this->db->prepare($sql);
         $stmt->bindValue(1, 'accepted');
-        $stmt->bindValue(':limit', (int) $perPage, PDO::PARAM_INT);
-        $stmt->bindValue(':offset', (int) $offset, PDO::PARAM_INT);
+        $stmt->bindValue(2, (int) $perPage, PDO::PARAM_INT);
+        $stmt->bindValue(3, (int) $offset, PDO::PARAM_INT);
         $stmt->execute();
         return $stmt->fetchAll();
     }

@@ -1,4 +1,4 @@
-<link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/css/jobs-style.css">
+<link rel="stylesheet" href="<?= BASE_URL ?>/assets/css/jobs-style.css">
 
 <div class="saved-hero gsap-reveal">
     <h1 class="saved-title-giant">Saved Assets</h1>

@@ -162,13 +162,13 @@ class Job {
         $offset = max(0, ($page - 1) * $perPage);
         $sql = "SELECT j.*, u.name AS created_by_name FROM jobs j
             LEFT JOIN users u ON u.id = j.created_by $where
-            ORDER BY j.created_at DESC LIMIT :limit OFFSET :offset";
+            ORDER BY j.created_at DESC LIMIT ? OFFSET ?";
         $stmt = $this->db->prepare($sql);
         foreach ($bind as $i => $v) {
             $stmt->bindValue($i + 1, $v);
         }
-        $stmt->bindValue(':limit', (int) $perPage, PDO::PARAM_INT);
-        $stmt->bindValue(':offset', (int) $offset, PDO::PARAM_INT);
+        $stmt->bindValue(count($bind) + 1, (int) $perPage, PDO::PARAM_INT);
+        $stmt->bindValue(count($bind) + 2, (int) $offset, PDO::PARAM_INT);
         $stmt->execute();
         return $stmt->fetchAll();
     }
@@ -284,7 +284,7 @@ class Job {
                 INNER JOIN saved_jobs sj ON sj.job_id = j.id AND sj.user_id = ?
                 WHERE 1=1 $where
                 ORDER BY j.created_at DESC
-                LIMIT :limit OFFSET :offset";
+                LIMIT ? OFFSET ?";
         } else {
             $sql = "SELECT DISTINCT j.*, u.name AS created_by_name
                 FROM jobs j
@@ -292,7 +292,7 @@ class Job {
                 INNER JOIN applications a ON a.job_id = j.id AND a.user_id = ?
                 WHERE 1=1 $where
                 ORDER BY j.created_at DESC
-                LIMIT :limit OFFSET :offset";
+                LIMIT ? OFFSET ?";
         }
 
         array_unshift($bind, $userId);
@@ -300,8 +300,8 @@ class Job {
         foreach ($bind as $i => $v) {
             $stmt->bindValue($i + 1, $v);
         }
-        $stmt->bindValue(':limit', (int) $perPage, PDO::PARAM_INT);
-        $stmt->bindValue(':offset', (int) $offset, PDO::PARAM_INT);
+        $stmt->bindValue(count($bind) + 1, (int) $perPage, PDO::PARAM_INT);
+        $stmt->bindValue(count($bind) + 2, (int) $offset, PDO::PARAM_INT);
         $stmt->execute();
         return $stmt->fetchAll();
     }
