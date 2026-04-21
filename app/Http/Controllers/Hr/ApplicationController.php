@@ -3,25 +3,28 @@
 namespace App\Http\Controllers\Hr;
 
 use App\Http\Controllers\Controller;
+use App\Models\Application;
+use App\Services\Hr\ApplicationManagementService;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class ApplicationController extends Controller
 {
+    protected $applicationService;
+
+    public function __construct(ApplicationManagementService $applicationService)
+    {
+        $this->applicationService = $applicationService;
+    }
+
     public function index(Request $request)
     {
-        $query = \App\Models\Application::whereHas('job', function($q) {
-            $q->where('created_by', auth()->id());
-        })->with(['job', 'user']);
-
-        if ($status = $request->get('status')) {
-            $query->where('status', $status);
-        }
-
-        if ($jobId = $request->get('job_id')) {
-            $query->where('job_id', $jobId);
-        }
-
-        $applications = $query->latest()->get();
+        $applications = $this->applicationService->getApplications(
+            auth()->id(),
+            $request->get('status'),
+            $request->get('job_id')
+        );
+        
         $jobs = auth()->user()->jobPostings()->select('id', 'title')->get();
 
         return view('hr.applications.index', [
@@ -31,7 +34,7 @@ class ApplicationController extends Controller
         ]);
     }
 
-    public function berkas(\App\Models\Application $application)
+    public function berkas(Application $application)
     {
         $this->authorizeOwner($application);
 
@@ -44,24 +47,22 @@ class ApplicationController extends Controller
         ]);
     }
 
-    public function updateStatus(Request $request, \App\Models\Application $application)
+    public function updateStatus(Request $request, Application $application)
     {
         $this->authorizeOwner($application);
 
         $request->validate([
-            'status' => ['required', \Illuminate\Validation\Rule::enum(\App\Enums\ApplicationStatus::class)],
+            'status' => ['required', Rule::enum(\App\Enums\ApplicationStatus::class)],
         ]);
 
-        $application->update([
-            'status' => $request->status,
-        ]);
+        $this->applicationService->updateStatus($application, $request->status);
 
         return back()->with('flash_toast', [
             'message' => 'Status lamaran berhasil diperbarui menjadi ' . $request->status,
         ]);
     }
 
-    protected function authorizeOwner(\App\Models\Application $application)
+    protected function authorizeOwner(Application $application)
     {
         if ($application->job->created_by !== auth()->id()) {
             abort(403);

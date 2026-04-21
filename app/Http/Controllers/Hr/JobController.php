@@ -3,16 +3,22 @@
 namespace App\Http\Controllers\Hr;
 
 use App\Http\Controllers\Controller;
+use App\Models\JobPosting;
+use App\Services\Hr\JobManagementService;
 use Illuminate\Http\Request;
 
 class JobController extends Controller
 {
+    protected $jobService;
+
+    public function __construct(JobManagementService $jobService)
+    {
+        $this->jobService = $jobService;
+    }
+
     public function index()
     {
-        $jobs = auth()->user()->jobPostings()
-            ->withCount('applications')
-            ->latest()
-            ->get();
+        $jobs = $this->jobService->getHrJobs(auth()->id());
             
         return view('hr.jobs.index', [
             'jobs' => $jobs,
@@ -29,35 +35,15 @@ class JobController extends Controller
 
     public function store(Request $request)
     {
-        $validated = $request->validate([
-            'title' => ['required', 'string', 'max:255'],
-            'description' => ['required', 'string'],
-            'short_description' => ['nullable', 'string', 'max:255'],
-            'location' => ['nullable', 'string'],
-            'salary_range' => ['nullable', 'string'],
-            'min_salary' => ['nullable', 'numeric'],
-            'max_salary' => ['nullable', 'numeric'],
-            'job_type' => ['nullable', 'string'],
-            'min_education' => ['nullable', 'string'],
-            'experience_level' => ['nullable', 'string'],
-            'is_urgent' => ['boolean'],
-            'deadline' => ['nullable', 'date'],
-            'max_applicants' => ['nullable', 'integer'],
-            'skills' => ['nullable', 'string'],
-            'benefits' => ['nullable', 'string'],
-        ]);
-
-        // Process lists to JSON
-        $validated['skills_json'] = array_filter(array_map('trim', explode(',', $request->skills ?? '')));
-        $validated['benefits_json'] = array_filter(array_map('trim', explode(',', $request->benefits ?? '')));
+        $validated = $this->validateJob($request);
         
-        auth()->user()->jobPostings()->create($validated);
+        $this->jobService->createJob(auth()->id(), $validated);
 
         return redirect()->route('hr.dashboard')
             ->with('flash_toast', ['message' => 'Lowongan berhasil dipublikasikan.']);
     }
 
-    public function edit(\App\Models\JobPosting $job)
+    public function edit(JobPosting $job)
     {
         $this->authorizeOwner($job);
         
@@ -67,11 +53,30 @@ class JobController extends Controller
         ]);
     }
 
-    public function update(Request $request, \App\Models\JobPosting $job)
+    public function update(Request $request, JobPosting $job)
     {
         $this->authorizeOwner($job);
 
-        $validated = $request->validate([
+        $validated = $this->validateJob($request);
+        
+        $this->jobService->updateJob($job, $validated);
+
+        return redirect()->route('hr.dashboard')
+            ->with('flash_toast', ['message' => 'Lowongan berhasil diperbarui.']);
+    }
+
+    public function destroy(JobPosting $job)
+    {
+        $this->authorizeOwner($job);
+        
+        $this->jobService->deleteJob($job);
+
+        return back()->with('flash_toast', ['message' => 'Lowongan berhasil dihapus.']);
+    }
+
+    protected function validateJob(Request $request): array
+    {
+        return $request->validate([
             'title' => ['required', 'string', 'max:255'],
             'description' => ['required', 'string'],
             'short_description' => ['nullable', 'string', 'max:255'],
@@ -88,25 +93,9 @@ class JobController extends Controller
             'skills' => ['nullable', 'string'],
             'benefits' => ['nullable', 'string'],
         ]);
-
-        $validated['skills_json'] = array_filter(array_map('trim', explode(',', $request->skills ?? '')));
-        $validated['benefits_json'] = array_filter(array_map('trim', explode(',', $request->benefits ?? '')));
-
-        $job->update($validated);
-
-        return redirect()->route('hr.dashboard')
-            ->with('flash_toast', ['message' => 'Lowongan berhasil diperbarui.']);
     }
 
-    public function destroy(\App\Models\JobPosting $job)
-    {
-        $this->authorizeOwner($job);
-        $job->delete();
-
-        return back()->with('flash_toast', ['message' => 'Lowongan berhasil dihapus.']);
-    }
-
-    protected function authorizeOwner(\App\Models\JobPosting $job)
+    protected function authorizeOwner(JobPosting $job)
     {
         if ($job->created_by !== auth()->id()) {
             abort(403);

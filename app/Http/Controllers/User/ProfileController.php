@@ -3,15 +3,19 @@
 namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
+use App\Services\FileUploadService;
+use App\Services\User\ProfileSyncService;
 use Illuminate\Http\Request;
 
 class ProfileController extends Controller
 {
     protected $fileService;
+    protected $profileSyncService;
 
-    public function __construct(\App\Services\FileUploadService $fileService)
+    public function __construct(FileUploadService $fileService, ProfileSyncService $profileSyncService)
     {
         $this->fileService = $fileService;
+        $this->profileSyncService = $profileSyncService;
     }
 
     public function edit()
@@ -59,42 +63,12 @@ class ProfileController extends Controller
             'user_summary' => ['nullable', 'string'],
         ]);
 
-        $user->update($validated);
-
-        // Update Work Experiences
-        $user->workExperiences()->delete();
-        if ($request->has('work_title')) {
-            foreach ($request->work_title as $i => $title) {
-                if ($title) {
-                    $user->workExperiences()->create([
-                        'title' => $title,
-                        'company_name' => $request->work_company[$i] ?? '',
-                        'year_start' => $request->work_year_start[$i] ?? '',
-                        'year_end' => $request->work_year_end[$i] ?? '',
-                        'description' => $request->work_description[$i] ?? '',
-                    ]);
-                }
-            }
-        }
-
-        // Update Achievements
-        $user->achievements()->delete();
-        if ($request->has('ach_title')) {
-            foreach ($request->ach_title as $i => $title) {
-                if ($title) {
-                    $user->achievements()->create([
-                        'type' => $request->ach_type[$i] ?? '',
-                        'title' => $title,
-                        'description' => $request->ach_description[$i] ?? '',
-                        'organizer' => $request->ach_organizer[$i] ?? '',
-                        'year' => $request->ach_year[$i] ?? '',
-                        'rank' => $request->ach_rank[$i] ?? '',
-                        'level' => $request->ach_level[$i] ?? '',
-                        'certificate_link' => $request->ach_certificate_link[$i] ?? '',
-                    ]);
-                }
-            }
-        }
+        $this->profileSyncService->updateProfile(
+            $user,
+            $validated,
+            $request->only(['work_title', 'work_company', 'work_year_start', 'work_year_end', 'work_description']),
+            $request->only(['ach_title', 'ach_type', 'ach_description', 'ach_organizer', 'ach_year', 'ach_rank', 'ach_level', 'ach_certificate_link'])
+        );
 
         return back()->with('flash_toast', ['message' => 'Profil berhasil diperbarui.']);
     }
