@@ -11,14 +11,14 @@
 
 @section('content')
 <div class="saved-hero gsap-reveal">
-    <h1 class="saved-title-giant">Saved Assets</h1>
-    <p class="saved-subtext">Positions flagged for future intelligence processing.</p>
+    <h1 class="saved-title-giant">Saved Jobs</h1>
+    <p class="saved-subtext">Positions you've saved for later.</p>
 </div>
 
 <div class="job-list-area">
     @if ($savedJobs->isEmpty())
         <div class="bg-secondary p-12 text-center border-2 border-dashed border-border gsap-reveal">
-            <h3 class="font-black text-2xl mb-2">No saved items</h3>
+            <h3 class="font-black text-2xl mb-2">No saved jobs</h3>
             <p class="text-text-muted font-bold">Your flagged positions will appear here for review.</p>
             <a href="{{ route('jobs.index') }}" class="inline-block mt-6 bg-accent text-surface px-6 py-3 font-black uppercase tracking-widest border-2 border-black shadow-[4px_4px_0_black] hover:translate-y-[2px] transition-all">Explore Boards</a>
         </div>

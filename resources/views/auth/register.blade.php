@@ -130,7 +130,7 @@
         </div>
 
         <div class="brand-footer gsap-item">
-            AUTH PROTOCOL — V2.2.2
+            AUTH PROTOCOL — V{{ $appVersion }}
         </div>
     </div>
 </div>

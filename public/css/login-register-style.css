@@ -7,7 +7,7 @@
     --color-safety-orange: #ff4500;
 }
 
-body {
+body.auth-dotgrid-page {
     font-family: var(--font-sans);
     background: var(--color-primary);
     color: var(--color-text);
@@ -15,10 +15,28 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    background-image: radial-gradient(var(--color-border) 1px, transparent 1px);
-    background-size: 24px 24px;
     overflow-x: hidden;
     overflow-y: auto;
+    position: relative;
+    isolation: isolate;
+}
+
+.auth-dotgrid-react-root {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background: var(--color-primary);
+}
+
+.auth-content-shell {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .split-card {

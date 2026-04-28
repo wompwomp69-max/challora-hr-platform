@@ -280,7 +280,7 @@
                     @if ($isApplied)
                         <div class="apply-btn-giant btn-secondary-shadow text-center opacity-50 cursor-not-allowed">Application Sent</div>
                     @else
-                        <form method="post" action="{{ route('user.applications.apply', $job->id) }}">
+                        <form method="post" action="{{ route('user.jobs.apply', $job->id) }}">
                             @csrf
                             <button type="submit" class="apply-btn-giant">Apply for Position</button>
                         </form>

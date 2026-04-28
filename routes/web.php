@@ -46,14 +46,16 @@ Route::middleware('auth')->group(function () {
     Route::get('/avatar', [DownloadController::class, 'avatar'])->name('avatar');
 
     // User / Candidate Routes
-    Route::middleware('role:user')->prefix('user')->name('user.')->group(function () {
-        Route::get('/settings', [ProfileController::class, 'edit'])->name('settings.edit');
+    Route::middleware('role:user,hr')->prefix('user')->name('user.')->group(function () {
+        Route::get('/settings', [ProfileController::class, 'index'])->name('settings.index');
+        Route::get('/settings/edit', [ProfileController::class, 'edit'])->name('settings.edit');
         Route::post('/settings', [ProfileController::class, 'update'])->name('settings.update');
         Route::post('/settings/avatar', [ProfileController::class, 'uploadAvatar'])->name('settings.avatar');
         Route::post('/settings/upload/{field}', [ProfileController::class, 'uploadDocument'])->name('settings.upload');
         
         Route::get('/applications', [UserApplicationController::class, 'index'])->name('applications.index');
         Route::post('/jobs/{job}/apply', [UserApplicationController::class, 'apply'])->name('jobs.apply');
+        Route::post('/applications/{job}/apply', [UserApplicationController::class, 'apply'])->name('applications.apply');
         
         Route::get('/jobs/saved', [SavedJobController::class, 'index'])->name('jobs.saved');
         Route::post('/jobs/{job}/save', [SavedJobController::class, 'save'])->name('jobs.save');
@@ -68,6 +70,7 @@ Route::middleware('auth')->group(function () {
         
         Route::get('/applications', [HrApplicationController::class, 'index'])->name('applications.index');
         Route::get('/applications/{application}/berkas', [HrApplicationController::class, 'berkas'])->name('applications.berkas');
+        Route::get('/applications/{application}/file', [HrApplicationController::class, 'berkas'])->name('applications.file');
         Route::post('/applications/{application}/status', [HrApplicationController::class, 'updateStatus'])->name('applications.status');
     });
 });

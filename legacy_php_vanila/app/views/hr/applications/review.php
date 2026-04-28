@@ -128,7 +128,7 @@ if (!empty($reviewReturnParams)) $reviewReturnTo .= '?' . http_build_query($revi
 .rv-page-btn {
     display: inline-flex; align-items: center; justify-content: center;
     width: 32px; height: 32px; border-radius: var(--radius-sm); font-size: 12px; font-weight: 600;
-    text-decoration: none; color: var(--color-text-muted);
+    text-decoration: none; color: var(--color-accent);
     border: 1px solid var(--color-border); background: transparent; cursor: pointer; transition: all 0.15s;
 }
 .rv-page-btn:hover { border-color: var(--color-secondary-hover); color: var(--color-text); }
