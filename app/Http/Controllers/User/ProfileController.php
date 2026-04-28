@@ -18,6 +18,16 @@ class ProfileController extends Controller
         $this->profileSyncService = $profileSyncService;
     }
 
+    public function index()
+    {
+        $user = auth()->user()->load(['workExperiences', 'achievements']);
+        
+        return view('user.settings.index', [
+            'user' => $user,
+            'pageTitle' => 'My Profile',
+        ]);
+    }
+
     public function edit()
     {
         $user = auth()->user()->load(['workExperiences', 'achievements']);

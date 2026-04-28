@@ -1,4 +1,4 @@
-@extends('layouts.hr')
+@extends('layouts.app')
 
 @push('styles')
 <style>

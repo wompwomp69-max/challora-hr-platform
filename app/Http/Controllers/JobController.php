@@ -23,8 +23,14 @@ class JobController extends Controller
 
         if (auth()->check() && auth()->user()->role === \App\Enums\UserRole::USER) {
             $user = auth()->user();
-            $appliedJobIds = $user->applications()->pluck('job_id')->toArray();
-            $savedJobIds = $user->savedJobs()->pluck('job_postings.id')->toArray();
+            
+            $appliedJobIds = cache()->remember("user_{$user->id}_applied_jobs", now()->addMinutes(5), function () use ($user) {
+                return $user->applications()->pluck('job_id')->toArray();
+            });
+            
+            $savedJobIds = cache()->remember("user_{$user->id}_saved_jobs", now()->addMinutes(5), function () use ($user) {
+                return $user->savedJobs()->pluck('job_postings.id')->toArray();
+            });
             
             if (empty($user->cv_path) || empty($user->diploma_path) || empty($user->photo_path)) {
                 $isProfileComplete = false;
@@ -66,7 +72,7 @@ class JobController extends Controller
 
         return view('user.jobs.show', [
             'job' => $job,
-            'alreadyApplied' => $alreadyApplied,
+            'isApplied' => $alreadyApplied,
             'isSaved' => $isSaved,
             'missingDocs' => $missingDocs,
             'relatedJobs' => $relatedJobs,

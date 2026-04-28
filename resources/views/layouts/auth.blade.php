@@ -9,13 +9,17 @@
     
     <link rel="stylesheet" href="{{ asset('css/design-tokens.css') }}">
     <link rel="stylesheet" href="{{ asset('css/login-register-style.css') }}">
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
 </head>
 
-<body>
-    @yield('content')
+<body class="auth-dotgrid-page">
+    <div id="auth-dotgrid-react-root" class="auth-dotgrid-react-root" aria-hidden="true"></div>
+    <div class="auth-content-shell">
+        @yield('content')
+    </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
