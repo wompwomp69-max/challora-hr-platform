@@ -15,3 +15,11 @@ yarn-error.log
 /.vscode
 /.fleet
 /.phpunit.cache
+
+# Development folders
+/.cursor
+/.superpowers
+/docs/superpowers
+/workspace
+/folder2
+
