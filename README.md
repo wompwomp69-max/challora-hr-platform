@@ -1,5 +1,48 @@
-```
-### Challora Laravel MVC Architecture
+# Challora Laravel
+
+## Local Setup (MySQL + Vite)
+
+Use this flow for a fresh clone so the app boots without SQLite/cache-table errors.
+
+1. Clone and enter the project directory.
+2. Install PHP dependencies:
+   - `composer install`
+3. Install Node dependencies:
+   - `npm install`
+4. Create your environment file:
+   - copy `.env.example` to `.env`
+5. Configure database in `.env` (defaults are for XAMPP local):
+   - `DB_CONNECTION=mysql`
+   - `DB_HOST=127.0.0.1`
+   - `DB_PORT=3306`
+   - `DB_DATABASE=challora_laravel`
+   - `DB_USERNAME=root`
+   - `DB_PASSWORD=`
+6. Create the database (MySQL/XAMPP):
+   - `CREATE DATABASE challora_laravel CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;`
+7. Generate app key:
+   - `php artisan key:generate`
+8. Run migrations:
+   - `php artisan migrate`
+9. Build frontend assets:
+   - `npm run build`
+   - (for active development, use `npm run dev` instead)
+10. Start Laravel:
+   - `php artisan serve`
+
+## Quick Troubleshooting
+
+- If you see `no such table: cache` or session table errors:
+  - ensure `.env` uses `SESSION_DRIVER=file` and `CACHE_STORE=file`
+  - run `php artisan migrate`
+- If you see Vite manifest errors (for example wrong `app.tsx` entry):
+  - run `php artisan config:clear`
+  - run `php artisan view:clear`
+  - run `php artisan route:clear`
+  - run `php artisan cache:clear`
+  - run `npm run build`
+
+## Challora Laravel MVC Architecture
 📁 Project Structure
 
 challora-laravel/
