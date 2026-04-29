@@ -8,6 +8,15 @@ import Swup from 'swup';
 import SwupScriptsPlugin from '@swup/scripts-plugin';
 import SwupFormsPlugin from '@swup/forms-plugin';
 import SwupHeadPlugin from '@swup/head-plugin';
+import React from "react";
+import ReactDOM from "react-dom/client";
+import UserPage from "./components/UserPage.jsx";
+
+ReactDOM.createRoot(document.getElementById("app")).render(
+  <React.StrictMode>
+    <UserPage />
+  </React.StrictMode>
+);
 
 gsap.registerPlugin(ScrollTrigger);
 
