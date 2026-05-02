@@ -1,4 +1,4 @@
 <?php
-// Redirect ke front controller di public/
-header('Location: /challorav2/public/', true, 302);
+// Redirect to Laravel public folder
+header('Location: public/', true, 302);
 exit;

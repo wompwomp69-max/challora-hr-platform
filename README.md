@@ -1,280 +1,230 @@
-# Challora Recruitment Platform
+# Challora Laravel
 
-Platform rekrutmen dengan role User (pelamar) dan HR (pembuat lowongan). Dokumen ini menjelaskan arsitektur dan alur kerja aplikasi.
+## Local Setup (MySQL + Vite)
 
+Use this flow for a fresh clone so the app boots without SQLite/cache-table errors.
+
+1. Clone and enter the project directory.
+2. Install PHP dependencies:
+   - `composer install`
+3. Install Node dependencies:
+   - `npm install`
+4. Create your environment file:
+   - copy `.env.example` to `.env`
+5. Configure database in `.env` (defaults are for XAMPP local):
+   - `DB_CONNECTION=mysql`
+   - `DB_HOST=127.0.0.1`
+   - `DB_PORT=3306`
+   - `DB_DATABASE=challora_laravel`
+   - `DB_USERNAME=root`
+   - `DB_PASSWORD=`
+6. Create the database (MySQL/XAMPP):
+   - `CREATE DATABASE challora_laravel CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;`
+7. Generate app key:
+   - `php artisan key:generate`
+8. Run migrations:
+   - `php artisan migrate`
+9. Build frontend assets:
+   - `npm run build`
+   - (for active development, use `npm run dev` instead)
+10. Start Laravel:
+   - `php artisan serve`
+
+## Quick Troubleshooting
+
+- If you see `no such table: cache` or session table errors:
+  - ensure `.env` uses `SESSION_DRIVER=file` and `CACHE_STORE=file`
+  - run `php artisan migrate`
+- If you see Vite manifest errors (for example wrong `app.tsx` entry):
+  - run `php artisan config:clear`
+  - run `php artisan view:clear`
+  - run `php artisan route:clear`
+  - run `php artisan cache:clear`
+  - run `npm run build`
+
+## Challora Laravel MVC Architecture
+📁 Project Structure
+
+challora-laravel/
+├── app/
+│   ├── Enums/              # 4 files - Type safety
+│   ├── Http/
+│   │   ├── Controllers/    # 13 controllers
+│   │   └── Middleware/     # 1 middleware
+│   ├── Models/             # 6 Eloquent models
+│   └── Services/           # 2 services
+├── resources/views/        # 19 blade templates
+├── routes/web.php
+└── database/migrations/    # 8 migrations
+---
+🗂️ MVC Layer Overview\
+
+Layer	Location
+Models	app/Models/
+Views	resources/views/
+Controllers	app/Http/Controllers/
+Routes	routes/web.php
 ---
 
-## Daftar Isi
+### 1. Models & Relationships ###
 
-1. [Entry Point](#1-entry-point--dari-mana-semuanya-dimulai)
-2. [Routing & URL](#2-bagaimana-url-sampai-ke-indexphp)
-3. [Config & Autoload](#3-config--autoload)
-4. [Alur Data (MVC)](#4-bagaimana-data-diambil--hubungan-model-controller-view)
-5. [Navigasi Antar Halaman](#5-bagaimana-satu-page-melempar-ke-page-lain)
-6. [Sistem View](#6-bagaimana-view-ditampilkan)
-7. [Diagram Alur Lengkap](#7-diagram-alur-lengkap)
-8. [Ringkasan Koneksi](#8-ringkasan-koneksi)
-
+┌─────────────────────────────────────────────────────────────────┐
+│                         USER                                     │
+│  hasMany → jobPostings, applications, workExperiences, achievements│
+│  belongsToMany → savedJobs (via saved_jobs pivot)               │
+└──────────────────────────┬──────────────────────────────────────┘
+                           │
+                           ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                      JOBPOSTING                                  │
+│  belongsTo → creator (User)                                      │
+│  hasMany → applications                                         │
+│  belongsToMany → savedByUsers (via saved_jobs pivot)            │
+└──────────────────────────┬──────────────────────────────────────┘
+                           │
+                           ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                      APPLICATION                                 │
+│  belongsTo → user, jobPosting                                    │
+└──────────────────────────┬──────────────────────────────────────┘
+                           │
+         ┌─────────────────┴─────────────────┐
+         ▼                                   ▼
+┌─────────────────────┐         ┌─────────────────────┐
+│ USERWORKEXPERIENCE  │         │  USERACHIEVEMENT    │
+│ belongsTo → User    │         │  belongsTo → User   │
+└─────────────────────┘         └─────────────────────┘
 ---
 
-## 1. Entry Point – Dari mana semuanya dimulai
+### 2. Controllers Organization ###
 
-### `index.php` (di root proyek)
-
-```php
-header('Location: /challorav2/public/', true, 302);
-exit;
-```
-
-File ini hanya mengalihkan semua request ke folder `public/`, karena semua file yang diakses user berada di sana.
-
+app/Http/Controllers/
+├── Auth/
+│   ├── LoginController.php
+│   ├── RegisterController.php
+│   └── ForgotPasswordController.php
+│
+├── User/
+│   ├── ApplicationController.php
+│   ├── ProfileController.php
+│   └── SavedJobController.php
+│
+├── Hr/
+│   ├── DashboardController.php
+│   ├── JobController.php
+│   └── ApplicationController.php
+│
+├── JobController.php         (shared)
+└── DownloadController.php    (shared)
 ---
 
-### `public/index.php` – Front Controller (inti routing)
+### 3. Views Structure ###
 
-Ini adalah **otak aplikasi**. Setiap request melewati file ini. Alurnya:
-
-1. **Load config** via `require config/app.php` (autoload, session, database, helpers)
-2. **Ambil URL & method** dari `$_GET['url']` (diisi oleh .htaccess) dan `$_SERVER['REQUEST_METHOD']`
-3. **Cocokkan dengan routing** – array `$routes` memetakan kombinasi (method, path) ke pasangan `[Controller, method]`
-4. **Instantiasi controller** dan panggil method-nya
-5. Jika tidak cocok → 404
-
----
-
-## 2. Bagaimana URL sampai ke index.php
-
-### `.htaccess` di `public/`
-
-```apache
-RewriteRule ^(.*)$ index.php?url=$1 [QSA,L]
-```
-
-- Semua request yang **bukan file/direktori fisik** akan diarahkan ke `index.php?url=...`
-- Contoh: `/challorav2/public/jobs` → `index.php?url=jobs`
-- Contoh: `/challorav2/public/auth/login` → `index.php?url=auth/login`
-
-Jadi semua URL “cantik” tetap diproses oleh satu file `index.php`.
-
----
-
-## 3. Config & Autoload
-
-### `config/app.php`
-
-Di-load di awal dan melakukan:
-
-- Define konstanta path (BASE_PATH, APP_PATH, BASE_URL)
-- Composer autoload
-- Custom autoloader untuk class `core/`, `controllers/`, `models/`
-- Load database config & helpers
-
-### Autoloader
-
-Ketika PHP menemukan `new JobController()`, ia akan otomatis mencari file `JobController.php` di folder controllers, lalu `require` file tersebut. Begitu pula untuk Model dan class di `core/`.
-
----
-
-## 4. Bagaimana Data Diambil – Hubungan Model, Controller, View
-
-### Database (`core/Database.php` + `config/database.php`)
-
-- Menggunakan PDO dengan pola singleton (satu koneksi untuk seluruh request)
-- Fungsi `getDB()` mengembalikan objek PDO
-
-### Model – Pengambil Data dari Database
-
-Model bertugas **query ke database** dan mengembalikan data. Contoh `Job` model:
-
-```php
-// Job.php
-public function all(): array {
-    $stmt = $this->db->query('SELECT j.*, u.name AS created_by_name FROM jobs j ...');
-    return $stmt->fetchAll();  // array of rows
-}
-
-public function findById(int $id): ?array {
-    $stmt = $this->db->prepare('SELECT ... WHERE id = ?');
-    $stmt->execute([$id]);
-    return $stmt->fetch() ?: null;
-}
-```
-
-### Controller – Penghubung Request, Model, dan View
-
-Controller:
-
-1. Menerima request (GET/POST, `$_GET`, `$_POST`, dll)
-2. Memanggil **Model** untuk ambil/simpan data
-3. Memanggil **View** dengan data tersebut via `render_view()`
-4. Atau melakukan **redirect** ke URL lain
-
-**Contoh: JobController::index()**
-
-```php
-public function index(): void {
-    requireLogin();                         // Cek login
-    $jobs = $this->jobModel->all();         // Ambil data dari Model
-    render_view('user/jobs/index', [        // Kirim ke View
-        'jobs' => $jobs,
-        'appliedJobIds' => $appliedJobIds,
-        'pageTitle' => 'Lowongan',
-    ]);
-}
-```
-
-**Contoh: AuthController::login() (saat POST)**
-
-```php
-$user = $this->userModel->findByEmail($email);
-if ($user && password_verify(...)) {
-    $_SESSION['user_id'] = $user['id'];
-    redirect('/jobs');  // Lempar ke halaman lain
-}
-```
-
----
-
-## 5. Bagaimana Satu Page "Melempar" ke Page Lain
-
-### Redirect
-
-```php
-redirect('/jobs');           // Ke halaman lowongan
-redirect('/auth/login');     // Ke halaman login
-redirect('/jobs/show?id=5'); // Ke detail job id 5
-```
-
-Helper `redirect()` akan mengubah path seperti `/jobs` menjadi URL penuh, misal: `BASE_URL . '/index.php?url=jobs'`, lalu kirim header `Location` dan `exit`.
-
-### Link biasa (dari view)
-
-```html
-<a href="<?= BASE_URL ?>/jobs">Lowongan</a>
-<a href="<?= BASE_URL ?>/jobs/show?id=<?= $job['id'] ?>">Detail</a>
-```
-
-Saat diklik, browser akan request URL tersebut, lalu .htaccess + index.php memproses lagi.
-
-### Form POST
-
-```html
-<form method="post" action="<?= BASE_URL ?>/auth/login">
-```
-
-Saat submit, data POST dikirim ke route yang sama. Controller `AuthController::login()` memproses `$_POST`, validasi, login, lalu `redirect()` ke halaman tujuan.
-
----
-
-## 6. Bagaimana View Ditampilkan
-
-### Fungsi `render_view()` (di `core/helpers.php`)
-
-```php
-function render_view(string $view, array $data = []): void {
-    extract($data);                              // $jobs, $appliedJobIds jadi variabel
-    ob_start();
-    require APP_PATH . '/views/' . $view . '.php'; // Load user/jobs/index.php
-    $content = ob_get_clean();                    // Output view disimpan di $content
-    require APP_PATH . '/views/layouts/user.php';  // Layout membungkus $content
-}
-```
-
-1. `$data` di-`extract` menjadi variabel (misal: `$jobs`, `$pageTitle`)
-2. View (misal `user/jobs/index.php`) di-include dan output-nya ditangkap ke `$content`
-3. Layout (header, navbar, footer) di-include, dengan `$content` di tengah
-
-### Struktur View
-
-```
-app/views/
+resources/views/
 ├── layouts/
-│   ├── header.php
-│   ├── footer.php
-│   ├── user.php    (layout user biasa)
-│   └── hr.php      (layout HR dengan sidebar)
+│   ├── app.blade.php      # Main layout
+│   ├── auth.blade.php     # Login/Register layout
+│   └── hr.blade.php       # HR dashboard layout
+│
 ├── auth/
-│   ├── login.php
-│   └── register.php
+│   ├── login.blade.php
+│   ├── register.blade.php
+│   └── passwords/
+│       ├── email.blade.php
+│       └── reset.blade.php
+│
 ├── user/
 │   ├── jobs/
-│   │   ├── index.php   (daftar lowongan)
-│   │   └── show.php    (detail lowongan)
-│   └── applications/
-│       └── index.php
+│   │   ├── index.blade.php
+│   │   ├── show.blade.php
+│   │   └── saved.blade.php
+│   ├── applications/index.blade.php
+│   └── settings/edit.blade.php
+│
 └── hr/
-    └── ...
-```
-
-Layout dipilih otomatis: view yang path-nya dimulai `hr/` pakai layout `hr`, sisanya pakai layout `user`.
-
+    ├── dashboard.blade.php
+    ├── jobs/
+    │   ├── index.blade.php
+    │   ├── create.blade.php
+    │   └── edit.blade.php
+    └── applications/
+        ├── index.blade.php
+        └── berkas.blade.php
 ---
 
-## 7. Diagram Alur Lengkap
+### 4. Request Flow ###
 
-```
-Browser: GET /challorav2/public/jobs
-    │
-    ▼
-.htaccess → index.php?url=jobs
-    │
-    ▼
-public/index.php
-    ├─ config/app.php (autoload, session, DB)
-    ├─ $url = 'jobs', $method = 'GET'
-    ├─ $routes['GET']['jobs'] = [JobController::class, 'index']
-    └─ new JobController(); $controller->index();
-    │
-    ▼
-JobController::index()
-    ├─ requireLogin()
-    ├─ $jobs = $this->jobModel->all()     ← Model query ke DB
-    └─ render_view('user/jobs/index', ['jobs' => $jobs, ...])
-    │
-    ▼
-render_view()
-    ├─ extract($data)
-    ├─ require views/user/jobs/index.php  ← View akses $jobs
-    ├─ $content = output
-    └─ require layouts/user.php           ← Layout bungkus $content
-    │
-    ▼
-HTML terkirim ke browser
-```
-
+┌─────────────┐     ┌──────────────┐     ┌─────────────┐
+│   BROWSER   │────▶│   ROUTES    │────▶│ CONTROLLER │
+└─────────────┘     │  web.php    │     └──────┬──────┘
+                    └──────────────┘            │
+                                                 ▼
+                                         ┌─────────────┐
+                                         │   SERVICE   │
+                                         └──────┬──────┘
+                                                │
+                                                ▼
+                                         ┌─────────────┐
+                                         │    MODEL    │
+                                         └──────┬──────┘
+                                                │
+                                                ▼
+                                         ┌─────────────┐
+                                         │  DATABASE   │
+                                         └──────┬──────┘
+                                                │
+                                                ▼
+                                         ┌─────────────┐
+                                         │    VIEW     │
+                                         │ (Blade)     │
+                                         └─────────────┘
 ---
 
-## 8. Ringkasan Koneksi
+### 5. Middleware Pipeline ###
 
-| Komponen | Peran |
-|----------|-------|
-| `index.php` (root) | Redirect ke `public/` |
-| `public/.htaccess` | Semua URL → `index.php?url=...` |
-| `public/index.php` | **Routing**: URL + method → Controller + method |
-| `config/app.php` | Load autoload, database, helpers |
-| `config/database.php` | Kredensial DB, fungsi `getDB()` |
-| `core/Database.php` | Koneksi PDO (singleton) |
-| **Model** | Query ke DB, return array |
-| **Controller** | Terima request → panggil Model → `render_view()` atau `redirect()` |
-| **View** | Tampilkan data dari Controller |
-| `render_view()` | Load view + layout, output HTML |
-| `redirect()` | Lempar user ke URL lain (HTTP 302) |
-
+REQUEST
+   │
+   ▼
+┌──────────────────┐
+│  auth middleware │  ──▶ If not authenticated → login page
+└────────┬─────────┘
+         │ (authenticated)
+         ▼
+┌──────────────────┐
+│ EnsureRole      │  ──▶ role:user OR role:hr
+└────────┬─────────┘
+         │ (authorized)
+         ▼
+   CONTROLLER
 ---
 
-## Struktur Routing Utama
+### 6. Routes Summary ###
 
-| Method | URL | Controller | Method |
-|--------|-----|------------|--------|
-| GET | auth/login | AuthController | login |
-| GET | auth/register | AuthController | register |
-| GET | jobs | JobController | index |
-| GET | jobs/show | JobController | show |
-| POST | jobs/apply | ApplicationController | apply |
-| GET | applications | ApplicationController | index |
-| GET | user/settings | UserController | profile |
-| GET | hr/jobs | HrJobController | index |
-| POST | hr/jobs/store | HrJobController | create |
-| ... | ... | ... | ... |
+Prefix	Middleware	Controller
+/auth/*	guest	Login, Register, ForgotPassword
+/jobs	auth	JobController
+/user/*	auth, role:user	Profile, Application, SavedJob
+/hr/*	auth, role:hr	Job, Application, Dashboard
+/download/*	auth	DownloadController
+---
 
-Lihat `public/index.php` untuk daftar lengkap route.
+### 7. Database Tables (Migrations) ###
+
+Migration	Table
+0001_01_01_000000_create_users_table.php	users
+0001_01_01_000001_create_cache_table.php	cache
+2026_04_20_133724_create_job_postings_table.php	job_postings
+2026_04_20_133748_create_applications_table.php	applications
+2026_04_20_133748_create_saved_jobs_table.php	saved_jobs
+2026_04_20_133749_create_user_achievements_table.php	user_achievements
+2026_04_20_133749_create_user_work_experiences_table.php	user_work_experiences
+---
+📊 Statistics Summary
+Component	Count
+Models	6
+Controllers	13
+Views	19
+Migrations	8
+Services	2
+Enums	4
+Middleware	1
