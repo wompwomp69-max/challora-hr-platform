@@ -53,6 +53,11 @@ class JobPosting extends Model
         return $this->belongsToMany(User::class, 'saved_jobs', 'job_id', 'user_id')->withTimestamps();
     }
 
+    public function aiRecommendations(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(AiUserJobRecommendation::class, 'job_id');
+    }
+
     // Scopes for filtering
     public function scopeSearch($query, $search)
     {

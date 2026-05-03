@@ -10,6 +10,8 @@ use App\Http\Controllers\User\ProfileController;
 use App\Http\Controllers\User\ApplicationController as UserApplicationController;
 use App\Http\Controllers\Hr\JobController as HrJobController;
 use App\Http\Controllers\Hr\ApplicationController as HrApplicationController;
+use App\Http\Controllers\Hr\IntelligenceController as HrIntelligenceController;
+use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     $latestJobs = \App\Models\JobPosting::with('creator')->latest()->take(3)->get();
@@ -52,10 +54,10 @@ Route::middleware('auth')->group(function () {
         Route::post('/settings', [ProfileController::class, 'update'])->name('settings.update');
         Route::post('/settings/avatar', [ProfileController::class, 'uploadAvatar'])->name('settings.avatar');
         Route::post('/settings/upload/{field}', [ProfileController::class, 'uploadDocument'])->name('settings.upload');
+        Route::post('/settings/ai-suggestion', [ProfileController::class, 'requestAiSuggestion'])->name('settings.ai_suggestion');
         
         Route::get('/applications', [UserApplicationController::class, 'index'])->name('applications.index');
         Route::post('/jobs/{job}/apply', [UserApplicationController::class, 'apply'])->name('jobs.apply');
-        Route::post('/applications/{job}/apply', [UserApplicationController::class, 'apply'])->name('applications.apply');
         
         Route::get('/jobs/saved', [SavedJobController::class, 'index'])->name('jobs.saved');
         Route::post('/jobs/{job}/save', [SavedJobController::class, 'save'])->name('jobs.save');
@@ -65,6 +67,9 @@ Route::middleware('auth')->group(function () {
     // HR Routes
     Route::middleware('role:hr')->prefix('hr')->name('hr.')->group(function () {
         Route::get('/dashboard', \App\Http\Controllers\Hr\DashboardController::class)->name('dashboard');
+        Route::get('/intelligence', [HrIntelligenceController::class, 'index'])->name('intelligence');
+        Route::get('/intelligence/candidates/{application}', [HrIntelligenceController::class, 'showCandidate'])
+            ->name('intelligence.candidates.show');
         
         Route::resource('jobs', HrJobController::class);
         
@@ -72,5 +77,6 @@ Route::middleware('auth')->group(function () {
         Route::get('/applications/{application}/berkas', [HrApplicationController::class, 'berkas'])->name('applications.berkas');
         Route::get('/applications/{application}/file', [HrApplicationController::class, 'berkas'])->name('applications.file');
         Route::post('/applications/{application}/status', [HrApplicationController::class, 'updateStatus'])->name('applications.status');
+        Route::post('/applications/{application}/ai-refresh', [HrApplicationController::class, 'refreshAi'])->name('applications.ai_refresh');
     });
 });

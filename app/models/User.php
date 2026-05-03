@@ -104,6 +104,16 @@ class User extends Authenticatable
         return $this->hasMany(UserAchievement::class);
     }
 
+    public function aiProfileSuggestions(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(AiUserProfileSuggestion::class);
+    }
+
+    public function aiJobRecommendations(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(AiUserJobRecommendation::class);
+    }
+
     public function isAdmin(): bool
     {
         return $this->role === \App\Enums\UserRole::HR;

@@ -105,11 +105,17 @@
                     $salaryDisplay = !empty($j->min_salary) ? 'IDR ' . number_format($j->min_salary / 1000000, 1) . 'M+' : ($j->salary_range ?: 'Competitive');
                     $isSaved = in_array($j->id, $savedJobIds);
                     $isApplied = in_array($j->id, $appliedJobIds);
+                    $isTopAiJob = in_array($j->id, $topJobRecommendationIds ?? []);
                 @endphp
                 <div class="job-card-premium" onclick="window.location.href='{{ route('jobs.show', $j->id) }}'">
                     <div class="job-main-info">
                         <h2 class="job-role-title">{{ $j->title }}</h2>
                         <div class="job-company-line">{{ $j->creator->name ?? 'Company' }}</div>
+                        @if($isTopAiJob)
+                            <div class="inline-flex items-center gap-2 bg-accent text-white px-3 py-1 mt-2 text-[10px] font-black uppercase tracking-widest">
+                                Top Job Match by Chally AI
+                            </div>
+                        @endif
                         <div class="job-meta-line">
                             <span>
                                 <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5"

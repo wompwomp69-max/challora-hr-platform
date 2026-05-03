@@ -179,5 +179,4 @@
     <div class="mt-8">
         {{ $applications->links() }}
     </div>
-    </div>
 @endsection

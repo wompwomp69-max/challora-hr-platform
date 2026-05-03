@@ -145,6 +145,47 @@
 </div>
 
 <div class="brutalist-profile-card">
+    <h3 class="font-black text-xl mb-6">AI Talent Assessment</h3>
+    @if($application->aiScore && $application->aiScore->status === 'completed')
+        <div class="mb-6">
+            <p class="text-sm uppercase font-black text-text-muted">CV Fit Score</p>
+            <p class="text-5xl font-black text-accent">{{ $application->aiScore->score_total }}/100</p>
+            <p class="text-sm font-bold mt-2">Core Strength: {{ $application->aiScore->core_strength ?: '-' }}</p>
+        </div>
+    @else
+        <p class="text-sm font-bold text-yellow-500 uppercase mb-6">AI score sedang diproses.</p>
+    @endif
+
+    @if($application->aiSummary && $application->aiSummary->status === 'completed')
+        <div class="grid grid-cols-2 gap-8">
+            <div>
+                <p class="font-black uppercase text-xs mb-3 text-green-600">Plus</p>
+                <ul class="list-disc pl-5 text-sm font-medium">
+                    @foreach($application->aiSummary->pros_json ?? [] as $pro)
+                        <li>{{ $pro }}</li>
+                    @endforeach
+                </ul>
+            </div>
+            <div>
+                <p class="font-black uppercase text-xs mb-3 text-red-600">Minus</p>
+                <ul class="list-disc pl-5 text-sm font-medium">
+                    @foreach($application->aiSummary->cons_json ?? [] as $con)
+                        <li>{{ $con }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        </div>
+        <div class="mt-6">
+            <p class="font-black uppercase text-xs text-text-muted">Summary</p>
+            <p class="mt-2">{{ $application->aiSummary->summary_text }}</p>
+            <p class="mt-3 text-xs uppercase font-black text-accent">Recommendation: {{ $application->aiSummary->recommendation }}</p>
+        </div>
+    @else
+        <p class="text-sm font-bold text-yellow-500 uppercase">AI summary sedang diproses.</p>
+    @endif
+</div>
+
+<div class="brutalist-profile-card">
     <h3 class="font-black text-xl mb-6">Decision Center</h3>
     <form action="{{ route('hr.applications.status', $application->id) }}" method="POST" class="flex gap-6">
         @csrf

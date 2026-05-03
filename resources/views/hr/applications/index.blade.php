@@ -143,6 +143,7 @@
                 <tr>
                     <th>Candidate</th>
                     <th>Applied For</th>
+                    <th>AI Score</th>
                     <th>Status</th>
                     <th>Files</th>
                     <th class="text-right">Intelligence Actions</th>
@@ -153,11 +154,24 @@
                     <tr>
                         <td>
                             <div class="applicant-name">{{ $a->user->name }}</div>
+                            @if(($topApplicationId ?? null) === $a->id)
+                                <div class="text-[10px] font-black uppercase text-accent mt-1">Top Candidate</div>
+                            @endif
                             <div class="applicant-contact">{{ $a->user->email }}</div>
                         </td>
                         <td>
                             <div class="font-bold uppercase text-xs tracking-widest text-accent">{{ $a->job->title }}</div>
                             <div class="text-[10px] font-bold text-text-muted mt-1">{{ $a->created_at->format('d M Y') }}</div>
+                        </td>
+                        <td>
+                            @if($a->aiScore && $a->aiScore->status === 'completed')
+                                <div class="font-black text-xl">{{ $a->aiScore->score_total }}/100</div>
+                                <div class="text-[10px] font-bold uppercase text-text-muted mt-1">{{ $a->aiScore->core_strength }}</div>
+                            @elseif($a->aiScore && $a->aiScore->status === 'failed')
+                                <span class="text-red-500 font-bold text-xs uppercase">AI Failed</span>
+                            @else
+                                <span class="text-yellow-500 font-bold text-xs uppercase">AI Processing</span>
+                            @endif
                         </td>
                         <td>
                             <span class="status-badge-premium status-{{ $a->status->value }}">
@@ -179,6 +193,11 @@
                             </div>
                         </td>
                         <td class="text-right">
+                            <div class="flex justify-end items-center gap-4">
+                            <form method="post" action="{{ route('hr.applications.ai_refresh', $a->id) }}">
+                                @csrf
+                                <button class="action-select-premium" type="submit">Refresh AI</button>
+                            </form>
                             <form method="post" action="{{ route('hr.applications.status', $a->id) }}" class="flex justify-end items-center gap-4">
                                 @csrf
                                 <select name="status" class="action-select-premium" onchange="this.form.submit()">
@@ -189,6 +208,7 @@
                                     @endforeach
                                 </select>
                             </form>
+                            </div>
                         </td>
                     </tr>
                 @endforeach

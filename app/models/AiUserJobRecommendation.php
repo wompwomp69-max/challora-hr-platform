@@ -4,19 +4,22 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Application extends Model
+class AiUserJobRecommendation extends Model
 {
     protected $fillable = [
         'user_id',
         'job_id',
-        'cv_path',
-        'diploma_path',
-        'photo_path',
+        'match_score',
+        'reason_json',
+        'model_version',
         'status',
+        'error_message',
+        'generated_at',
     ];
 
     protected $casts = [
-        'status' => \App\Enums\ApplicationStatus::class,
+        'reason_json' => 'array',
+        'generated_at' => 'datetime',
     ];
 
     public function user(): \Illuminate\Database\Eloquent\Relations\BelongsTo
@@ -27,15 +30,5 @@ class Application extends Model
     public function job(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(JobPosting::class, 'job_id');
-    }
-
-    public function aiScore(): \Illuminate\Database\Eloquent\Relations\HasOne
-    {
-        return $this->hasOne(AiCandidateScore::class);
-    }
-
-    public function aiSummary(): \Illuminate\Database\Eloquent\Relations\HasOne
-    {
-        return $this->hasOne(AiCandidateSummary::class);
     }
 }

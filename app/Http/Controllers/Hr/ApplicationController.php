@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Hr;
 
 use App\Http\Controllers\Controller;
+use App\Jobs\Ai\GenerateCandidateSummaryJob;
+use App\Jobs\Ai\GenerateCvRatingJob;
 use App\Models\Application;
 use App\Services\Hr\ApplicationManagementService;
 use Illuminate\Http\Request;
@@ -59,6 +61,18 @@ class ApplicationController extends Controller
 
         return back()->with('flash_toast', [
             'message' => 'Application status successfully updated to ' . $request->status,
+        ]);
+    }
+
+    public function refreshAi(Application $application)
+    {
+        $this->authorizeOwner($application);
+
+        GenerateCvRatingJob::dispatch($application->id);
+        GenerateCandidateSummaryJob::dispatch($application->id);
+
+        return back()->with('flash_toast', [
+            'message' => 'AI scoring and summary have been queued for refresh.',
         ]);
     }
 

@@ -11,7 +11,7 @@ class ApplicationManagementService
     {
         $query = Application::whereHas('job', function($q) use ($hrId) {
             $q->where('created_by', $hrId);
-        })->with(['job', 'user']);
+        })->with(['job', 'user', 'aiScore']);
 
         if ($status) {
             $query->where('status', $status);

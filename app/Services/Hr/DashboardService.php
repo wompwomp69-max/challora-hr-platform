@@ -4,7 +4,6 @@ namespace App\Services\Hr;
 
 use App\Models\Application;
 use App\Models\JobPosting;
-use App\Models\User;
 use Illuminate\Support\Facades\DB;
 
 class DashboardService
@@ -12,6 +11,7 @@ class DashboardService
     public function getDashboardData(int $hrId): array
     {
         return cache()->remember("hr_dashboard_{$hrId}", now()->addMinutes(10), function () use ($hrId) {
+            $driver = DB::connection()->getDriverName();
             $jobs = JobPosting::where('created_by', $hrId)->pluck('id');
             $totalJobs = $jobs->count();
             
@@ -24,23 +24,28 @@ class DashboardService
                 ")
                 ->first();
 
-            // 2. Top Regions (Calculated from user addresses)
-            $topRegions = User::whereHas('applications', function($q) use ($jobs) {
-                    $q->whereIn('job_id', $jobs);
-                })
-                ->select('address as region', DB::raw('count(*) as total'))
-                ->groupBy('address')
+            // Group by job location to avoid fragmented free-text user addresses.
+            $topRegions = JobPosting::query()
+                ->whereIn('id', $jobs)
+                ->join('applications', 'applications.job_id', '=', 'job_postings.id')
+                ->selectRaw("COALESCE(NULLIF(job_postings.location, ''), 'Unknown') as region")
+                ->selectRaw('COUNT(applications.id) as total')
+                ->groupBy('region')
                 ->orderByDesc('total')
                 ->limit(5)
                 ->get();
 
-            // 3. Monthly Trend (Applications over last 6 months)
-            $monthlyTrend = Application::whereIn('job_id', $jobs)
-                ->selectRaw("DATE_FORMAT(created_at, '%b %Y') as month_label, COUNT(*) as total, SUM(CASE WHEN status = 'accepted' THEN 1 ELSE 0 END) as accepted")
-                ->where('created_at', '>=', now()->subMonths(6))
-                ->groupBy('month_label', DB::raw('MONTH(created_at)'))
-                ->orderBy(DB::raw('MONTH(created_at)'))
-                ->get();
+            // Monthly trend currently relies on MySQL functions for grouped month labels.
+            if ($driver === 'mysql') {
+                $monthlyTrend = Application::whereIn('job_id', $jobs)
+                    ->selectRaw("DATE_FORMAT(created_at, '%b %Y') as month_label, COUNT(*) as total, SUM(CASE WHEN status = 'accepted' THEN 1 ELSE 0 END) as accepted")
+                    ->where('created_at', '>=', now()->subMonths(6))
+                    ->groupBy('month_label', DB::raw('MONTH(created_at)'))
+                    ->orderBy(DB::raw('MONTH(created_at)'))
+                    ->get();
+            } else {
+                $monthlyTrend = collect();
+            }
 
             // 4. Jobs by Applicants
             $jobsWithStats = JobPosting::where('created_by', $hrId)

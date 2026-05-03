@@ -19,6 +19,7 @@ class JobManagementService
     {
         $data['skills_json'] = $this->parseList($data['skills'] ?? '');
         $data['benefits_json'] = $this->parseList($data['benefits'] ?? '');
+        unset($data['skills'], $data['benefits']);
         $data['created_by'] = $hrId;
 
         return JobPosting::create($data);
@@ -28,6 +29,7 @@ class JobManagementService
     {
         $data['skills_json'] = $this->parseList($data['skills'] ?? '');
         $data['benefits_json'] = $this->parseList($data['benefits'] ?? '');
+        unset($data['skills'], $data['benefits']);
 
         return $job->update($data);
     }

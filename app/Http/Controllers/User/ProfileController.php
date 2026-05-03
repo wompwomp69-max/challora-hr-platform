@@ -3,9 +3,12 @@
 namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
+use App\Jobs\Ai\GenerateProfileSuggestionJob;
+use App\Models\AiUserProfileSuggestion;
 use App\Services\FileUploadService;
 use App\Services\User\ProfileSyncService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class ProfileController extends Controller
 {
@@ -20,17 +23,25 @@ class ProfileController extends Controller
 
     public function index()
     {
-        $user = auth()->user()->load(['workExperiences', 'achievements']);
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+        $user->load(['workExperiences', 'achievements']);
+        $latestSuggestion = AiUserProfileSuggestion::where('user_id', $user->id)
+            ->latest('generated_at')
+            ->first();
         
         return view('user.settings.index', [
             'user' => $user,
+            'latestSuggestion' => $latestSuggestion,
             'pageTitle' => 'My Profile',
         ]);
     }
 
     public function edit()
     {
-        $user = auth()->user()->load(['workExperiences', 'achievements']);
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+        $user->load(['workExperiences', 'achievements']);
         
         return view('user.settings.edit', [
             'user' => $user,
@@ -42,7 +53,8 @@ class ProfileController extends Controller
 
     public function update(Request $request)
     {
-        $user = auth()->user();
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
         
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
@@ -89,7 +101,8 @@ class ProfileController extends Controller
             'avatar' => ['required', 'image', 'max:1024'],
         ]);
 
-        $user = auth()->user();
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
         
         $this->fileService->delete($user->avatar_path);
         $path = $this->fileService->upload($request->file('avatar'), 'photos', 'avatar');
@@ -110,7 +123,8 @@ class ProfileController extends Controller
             $field => ['required', 'file', 'max:2048'],
         ]);
 
-        $user = auth()->user();
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
         $dbField = $field . '_path';
         
         $this->fileService->delete($user->$dbField);
@@ -120,5 +134,18 @@ class ProfileController extends Controller
         $user->update([$dbField => $path]);
 
         return back()->with('flash_toast', ['message' => ucfirst($field) . ' updated successfully.']);
+    }
+
+    public function requestAiSuggestion(Request $request)
+    {
+        $request->validate([
+            'target_role' => ['nullable', 'string', 'max:120'],
+        ]);
+
+        GenerateProfileSuggestionJob::dispatch((int) Auth::id(), $request->input('target_role'));
+
+        return back()->with('flash_toast', [
+            'message' => 'AI profile suggestions are being generated.',
+        ]);
     }
 }

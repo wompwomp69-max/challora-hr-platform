@@ -2,7 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\Ai\GenerateTopJobsJob;
+use App\Models\AiUserJobRecommendation;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 
 class JobController extends Controller
 {
@@ -20,9 +24,11 @@ class JobController extends Controller
         $appliedJobIds = [];
         $savedJobIds = [];
         $isProfileComplete = true;
+        $topJobRecommendationIds = [];
 
-        if (auth()->check() && auth()->user()->role === \App\Enums\UserRole::USER) {
-            $user = auth()->user();
+        if (Auth::check() && Auth::user()?->role === \App\Enums\UserRole::USER) {
+            /** @var \App\Models\User $user */
+            $user = Auth::user();
             
             $appliedJobIds = cache()->remember("user_{$user->id}_applied_jobs", now()->addMinutes(5), function () use ($user) {
                 return $user->applications()->pluck('job_id')->toArray();
@@ -35,6 +41,25 @@ class JobController extends Controller
             if (empty($user->cv_path) || empty($user->diploma_path) || empty($user->photo_path)) {
                 $isProfileComplete = false;
             }
+
+            $topJobRecommendationIds = AiUserJobRecommendation::where('user_id', $user->id)
+                ->where('status', 'completed')
+                ->orderByDesc('match_score')
+                ->limit(10)
+                ->pluck('job_id')
+                ->toArray();
+
+            if (empty($topJobRecommendationIds)) {
+                $dispatchLockKey = "user_{$user->id}_top_jobs_dispatch_lock";
+                $hasRecentPending = AiUserJobRecommendation::where('user_id', $user->id)
+                    ->whereIn('status', ['pending', 'processing'])
+                    ->where('updated_at', '>=', now()->subMinutes(10))
+                    ->exists();
+
+                if (!$hasRecentPending && Cache::add($dispatchLockKey, true, now()->addMinutes(10))) {
+                    GenerateTopJobsJob::dispatch($user->id);
+                }
+            }
         }
 
         return view('user.jobs.index', [
@@ -42,6 +67,7 @@ class JobController extends Controller
             'appliedJobIds' => $appliedJobIds,
             'savedJobIds' => $savedJobIds,
             'isProfileComplete' => $isProfileComplete,
+            'topJobRecommendationIds' => $topJobRecommendationIds,
             'pageTitle' => 'Lowongan Kerja',
         ]);
     }
@@ -52,8 +78,9 @@ class JobController extends Controller
         $isSaved = false;
         $missingDocs = [];
 
-        if (auth()->check() && auth()->user()->role === \App\Enums\UserRole::USER) {
-            $user = auth()->user();
+        if (Auth::check() && Auth::user()?->role === \App\Enums\UserRole::USER) {
+            /** @var \App\Models\User $user */
+            $user = Auth::user();
             $alreadyApplied = $user->applications()->where('job_id', $job->id)->exists();
             $isSaved = $user->savedJobs()->where('job_postings.id', $job->id)->exists();
             
