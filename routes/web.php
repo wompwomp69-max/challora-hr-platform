@@ -13,6 +13,10 @@ use App\Http\Controllers\Hr\ApplicationController as HrApplicationController;
 use App\Http\Controllers\Hr\IntelligenceController as HrIntelligenceController;
 use Illuminate\Support\Facades\Route;
 
+Route::get('/up', function () {
+    return response('OK', 200);
+});
+
 Route::get('/', function () {
     $latestJobs = \App\Models\JobPosting::with('creator')->latest()->take(3)->get();
     return view('landing', [
