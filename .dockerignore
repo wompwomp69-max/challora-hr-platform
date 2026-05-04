@@ -1,0 +1,15 @@
+node_modules
+vendor
+legacy_php_vanila
+CHALLY_HR_AI
+.git
+.cursor
+.superpowers
+workspace
+docs
+storage/logs
+tests
+*.md
+.env
+.env.*
+database/database.sqlite
