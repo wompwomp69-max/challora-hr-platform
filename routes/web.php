@@ -17,6 +17,25 @@ Route::get('/up', function () {
     return response('OK', 200);
 });
 
+Route::get('/dbcheck', function () {
+    return response()->json([
+        'host' => env('DB_HOST'),
+        'port' => env('DB_PORT'),
+        'database' => env('DB_DATABASE'),
+        'username' => env('DB_USERNAME'),
+        'connection' => env('DB_CONNECTION'),
+        'db' => function_exists('DB') ? 'loaded' : 'missing',
+        'ping' => (function() {
+            try {
+                \DB::connection()->getPdo();
+                return 'connected';
+            } catch (\Exception $e) {
+                return $e->getMessage();
+            }
+        })(),
+    ]);
+});
+
 Route::get('/', function () {
     $latestJobs = \App\Models\JobPosting::with('creator')->latest()->take(3)->get();
     return view('landing', [
