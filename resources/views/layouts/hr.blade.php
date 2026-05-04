@@ -9,7 +9,11 @@
 
     <link rel="stylesheet" href="{{ asset('css/design-tokens.css') }}">
     <!-- Vite Assets (Tailwind & JS) -->
+<<<<<<< HEAD
     @vite(['resources/css/app.css', 'resources/js/app.jsx'])
+=======
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
+>>>>>>> fb4e66edda25b343721dad90c6012d741003189d
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>

@@ -91,6 +91,7 @@
                         <p class="text-text-muted italic font-bold">No work experience added yet.</p>
                     @endforelse
                 </section>
+<<<<<<< HEAD
 
                 <section class="info-card">
                     <h2 class="info-card-title">Organizational Experience</h2>
@@ -174,6 +175,8 @@
                         @endif
                     </div>
                 </section>
+=======
+>>>>>>> fb4e66edda25b343721dad90c6012d741003189d
             </div>
 
             <aside class="profile-sidebar">
@@ -224,6 +227,7 @@
         (function initIndexAnim() {
             if (!window.gsap) return setTimeout(initIndexAnim, 50);
 
+<<<<<<< HEAD
             // AI Generation Form Handling
             const genForm = document.getElementById('ai-gen-form');
             if (genForm) {
@@ -236,6 +240,8 @@
                 });
             }
 
+=======
+>>>>>>> fb4e66edda25b343721dad90c6012d741003189d
             // Kill existing animations on these targets to prevent conflicts when Swup re-navigates
             window.gsap.killTweensOf(".profile-header, .info-card, .profile-sidebar, .btn-edit-float");
 

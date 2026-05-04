@@ -3,8 +3,11 @@
 namespace App\Http\Controllers\Hr;
 
 use App\Http\Controllers\Controller;
+<<<<<<< HEAD
 use App\Jobs\Ai\GenerateCandidateSummaryJob;
 use App\Jobs\Ai\GenerateCvRatingJob;
+=======
+>>>>>>> fb4e66edda25b343721dad90c6012d741003189d
 use App\Models\Application;
 use App\Services\Hr\ApplicationManagementService;
 use Illuminate\Http\Request;
@@ -24,8 +27,12 @@ class ApplicationController extends Controller
         $applications = $this->applicationService->getApplications(
             auth()->id(),
             $request->get('status'),
+<<<<<<< HEAD
             $request->get('job_id'),
             $request->get('sort_rating')
+=======
+            $request->get('job_id')
+>>>>>>> fb4e66edda25b343721dad90c6012d741003189d
         );
         
         $jobs = auth()->user()->jobPostings()->select('id', 'title')->get();
@@ -65,6 +72,7 @@ class ApplicationController extends Controller
         ]);
     }
 
+<<<<<<< HEAD
     public function refreshAi(Application $application)
     {
         $this->authorizeOwner($application);
@@ -77,6 +85,8 @@ class ApplicationController extends Controller
         ]);
     }
 
+=======
+>>>>>>> fb4e66edda25b343721dad90c6012d741003189d
     protected function authorizeOwner(Application $application)
     {
         if ($application->job->created_by !== auth()->id()) {

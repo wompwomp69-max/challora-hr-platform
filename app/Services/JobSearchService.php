@@ -11,6 +11,7 @@ class JobSearchService
     {
         $query = JobPosting::query();
 
+<<<<<<< HEAD
         // Top Choice Filter
         if ($request->get('top_choice') === '1' && auth()->check()) {
             $topIds = \App\Models\AiUserJobRecommendation::where('user_id', auth()->id())
@@ -22,6 +23,8 @@ class JobSearchService
             $query->whereIn('id', $topIds);
         }
 
+=======
+>>>>>>> fb4e66edda25b343721dad90c6012d741003189d
         // Basic Search (title, description)
         $query->search($request->get('q'));
 

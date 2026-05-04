@@ -28,7 +28,11 @@ class DummyJobSeeder extends Seeder
             $hr = User::create([
                 'name' => 'Challora HR Specialist',
                 'email' => 'hr@challora.com',
+<<<<<<< HEAD
                 'password' => Hash::make('pas'),
+=======
+                'password' => Hash::make('password'),
+>>>>>>> fb4e66edda25b343721dad90c6012d741003189d
                 'role' => UserRole::HR,
                 'phone' => '08123456789',
             ]);

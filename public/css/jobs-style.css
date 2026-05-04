@@ -127,6 +127,7 @@
 /* Layout Utilities */
 .job-layout-grid {
     display: grid;
+<<<<<<< HEAD
     grid-template-columns: 1fr 350px;
     gap: 40px;
 }
@@ -135,6 +136,12 @@
     width: 100%;
 }
 
+=======
+    grid-template-columns: 1fr 340px;
+    gap: 40px;
+}
+
+>>>>>>> fb4e66edda25b343721dad90c6012d741003189d
 .chally-sidebar-premium {
     position: sticky;
     top: 120px;

@@ -179,4 +179,8 @@
     <div class="mt-8">
         {{ $applications->links() }}
     </div>
+<<<<<<< HEAD
+=======
+    </div>
+>>>>>>> fb4e66edda25b343721dad90c6012d741003189d
 @endsection

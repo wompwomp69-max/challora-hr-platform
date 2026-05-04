@@ -156,6 +156,7 @@
                 </div>
             </div>
 
+<<<<<<< HEAD
             <!-- Organizational Experience Section -->
             <div class="edit-section" id="org-experience">
                 <div class="flex justify-between items-center mb-6">
@@ -185,6 +186,8 @@
                 </div>
             </div>
 
+=======
+>>>>>>> fb4e66edda25b343721dad90c6012d741003189d
             <div class="flex gap-4 mt-12 pb-12">
                 <button type="submit" class="btn-submit">Save All Changes</button>
                 <a href="{{ route('user.settings.index') }}" class="btn-cancel">Back to Profile</a>
@@ -208,8 +211,14 @@
                             <h4 class="font-black text-xs uppercase tracking-widest mb-1">{{ $label }}</h4>
                             @php $field = $key . '_path'; @endphp
                             @if($user->$field)
+<<<<<<< HEAD
                                 <p class="text-[10px] font-bold text-success-text mb-1 uppercase">Terunggah</p>
                                 <p class="text-[11px] font-semibold text-white/80 mb-4 break-all">{{ basename($user->$field) }}</p>
+=======
+                                <p class="text-[10px] font-bold text-success-text mb-4 uppercase">Terunggah &bull; <a
+                                        href="{{ route('preview.user_file', ['type' => $key]) }}" target="_blank"
+                                        class="underline">Lihat</a></p>
+>>>>>>> fb4e66edda25b343721dad90c6012d741003189d
                             @else
                                 <p class="text-[10px] font-bold text-red-600 mb-4 uppercase">Belum Diunggah</p>
                             @endif
@@ -217,6 +226,7 @@
                         <form action="{{ route('user.settings.upload', $key) }}" method="POST" enctype="multipart/form-data">
                             @csrf
                             <input type="file" name="{{ $key }}" class="hidden" id="file-{{ $key }}"
+<<<<<<< HEAD
                                 accept="{{ $key === 'photo' ? 'image/*' : '.pdf' }}"
                                 onchange="this.form.submit()">
                             <div class="grid grid-cols-2 gap-2">
@@ -229,6 +239,11 @@
                                 <label for="file-{{ $key }}"
                                     class="btn-cancel py-2 px-4 text-[10px] block text-center cursor-pointer">UPLOAD NEW</label>
                             </div>
+=======
+                                onchange="this.form.submit()">
+                            <label for="file-{{ $key }}"
+                                class="btn-cancel py-2 px-4 text-[10px] block text-center cursor-pointer">UPLOAD NEW</label>
+>>>>>>> fb4e66edda25b343721dad90c6012d741003189d
                         </form>
                     </div>
                 @endforeach
@@ -251,6 +266,7 @@
             <textarea name="work_description[]" class="form-textarea" placeholder="Job description..."></textarea>
         </div>
     </template>
+<<<<<<< HEAD
 
     <template id="org-template">
         <div class="dynamic-list-item flex-col items-start gap-4 mb-6">
@@ -302,4 +318,33 @@
             );
         })();
     </script>
+=======
+@endsection
+
+<script>
+    (function initEditAnim() {
+        if (!window.gsap) return setTimeout(initEditAnim, 50);
+
+        const addExpBtn = document.getElementById('add-exp');
+        if (addExpBtn && !addExpBtn.dataset.listenerAttached) {
+            addExpBtn.dataset.listenerAttached = 'true';
+            addExpBtn.addEventListener('click', () => {
+                const container = document.getElementById('exp-container');
+                const template = document.getElementById('exp-template');
+                container.appendChild(template.content.cloneNode(true));
+            });
+        }
+
+        window.gsap.killTweensOf(".edit-hero, .edit-section");
+        window.gsap.fromTo(".edit-hero",
+            { opacity: 0, x: -30 },
+            { opacity: 1, x: 0, duration: 0.8, ease: "power4.out" }
+        );
+        window.gsap.fromTo(".edit-section",
+            { opacity: 0, y: 30 },
+            { opacity: 1, y: 0, stagger: 0.1, duration: 1, ease: "power4.out", delay: 0.2 }
+        );
+    })();
+</script>
+>>>>>>> fb4e66edda25b343721dad90c6012d741003189d
 @endsection

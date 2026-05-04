@@ -9,7 +9,11 @@
     
     <link rel="stylesheet" href="{{ asset('css/design-tokens.css') }}">
     <link rel="stylesheet" href="{{ asset('css/login-register-style.css') }}">
+<<<<<<< HEAD
     @vite(['resources/css/app.css', 'resources/js/app.jsx'])
+=======
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
+>>>>>>> fb4e66edda25b343721dad90c6012d741003189d
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>

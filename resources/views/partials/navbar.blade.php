@@ -9,6 +9,7 @@
         <nav class="ml-12 hidden md:flex items-center gap-8">
             @if(auth()->check() && auth()->user()->isAdmin())
                 <a href="{{ route('hr.dashboard') }}"
+<<<<<<< HEAD
                     class="nav-link-image {{ request()->is('hr/dashboard*') ? 'active' : '' }}">
                     Analytics
                 </a>
@@ -27,6 +28,29 @@
                 </a>
                 <a href="{{ route('user.applications.index') }}"
                     class="nav-link-image {{ request()->is('user/applications*') ? 'active' : '' }}">
+=======
+                    class="nav-link-image {{ request()->routeIs('hr.dashboard') ? 'active' : '' }}">
+                    Analytics
+                </a>
+                <a href="{{ route('hr.jobs.index') }}"
+                    class="nav-link-image {{ request()->routeIs('hr.jobs.*') ? 'active' : '' }}">
+                    Positions
+                </a>
+                <a href="{{ route('hr.applications.index') }}"
+                    class="nav-link-image {{ request()->routeIs('hr.applications.*') ? 'active' : '' }}">
+                    Pipelines
+                </a>
+                <a href="#" class="nav-link-image opacity-50">
+                    Intelligence
+                </a>
+            @else
+                <a href="{{ route('jobs.index') }}"
+                    class="nav-link-image {{ (request()->routeIs('jobs.*') || request()->routeIs('landing')) && !request()->routeIs('user.jobs.saved') ? 'active' : '' }}">
+                    Job Listings
+                </a>
+                <a href="{{ route('user.applications.index') }}"
+                    class="nav-link-image {{ request()->routeIs('user.applications.*') ? 'active' : '' }}">
+>>>>>>> fb4e66edda25b343721dad90c6012d741003189d
                     Applied Jobs
                 </a>
                 <a href="{{ route('user.jobs.saved') }}"
@@ -53,9 +77,14 @@
                     @if(auth()->user()->isAdmin())
                         <a href="{{ route('hr.dashboard') }}" class="dropdown-link-image">HR Dashboard</a>
                         <a href="{{ route('jobs.index') }}" class="dropdown-link-image">Candidate View</a>
+<<<<<<< HEAD
                     @else
                         <a href="{{ route('user.settings.index') }}" class="dropdown-link-image">Settings</a>
                     @endif
+=======
+                    @endif
+                    <a href="{{ route('user.settings.index') }}" class="dropdown-link-image">Settings</a>
+>>>>>>> fb4e66edda25b343721dad90c6012d741003189d
                     <form method="POST" action="{{ route('logout') }}">
                         @csrf
                         <button type="submit" class="dropdown-link-image w-full text-left font-bold text-accent-800">Sign

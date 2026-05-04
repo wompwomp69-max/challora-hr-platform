@@ -84,6 +84,7 @@
                     class="brutalist-input-subtle" onchange="this.form.submit()">
             </div>
             <div class="filter-group relative">
+<<<<<<< HEAD
                 <button type="button" 
                     onclick="const inp = document.getElementById('top-choice-input'); inp.value = inp.value === '1' ? '0' : '1'; this.form.submit();"
                     class="flex gap-2 items-center {{ request('top_choice') === '1' ? 'bg-accent text-white' : 'bg-white text-black' }} px-8 py-4 font-black uppercase tracking-widest border-4 border-black shadow-[6px_6px_0_0_black] hover:translate-y-[2px] transition-all group">
@@ -93,28 +94,50 @@
                     Top Choice
                 </button>
                 <input type="hidden" name="top_choice" id="top-choice-input" value="{{ request('top_choice', '0') }}">
+=======
+                <button type="submit"
+                    class="flex gap-2 items-center bg-accent text-surface px-8 py-4 font-black uppercase tracking-widest border-4 border-black shadow-[6px_6px_0_0_black] hover:translate-y-[2px] transition-all group filter-submit">
+                    <svg width="16" height="16" class="group-hover:scale-110 transition-transform" fill="none"
+                        stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z">
+                        </path>
+                    </svg>
+                    Filter Analytics
+                </button>
+>>>>>>> fb4e66edda25b343721dad90c6012d741003189d
             </div>
         </div>
     </form>
 
+<<<<<<< HEAD
     <div class="job-list-full-width">
+=======
+    <div class="job-layout-grid">
+>>>>>>> fb4e66edda25b343721dad90c6012d741003189d
         <div class="job-list-area">
             @forelse ($jobs as $j)
                 @php
                     $salaryDisplay = !empty($j->min_salary) ? 'IDR ' . number_format($j->min_salary / 1000000, 1) . 'M+' : ($j->salary_range ?: 'Competitive');
                     $isSaved = in_array($j->id, $savedJobIds);
                     $isApplied = in_array($j->id, $appliedJobIds);
+<<<<<<< HEAD
                     $isTopAiJob = in_array($j->id, $topJobRecommendationIds ?? []);
+=======
+>>>>>>> fb4e66edda25b343721dad90c6012d741003189d
                 @endphp
                 <div class="job-card-premium" onclick="window.location.href='{{ route('jobs.show', $j->id) }}'">
                     <div class="job-main-info">
                         <h2 class="job-role-title">{{ $j->title }}</h2>
                         <div class="job-company-line">{{ $j->creator->name ?? 'Company' }}</div>
+<<<<<<< HEAD
                         @if($isTopAiJob)
                             <div class="inline-flex items-center gap-2 bg-accent text-white px-3 py-1 mt-2 text-[10px] font-black uppercase tracking-widest">
                                 Top Job Match by Chally AI
                             </div>
                         @endif
+=======
+>>>>>>> fb4e66edda25b343721dad90c6012d741003189d
                         <div class="job-meta-line">
                             <span>
                                 <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5"
@@ -177,6 +200,41 @@
                 {{ $jobs->links() }}
             </div>
         </div>
+<<<<<<< HEAD
+=======
+        <aside class="chally-sidebar-premium">
+            <div class="ai-card-premium">
+                <h2 class="font-black text-xs uppercase tracking-[0.2em] text-accent mb-4">Internal Intelligence</h2>
+                <div class="ai-voice-line">How can Chally AI optimize your search today?</div>
+
+                <div class="ai-suggestion-list">
+                    <div class="ai-suggestion-item">
+                        <div class="ai-dot-pulse"></div>
+                        <span>Find high-priority matches for my skill set.</span>
+                    </div>
+                    <div class="ai-suggestion-item">
+                        <div class="ai-dot-pulse"></div>
+                        <span>Enhance my CV for creative director roles.</span>
+                    </div>
+                    <div class="ai-suggestion-item">
+                        <div class="ai-dot-pulse"></div>
+                        <span>Generate interview prep for Netflix.</span>
+                    </div>
+                </div>
+
+                <div class="mt-8 pt-8 border-t-2 border-border">
+                    <div class="flex items-center gap-3 text-sm font-bold opacity-60">
+                        <svg width="16" height="16" class="text-accent" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd"
+                                d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.381z"
+                                clip-rule="evenodd"></path>
+                        </svg>
+                        <span>Profiles synchronized with V2 engine.</span>
+                    </div>
+                </div>
+            </div>
+        </aside>
+>>>>>>> fb4e66edda25b343721dad90c6012d741003189d
     </div>
 @endsection
 

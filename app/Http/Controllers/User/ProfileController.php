@@ -3,12 +3,18 @@
 namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
+<<<<<<< HEAD
 use App\Jobs\Ai\GenerateProfileSuggestionJob;
 use App\Models\AiUserProfileSuggestion;
 use App\Services\FileUploadService;
 use App\Services\User\ProfileSyncService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+=======
+use App\Services\FileUploadService;
+use App\Services\User\ProfileSyncService;
+use Illuminate\Http\Request;
+>>>>>>> fb4e66edda25b343721dad90c6012d741003189d
 
 class ProfileController extends Controller
 {
@@ -23,6 +29,7 @@ class ProfileController extends Controller
 
     public function index()
     {
+<<<<<<< HEAD
         /** @var \App\Models\User $user */
         $user = Auth::user();
         $user->load(['workExperiences', 'achievements']);
@@ -33,15 +40,25 @@ class ProfileController extends Controller
         return view('user.settings.index', [
             'user' => $user,
             'latestSuggestion' => $latestSuggestion,
+=======
+        $user = auth()->user()->load(['workExperiences', 'achievements']);
+        
+        return view('user.settings.index', [
+            'user' => $user,
+>>>>>>> fb4e66edda25b343721dad90c6012d741003189d
             'pageTitle' => 'My Profile',
         ]);
     }
 
     public function edit()
     {
+<<<<<<< HEAD
         /** @var \App\Models\User $user */
         $user = Auth::user();
         $user->load(['workExperiences', 'achievements']);
+=======
+        $user = auth()->user()->load(['workExperiences', 'achievements']);
+>>>>>>> fb4e66edda25b343721dad90c6012d741003189d
         
         return view('user.settings.edit', [
             'user' => $user,
@@ -53,8 +70,12 @@ class ProfileController extends Controller
 
     public function update(Request $request)
     {
+<<<<<<< HEAD
         /** @var \App\Models\User $user */
         $user = Auth::user();
+=======
+        $user = auth()->user();
+>>>>>>> fb4e66edda25b343721dad90c6012d741003189d
         
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
@@ -89,8 +110,12 @@ class ProfileController extends Controller
             $user,
             $validated,
             $request->only(['work_title', 'work_company', 'work_year_start', 'work_year_end', 'work_description']),
+<<<<<<< HEAD
             $request->only(['ach_title', 'ach_type', 'ach_description', 'ach_organizer', 'ach_year', 'ach_rank', 'ach_level', 'ach_certificate_link']),
             $request->only(['org_name', 'org_position', 'org_year_start', 'org_year_end', 'org_description'])
+=======
+            $request->only(['ach_title', 'ach_type', 'ach_description', 'ach_organizer', 'ach_year', 'ach_rank', 'ach_level', 'ach_certificate_link'])
+>>>>>>> fb4e66edda25b343721dad90c6012d741003189d
         );
 
         return back()->with('flash_toast', ['message' => 'Profile updated successfully.']);
@@ -102,8 +127,12 @@ class ProfileController extends Controller
             'avatar' => ['required', 'image', 'max:1024'],
         ]);
 
+<<<<<<< HEAD
         /** @var \App\Models\User $user */
         $user = Auth::user();
+=======
+        $user = auth()->user();
+>>>>>>> fb4e66edda25b343721dad90c6012d741003189d
         
         $this->fileService->delete($user->avatar_path);
         $path = $this->fileService->upload($request->file('avatar'), 'photos', 'avatar');
@@ -120,6 +149,7 @@ class ProfileController extends Controller
             abort(404);
         }
 
+<<<<<<< HEAD
         $rulesByField = [
             'cv' => ['required', 'file', 'mimes:pdf', 'max:2048'],
             'diploma' => ['required', 'file', 'mimes:pdf', 'max:2048'],
@@ -130,6 +160,13 @@ class ProfileController extends Controller
 
         /** @var \App\Models\User $user */
         $user = Auth::user();
+=======
+        $request->validate([
+            $field => ['required', 'file', 'max:2048'],
+        ]);
+
+        $user = auth()->user();
+>>>>>>> fb4e66edda25b343721dad90c6012d741003189d
         $dbField = $field . '_path';
         
         $this->fileService->delete($user->$dbField);
@@ -140,6 +177,7 @@ class ProfileController extends Controller
 
         return back()->with('flash_toast', ['message' => ucfirst($field) . ' updated successfully.']);
     }
+<<<<<<< HEAD
 
     public function requestAiSuggestion(Request $request)
     {
@@ -153,4 +191,6 @@ class ProfileController extends Controller
             'message' => 'AI profile suggestions are being generated.',
         ]);
     }
+=======
+>>>>>>> fb4e66edda25b343721dad90c6012d741003189d
 }

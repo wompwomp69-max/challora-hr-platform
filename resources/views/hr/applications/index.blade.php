@@ -117,6 +117,7 @@
         <p class="hr-subtitle">Review and manage candidate applications across all postings.</p>
     </div>
     <div class="flex gap-4 gsap-reveal">
+<<<<<<< HEAD
         <form action="{{ route('hr.applications.index') }}" method="GET" class="flex gap-4">
             <div class="flex flex-col gap-1">
                 <label class="text-[10px] font-black uppercase text-text-muted">Job Posting</label>
@@ -150,6 +151,17 @@
                     <option value="low" {{ request('sort_rating') === 'low' ? 'selected' : '' }}>Low to High</option>
                 </select>
             </div>
+=======
+        <form action="{{ route('hr.applications.index') }}" method="GET" class="flex gap-2">
+            <select name="status" class="action-select-premium" onchange="this.form.submit()">
+                <option value="">All Statuses</option>
+                @foreach(\App\Enums\ApplicationStatus::cases() as $status)
+                    <option value="{{ $status->value }}" {{ request('status') === $status->value ? 'selected' : '' }}>
+                        {{ ucfirst($status->value) }}
+                    </option>
+                @endforeach
+            </select>
+>>>>>>> fb4e66edda25b343721dad90c6012d741003189d
         </form>
     </div>
 </div>
@@ -167,7 +179,10 @@
                 <tr>
                     <th>Candidate</th>
                     <th>Applied For</th>
+<<<<<<< HEAD
                     <th>AI Score</th>
+=======
+>>>>>>> fb4e66edda25b343721dad90c6012d741003189d
                     <th>Status</th>
                     <th>Files</th>
                     <th class="text-right">Intelligence Actions</th>
@@ -178,9 +193,12 @@
                     <tr>
                         <td>
                             <div class="applicant-name">{{ $a->user->name }}</div>
+<<<<<<< HEAD
                             @if(($topApplicationId ?? null) === $a->id)
                                 <div class="text-[10px] font-black uppercase text-accent mt-1">Top Candidate</div>
                             @endif
+=======
+>>>>>>> fb4e66edda25b343721dad90c6012d741003189d
                             <div class="applicant-contact">{{ $a->user->email }}</div>
                         </td>
                         <td>
@@ -188,6 +206,7 @@
                             <div class="text-[10px] font-bold text-text-muted mt-1">{{ $a->created_at->format('d M Y') }}</div>
                         </td>
                         <td>
+<<<<<<< HEAD
                             @if($a->aiScore && $a->aiScore->status === 'completed')
                                 <div class="font-black text-xl">{{ $a->aiScore->score_total }}/100</div>
                                 <div class="text-[10px] font-bold uppercase text-text-muted mt-1">{{ $a->aiScore->core_strength }}</div>
@@ -201,6 +220,8 @@
                             @endif
                         </td>
                         <td>
+=======
+>>>>>>> fb4e66edda25b343721dad90c6012d741003189d
                             <span class="status-badge-premium status-{{ $a->status->value }}">
                                 {{ $a->status->value }}
                             </span>
@@ -208,11 +229,16 @@
                         <td>
                             <div class="flex gap-2">
                                 @if($a->user->cv_path)
+<<<<<<< HEAD
                                     <a href="{{ route('download.file', ['type' => 'cv', 'id' => $a->id, 'back' => url()->current()]) }}" class="premium-btn-icon" title="CV">
+=======
+                                    <a href="{{ route('download.file', ['type' => 'cv', 'id' => $a->user->id]) }}" class="premium-btn-icon" title="CV">
+>>>>>>> fb4e66edda25b343721dad90c6012d741003189d
                                         <i class="bi bi-file-earmark-person"></i>
                                     </a>
                                 @endif
                                 @if($a->user->diploma_path)
+<<<<<<< HEAD
                                     <a href="{{ route('download.file', ['type' => 'diploma', 'id' => $a->id, 'back' => url()->current()]) }}" class="premium-btn-icon" title="Ijazah">
                                         <i class="bi bi-mortarboard"></i>
                                     </a>
@@ -233,6 +259,15 @@
                                 @csrf
                                 <button class="action-select-premium" type="submit">Refresh AI</button>
                             </form>
+=======
+                                    <a href="{{ route('download.file', ['type' => 'diploma', 'id' => $a->user->id]) }}" class="premium-btn-icon" title="Ijazah">
+                                        <i class="bi bi-mortarboard"></i>
+                                    </a>
+                                @endif
+                            </div>
+                        </td>
+                        <td class="text-right">
+>>>>>>> fb4e66edda25b343721dad90c6012d741003189d
                             <form method="post" action="{{ route('hr.applications.status', $a->id) }}" class="flex justify-end items-center gap-4">
                                 @csrf
                                 <select name="status" class="action-select-premium" onchange="this.form.submit()">
@@ -243,7 +278,10 @@
                                     @endforeach
                                 </select>
                             </form>
+<<<<<<< HEAD
                             </div>
+=======
+>>>>>>> fb4e66edda25b343721dad90c6012d741003189d
                         </td>
                     </tr>
                 @endforeach

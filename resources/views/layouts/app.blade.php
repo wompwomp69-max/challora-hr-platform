@@ -9,7 +9,10 @@
 
     <!-- Token tema (warna, font, radius) -->
     <link rel="stylesheet" href="{{ asset('css/design-tokens.css') }}">
+<<<<<<< HEAD
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+=======
+>>>>>>> fb4e66edda25b343721dad90c6012d741003189d
 
     <!-- Vite Assets (Tailwind & JS) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -17,7 +20,11 @@
     <link
         href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;700;800&display=swap"
         rel="stylesheet">
+<<<<<<< HEAD
     @vite(['resources/css/app.css', 'resources/js/app.jsx'])
+=======
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
+>>>>>>> fb4e66edda25b343721dad90c6012d741003189d
 
     @stack('styles')
 

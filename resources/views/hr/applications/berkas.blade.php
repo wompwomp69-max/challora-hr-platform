@@ -92,7 +92,11 @@
 
         <div class="info-group">
             <h4>Applied For</h4>
+<<<<<<< HEAD
             <p class="text-accent">{{ $application->job->title }}</p>
+=======
+            <p class="text-accent">{{ $job->title }}</p>
+>>>>>>> fb4e66edda25b343721dad90c6012d741003189d
             <p>Status: {{ strtoupper($application->status->value) }}</p>
         </div>
         
@@ -134,7 +138,11 @@
                 </div>
                 @if($user->$path)
                     <div class="flex gap-4">
+<<<<<<< HEAD
                         <a href="{{ route('download.file', ['type' => $key, 'id' => $application->id, 'back' => url()->current()]) }}" target="_blank" class="btn-brutalist-sm">
+=======
+                        <a href="{{ route('download.file', ['type' => $key, 'id' => $user->id]) }}" target="_blank" class="btn-brutalist-sm">
+>>>>>>> fb4e66edda25b343721dad90c6012d741003189d
                             View Document
                         </a>
                     </div>
@@ -145,6 +153,7 @@
 </div>
 
 <div class="brutalist-profile-card">
+<<<<<<< HEAD
     <h3 class="font-black text-xl mb-6">AI Talent Assessment</h3>
     @if($application->aiScore && $application->aiScore->status === 'completed')
         <div class="mb-6">
@@ -186,6 +195,8 @@
 </div>
 
 <div class="brutalist-profile-card">
+=======
+>>>>>>> fb4e66edda25b343721dad90c6012d741003189d
     <h3 class="font-black text-xl mb-6">Decision Center</h3>
     <form action="{{ route('hr.applications.status', $application->id) }}" method="POST" class="flex gap-6">
         @csrf

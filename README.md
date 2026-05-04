@@ -29,22 +29,32 @@ Use this flow for a fresh clone so the app boots without SQLite/cache-table erro
    - (for active development, use `npm run dev` instead)
 10. Start Laravel:
    - `php artisan serve`
+<<<<<<< HEAD
 11. Queue mode for local testing:
    - keep `QUEUE_CONNECTION=sync` so AI jobs execute immediately without running a worker
+=======
+>>>>>>> fb4e66edda25b343721dad90c6012d741003189d
 
 ## Quick Troubleshooting
 
 - If you see `no such table: cache` or session table errors:
   - ensure `.env` uses `SESSION_DRIVER=file` and `CACHE_STORE=file`
   - run `php artisan migrate`
+<<<<<<< HEAD
 - If you see Vite manifest errors (for example wrong `app.jsx` / `app.tsx` entry):
+=======
+- If you see Vite manifest errors (for example wrong `app.tsx` entry):
+>>>>>>> fb4e66edda25b343721dad90c6012d741003189d
   - run `php artisan config:clear`
   - run `php artisan view:clear`
   - run `php artisan route:clear`
   - run `php artisan cache:clear`
   - run `npm run build`
+<<<<<<< HEAD
 - For production queue processing:
   - set `QUEUE_CONNECTION=database` (or redis) and run `php artisan queue:work`
+=======
+>>>>>>> fb4e66edda25b343721dad90c6012d741003189d
 
 ## Challora Laravel MVC Architecture
 📁 Project Structure

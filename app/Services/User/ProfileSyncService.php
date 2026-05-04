@@ -6,11 +6,16 @@ use App\Models\User;
 
 class ProfileSyncService
 {
+<<<<<<< HEAD
     public function updateProfile(User $user, array $validatedData, array $workData, array $achievementData, array $orgData = []): void
+=======
+    public function updateProfile(User $user, array $validatedData, array $workData, array $achievementData): void
+>>>>>>> fb4e66edda25b343721dad90c6012d741003189d
     {
         $user->update($validatedData);
         $this->syncWorkExperiences($user, $workData);
         $this->syncAchievements($user, $achievementData);
+<<<<<<< HEAD
         $this->syncOrganizationalExperiences($user, $orgData);
     }
 
@@ -33,6 +38,8 @@ class ProfileSyncService
                 }
             }
         }
+=======
+>>>>>>> fb4e66edda25b343721dad90c6012d741003189d
     }
 
     private function syncWorkExperiences(User $user, array $workData): void

@@ -209,7 +209,11 @@
     <div class="job-meta-pills">
         <span class="meta-pill">{{ str_replace('_', '-', ucfirst($job->job_type->value)) }}</span>
         <span class="meta-pill">{{ $job->location ?: 'Remote Allowed' }}</span>
+<<<<<<< HEAD
         <span class="meta-pill">{{ $job->experience_level?->value ?? 'N/A' }} Tier</span>
+=======
+        <span class="meta-pill">{{ $job->experience_level->value }} Tier</span>
+>>>>>>> fb4e66edda25b343721dad90c6012d741003189d
         <span class="meta-pill">Verified by AI</span>
     </div>
 </div>
@@ -267,7 +271,11 @@
                 </div>
                 <div class="stat-row">
                     <label>Experience</label>
+<<<<<<< HEAD
                     <span>{{ $job->experience_level?->value ?? 'N/A' }}</span>
+=======
+                    <span>{{ $job->experience_level->value }}</span>
+>>>>>>> fb4e66edda25b343721dad90c6012d741003189d
                 </div>
                 <div class="stat-row">
                     <label>Deadline</label>

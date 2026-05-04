@@ -2,19 +2,31 @@
 
 namespace App\Services\Hr;
 
+<<<<<<< HEAD
 use App\Enums\ApplicationStatus;
 use App\Models\Application;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Cache;
+=======
+use App\Models\Application;
+>>>>>>> fb4e66edda25b343721dad90c6012d741003189d
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 class ApplicationManagementService
 {
+<<<<<<< HEAD
     public function getApplications(int $hrId, ?string $status, ?int $jobId, ?string $sortRating = null): LengthAwarePaginator
     {
         $query = Application::whereHas('job', function($q) use ($hrId) {
             $q->where('created_by', $hrId);
         })->with(['job', 'user', 'aiScore']);
+=======
+    public function getApplications(int $hrId, ?string $status, ?int $jobId): LengthAwarePaginator
+    {
+        $query = Application::whereHas('job', function($q) use ($hrId) {
+            $q->where('created_by', $hrId);
+        })->with(['job', 'user']);
+>>>>>>> fb4e66edda25b343721dad90c6012d741003189d
 
         if ($status) {
             $query->where('status', $status);
@@ -24,6 +36,7 @@ class ApplicationManagementService
             $query->where('job_id', $jobId);
         }
 
+<<<<<<< HEAD
         if ($sortRating === 'high') {
             $query->join('ai_candidate_scores', 'applications.id', '=', 'ai_candidate_scores.application_id')
                 ->orderBy('ai_candidate_scores.score_total', 'desc')
@@ -37,10 +50,14 @@ class ApplicationManagementService
         }
 
         return $query->paginate(10);
+=======
+        return $query->latest()->paginate(10);
+>>>>>>> fb4e66edda25b343721dad90c6012d741003189d
     }
 
     public function updateStatus(Application $application, string $status): bool
     {
+<<<<<<< HEAD
         $updated = $application->update(['status' => $status]);
 
         if ($updated) {
@@ -88,5 +105,8 @@ class ApplicationManagementService
                 $mail->to($candidate->email, $candidate->name)->subject($subject);
             }
         );
+=======
+        return $application->update(['status' => $status]);
+>>>>>>> fb4e66edda25b343721dad90c6012d741003189d
     }
 }
