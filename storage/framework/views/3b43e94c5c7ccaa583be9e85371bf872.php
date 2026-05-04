@@ -1,5 +1,3 @@
-
-
 <?php $__env->startPush('styles'); ?>
 <style>
     .hr-header-premium {
@@ -117,16 +115,41 @@
         <p class="hr-subtitle">Review and manage candidate applications across all postings.</p>
     </div>
     <div class="flex gap-4 gsap-reveal">
-        <form action="<?php echo e(route('hr.applications.index')); ?>" method="GET" class="flex gap-2">
-            <select name="status" class="action-select-premium" onchange="this.form.submit()">
-                <option value="">All Statuses</option>
-                <?php $__currentLoopData = \App\Enums\ApplicationStatus::cases(); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $status): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                    <option value="<?php echo e($status->value); ?>" <?php echo e(request('status') === $status->value ? 'selected' : ''); ?>>
-                        <?php echo e(ucfirst($status->value)); ?>
+        <form action="<?php echo e(route('hr.applications.index')); ?>" method="GET" class="flex gap-4">
+            <div class="flex flex-col gap-1">
+                <label class="text-[10px] font-black uppercase text-text-muted">Job Posting</label>
+                <select name="job_id" class="action-select-premium" onchange="this.form.submit()">
+                    <option value="">All Positions</option>
+                    <?php $__currentLoopData = $jobs; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $job): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                        <option value="<?php echo e($job->id); ?>" <?php echo e(request('job_id') == $job->id ? 'selected' : ''); ?>>
+                            <?php echo e($job->title); ?>
 
-                    </option>
-                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-            </select>
+                        </option>
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                </select>
+            </div>
+
+            <div class="flex flex-col gap-1">
+                <label class="text-[10px] font-black uppercase text-text-muted">Status</label>
+                <select name="status" class="action-select-premium" onchange="this.form.submit()">
+                    <option value="">All Statuses</option>
+                    <?php $__currentLoopData = \App\Enums\ApplicationStatus::cases(); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $status): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                        <option value="<?php echo e($status->value); ?>" <?php echo e(request('status') === $status->value ? 'selected' : ''); ?>>
+                            <?php echo e(ucfirst($status->value)); ?>
+
+                        </option>
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                </select>
+            </div>
+
+            <div class="flex flex-col gap-1">
+                <label class="text-[10px] font-black uppercase text-text-muted">Sort by Rating</label>
+                <select name="sort_rating" class="action-select-premium" onchange="this.form.submit()">
+                    <option value="">Newest First</option>
+                    <option value="high" <?php echo e(request('sort_rating') === 'high' ? 'selected' : ''); ?>>High to Low</option>
+                    <option value="low" <?php echo e(request('sort_rating') === 'low' ? 'selected' : ''); ?>>Low to High</option>
+                </select>
+            </div>
         </form>
     </div>
 </div>
@@ -144,6 +167,7 @@
                 <tr>
                     <th>Candidate</th>
                     <th>Applied For</th>
+                    <th>AI Score</th>
                     <th>Status</th>
                     <th>Files</th>
                     <th class="text-right">Intelligence Actions</th>
@@ -154,11 +178,27 @@
                     <tr>
                         <td>
                             <div class="applicant-name"><?php echo e($a->user->name); ?></div>
+                            <?php if(($topApplicationId ?? null) === $a->id): ?>
+                                <div class="text-[10px] font-black uppercase text-accent mt-1">Top Candidate</div>
+                            <?php endif; ?>
                             <div class="applicant-contact"><?php echo e($a->user->email); ?></div>
                         </td>
                         <td>
                             <div class="font-bold uppercase text-xs tracking-widest text-accent"><?php echo e($a->job->title); ?></div>
                             <div class="text-[10px] font-bold text-text-muted mt-1"><?php echo e($a->created_at->format('d M Y')); ?></div>
+                        </td>
+                        <td>
+                            <?php if($a->aiScore && $a->aiScore->status === 'completed'): ?>
+                                <div class="font-black text-xl"><?php echo e($a->aiScore->score_total); ?>/100</div>
+                                <div class="text-[10px] font-bold uppercase text-text-muted mt-1"><?php echo e($a->aiScore->core_strength); ?></div>
+                            <?php elseif($a->aiScore && $a->aiScore->status === 'failed'): ?>
+                                <span class="text-red-500 font-bold text-xs uppercase">AI Failed</span>
+                            <?php else: ?>
+                                <div class="flex flex-col items-center">
+                                    <div class="h-6 w-6 border-4 border-accent border-t-transparent rounded-full animate-spin"></div>
+                                    <span class="text-yellow-600 font-bold text-[10px] uppercase mt-2 animate-pulse">Analyzing...</span>
+                                </div>
+                            <?php endif; ?>
                         </td>
                         <td>
                             <span class="status-badge-premium status-<?php echo e($a->status->value); ?>">
@@ -181,6 +221,11 @@
                             </div>
                         </td>
                         <td class="text-right">
+                            <div class="flex justify-end items-center gap-4">
+                            <form method="post" action="<?php echo e(route('hr.applications.ai_refresh', $a->id)); ?>">
+                                <?php echo csrf_field(); ?>
+                                <button class="action-select-premium" type="submit">Refresh AI</button>
+                            </form>
                             <form method="post" action="<?php echo e(route('hr.applications.status', $a->id)); ?>" class="flex justify-end items-center gap-4">
                                 <?php echo csrf_field(); ?>
                                 <select name="status" class="action-select-premium" onchange="this.form.submit()">
@@ -192,6 +237,7 @@
                                     <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                 </select>
                             </form>
+                            </div>
                         </td>
                     </tr>
                 <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>

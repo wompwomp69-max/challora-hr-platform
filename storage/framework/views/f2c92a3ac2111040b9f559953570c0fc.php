@@ -9,7 +9,7 @@
     
     <link rel="stylesheet" href="<?php echo e(asset('css/design-tokens.css')); ?>">
     <link rel="stylesheet" href="<?php echo e(asset('css/login-register-style.css')); ?>">
-    <?php echo app('Illuminate\Foundation\Vite')(['resources/css/app.css', 'resources/js/app.js']); ?>
+    <?php echo app('Illuminate\Foundation\Vite')(['resources/css/app.css', 'resources/js/app.jsx']); ?>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>

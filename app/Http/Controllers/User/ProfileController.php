@@ -89,7 +89,8 @@ class ProfileController extends Controller
             $user,
             $validated,
             $request->only(['work_title', 'work_company', 'work_year_start', 'work_year_end', 'work_description']),
-            $request->only(['ach_title', 'ach_type', 'ach_description', 'ach_organizer', 'ach_year', 'ach_rank', 'ach_level', 'ach_certificate_link'])
+            $request->only(['ach_title', 'ach_type', 'ach_description', 'ach_organizer', 'ach_year', 'ach_rank', 'ach_level', 'ach_certificate_link']),
+            $request->only(['org_name', 'org_position', 'org_year_start', 'org_year_end', 'org_description'])
         );
 
         return back()->with('flash_toast', ['message' => 'Profile updated successfully.']);

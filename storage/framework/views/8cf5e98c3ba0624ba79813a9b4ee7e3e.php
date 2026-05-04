@@ -215,7 +215,7 @@
 
 <?php $__env->startPush('scripts'); ?>
 <script>
-    function initEditAnim() {
+    (function initEditAnim() {
         if (!window.gsap) return setTimeout(initEditAnim, 50);
 
         const addExpBtn = document.getElementById('add-exp');
@@ -237,7 +237,7 @@
             { opacity: 0, y: 30 },
             { opacity: 1, y: 0, stagger: 0.1, duration: 1, ease: "power4.out", delay: 0.2 }
         );
-    }
+    })();
 </script>
 <?php $__env->stopPush(); ?>
 <?php echo $__env->make('layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\xampp\htdocs\challorav2\resources\views/user/settings/edit.blade.php ENDPATH**/ ?>

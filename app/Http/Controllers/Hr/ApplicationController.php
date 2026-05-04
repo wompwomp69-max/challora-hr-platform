@@ -24,7 +24,8 @@ class ApplicationController extends Controller
         $applications = $this->applicationService->getApplications(
             auth()->id(),
             $request->get('status'),
-            $request->get('job_id')
+            $request->get('job_id'),
+            $request->get('sort_rating')
         );
         
         $jobs = auth()->user()->jobPostings()->select('id', 'title')->get();

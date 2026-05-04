@@ -117,15 +117,39 @@
         <p class="hr-subtitle">Review and manage candidate applications across all postings.</p>
     </div>
     <div class="flex gap-4 gsap-reveal">
-        <form action="{{ route('hr.applications.index') }}" method="GET" class="flex gap-2">
-            <select name="status" class="action-select-premium" onchange="this.form.submit()">
-                <option value="">All Statuses</option>
-                @foreach(\App\Enums\ApplicationStatus::cases() as $status)
-                    <option value="{{ $status->value }}" {{ request('status') === $status->value ? 'selected' : '' }}>
-                        {{ ucfirst($status->value) }}
-                    </option>
-                @endforeach
-            </select>
+        <form action="{{ route('hr.applications.index') }}" method="GET" class="flex gap-4">
+            <div class="flex flex-col gap-1">
+                <label class="text-[10px] font-black uppercase text-text-muted">Job Posting</label>
+                <select name="job_id" class="action-select-premium" onchange="this.form.submit()">
+                    <option value="">All Positions</option>
+                    @foreach($jobs as $job)
+                        <option value="{{ $job->id }}" {{ request('job_id') == $job->id ? 'selected' : '' }}>
+                            {{ $job->title }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
+
+            <div class="flex flex-col gap-1">
+                <label class="text-[10px] font-black uppercase text-text-muted">Status</label>
+                <select name="status" class="action-select-premium" onchange="this.form.submit()">
+                    <option value="">All Statuses</option>
+                    @foreach(\App\Enums\ApplicationStatus::cases() as $status)
+                        <option value="{{ $status->value }}" {{ request('status') === $status->value ? 'selected' : '' }}>
+                            {{ ucfirst($status->value) }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
+
+            <div class="flex flex-col gap-1">
+                <label class="text-[10px] font-black uppercase text-text-muted">Sort by Rating</label>
+                <select name="sort_rating" class="action-select-premium" onchange="this.form.submit()">
+                    <option value="">Newest First</option>
+                    <option value="high" {{ request('sort_rating') === 'high' ? 'selected' : '' }}>High to Low</option>
+                    <option value="low" {{ request('sort_rating') === 'low' ? 'selected' : '' }}>Low to High</option>
+                </select>
+            </div>
         </form>
     </div>
 </div>
@@ -170,7 +194,10 @@
                             @elseif($a->aiScore && $a->aiScore->status === 'failed')
                                 <span class="text-red-500 font-bold text-xs uppercase">AI Failed</span>
                             @else
-                                <span class="text-yellow-500 font-bold text-xs uppercase">AI Processing</span>
+                                <div class="flex flex-col items-center">
+                                    <div class="h-6 w-6 border-4 border-accent border-t-transparent rounded-full animate-spin"></div>
+                                    <span class="text-yellow-600 font-bold text-[10px] uppercase mt-2 animate-pulse">Analyzing...</span>
+                                </div>
                             @endif
                         </td>
                         <td>

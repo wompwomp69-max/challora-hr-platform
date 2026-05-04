@@ -7,7 +7,7 @@ use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 class ApplicationManagementService
 {
-    public function getApplications(int $hrId, ?string $status, ?int $jobId): LengthAwarePaginator
+    public function getApplications(int $hrId, ?string $status, ?int $jobId, ?string $sortRating = null): LengthAwarePaginator
     {
         $query = Application::whereHas('job', function($q) use ($hrId) {
             $q->where('created_by', $hrId);
@@ -21,7 +21,19 @@ class ApplicationManagementService
             $query->where('job_id', $jobId);
         }
 
-        return $query->latest()->paginate(10);
+        if ($sortRating === 'high') {
+            $query->join('ai_candidate_scores', 'applications.id', '=', 'ai_candidate_scores.application_id')
+                ->orderBy('ai_candidate_scores.score_total', 'desc')
+                ->select('applications.*');
+        } elseif ($sortRating === 'low') {
+            $query->join('ai_candidate_scores', 'applications.id', '=', 'ai_candidate_scores.application_id')
+                ->orderBy('ai_candidate_scores.score_total', 'asc')
+                ->select('applications.*');
+        } else {
+            $query->latest();
+        }
+
+        return $query->paginate(10);
     }
 
     public function updateStatus(Application $application, string $status): bool

@@ -26,7 +26,7 @@ class DashboardService
 
             // Group by job location to avoid fragmented free-text user addresses.
             $topRegions = JobPosting::query()
-                ->whereIn('id', $jobs)
+                ->whereIn('job_postings.id', $jobs)
                 ->join('applications', 'applications.job_id', '=', 'job_postings.id')
                 ->selectRaw("COALESCE(NULLIF(job_postings.location, ''), 'Unknown') as region")
                 ->selectRaw('COUNT(applications.id) as total')

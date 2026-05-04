@@ -156,6 +156,35 @@
                 </div>
             </div>
 
+            <!-- Organizational Experience Section -->
+            <div class="edit-section" id="org-experience">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="edit-section-title" style="margin:0;">
+                        <svg width="20" height="20" class="text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                        </svg>
+                        Organizational Experience
+                    </h2>
+                    <button type="button" class="btn-cancel py-1 px-4 text-xs tracking-widest" id="add-org">ADD NEW</button>
+                </div>
+                <div id="org-container">
+                    @foreach($user->organizationalExperiences ?? [] as $org)
+                        <div class="dynamic-list-item flex-col items-start gap-4 mb-6">
+                            <div class="grid grid-cols-2 gap-4 w-full">
+                                <input type="text" name="org_name[]" class="form-input" placeholder="Organization Name" value="{{ $org->organization_name }}">
+                                <input type="text" name="org_position[]" class="form-input" placeholder="Position / Role" value="{{ $org->position }}">
+                            </div>
+                            <div class="flex gap-4 w-full">
+                                <input type="text" name="org_year_start[]" class="form-input" placeholder="Start Year" value="{{ $org->start_year }}">
+                                <input type="text" name="org_year_end[]" class="form-input" placeholder="End Year" value="{{ $org->year_end }}">
+                                <button type="button" class="bg-red-600 text-white px-4 border-2 border-black" onclick="this.parentElement.parentElement.remove()">X</button>
+                            </div>
+                            <textarea name="org_description[]" class="form-textarea" placeholder="Describe your role and impact...">{{ $org->description }}</textarea>
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+
             <div class="flex gap-4 mt-12 pb-12">
                 <button type="submit" class="btn-submit">Save All Changes</button>
                 <a href="{{ route('user.settings.index') }}" class="btn-cancel">Back to Profile</a>
@@ -214,31 +243,55 @@
             <textarea name="work_description[]" class="form-textarea" placeholder="Job description..."></textarea>
         </div>
     </template>
-@endsection
 
-<script>
-    (function initEditAnim() {
-        if (!window.gsap) return setTimeout(initEditAnim, 50);
+    <template id="org-template">
+        <div class="dynamic-list-item flex-col items-start gap-4 mb-6">
+            <div class="grid grid-cols-2 gap-4 w-full">
+                <input type="text" name="org_name[]" class="form-input" placeholder="Organization Name">
+                <input type="text" name="org_position[]" class="form-input" placeholder="Position / Role">
+            </div>
+            <div class="flex gap-4 w-full">
+                <input type="text" name="org_year_start[]" class="form-input" placeholder="Start Year">
+                <input type="text" name="org_year_end[]" class="form-input" placeholder="End Year">
+                <button type="button" class="bg-red-600 text-white px-4 border-2 border-black" onclick="this.parentElement.parentElement.remove()">X</button>
+            </div>
+            <textarea name="org_description[]" class="form-textarea" placeholder="Describe your role and impact..."></textarea>
+        </div>
+    </template>
+    <script>
+        (function initEditAnim() {
+            console.log('initEditAnim running...');
+            if (!window.gsap) return setTimeout(initEditAnim, 50);
 
-        const addExpBtn = document.getElementById('add-exp');
-        if (addExpBtn && !addExpBtn.dataset.listenerAttached) {
-            addExpBtn.dataset.listenerAttached = 'true';
-            addExpBtn.addEventListener('click', () => {
-                const container = document.getElementById('exp-container');
-                const template = document.getElementById('exp-template');
-                container.appendChild(template.content.cloneNode(true));
-            });
-        }
+            const addExpBtn = document.getElementById('add-exp');
+            if (addExpBtn && !addExpBtn.dataset.listenerAttached) {
+                addExpBtn.dataset.listenerAttached = 'true';
+                addExpBtn.addEventListener('click', () => {
+                    const container = document.getElementById('exp-container');
+                    const template = document.getElementById('exp-template');
+                    container.appendChild(template.content.cloneNode(true));
+                });
+            }
 
-        window.gsap.killTweensOf(".edit-hero, .edit-section");
-        window.gsap.fromTo(".edit-hero",
-            { opacity: 0, x: -30 },
-            { opacity: 1, x: 0, duration: 0.8, ease: "power4.out" }
-        );
-        window.gsap.fromTo(".edit-section",
-            { opacity: 0, y: 30 },
-            { opacity: 1, y: 0, stagger: 0.1, duration: 1, ease: "power4.out", delay: 0.2 }
-        );
-    })();
-</script>
+            const addOrgBtn = document.getElementById('add-org');
+            if (addOrgBtn && !addOrgBtn.dataset.listenerAttached) {
+                addOrgBtn.dataset.listenerAttached = 'true';
+                addOrgBtn.addEventListener('click', () => {
+                    const container = document.getElementById('org-container');
+                    const template = document.getElementById('org-template');
+                    container.appendChild(template.content.cloneNode(true));
+                });
+            }
+
+            window.gsap.killTweensOf(".edit-hero, .edit-section");
+            window.gsap.fromTo(".edit-hero",
+                { opacity: 0, x: -30 },
+                { opacity: 1, x: 0, duration: 0.8, ease: "power4.out" }
+            );
+            window.gsap.fromTo(".edit-section",
+                { opacity: 0, y: 30 },
+                { opacity: 1, y: 0, stagger: 0.1, duration: 1, ease: "power4.out", delay: 0.2 }
+            );
+        })();
+    </script>
 @endsection

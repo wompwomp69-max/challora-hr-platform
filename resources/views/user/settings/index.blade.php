@@ -93,50 +93,86 @@
                 </section>
 
                 <section class="info-card">
+                    <h2 class="info-card-title">Organizational Experience</h2>
+                    @forelse($user->organizationalExperiences ?? [] as $org)
+                        <div class="experience-item">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <h3 class="text-xl font-black uppercase">{{ $org->organization_name }}</h3>
+                                    <p class="text-accent font-bold">{{ $org->position }}</p>
+                                </div>
+                                <span class="bg-black text-white px-3 py-1 text-xs font-black">
+                                    {{ $org->start_year }} — {{ $org->year_end }}
+                                </span>
+                            </div>
+                            <p class="mt-4 text-text-muted font-medium">{{ $org->description }}</p>
+                        </div>
+                    @empty
+                        <p class="text-text-muted italic font-bold">No organizational history added yet.</p>
+                    @endforelse
+                </section>
+
+                <section class="info-card" id="ai-optimization-section">
                     <div class="flex items-center justify-between mb-4">
                         <h2 class="info-card-title !mb-0">AI Profile Optimization</h2>
-                        <form action="{{ route('user.settings.ai_suggestion') }}" method="POST" class="flex items-center gap-2">
+                        <form action="{{ route('user.settings.ai_suggestion') }}" method="POST" class="flex items-center gap-2" id="ai-gen-form">
                             @csrf
                             <input type="text" name="target_role" placeholder="Target role (optional)" class="border-2 border-black px-3 py-2 text-xs font-bold uppercase">
-                            <button class="bg-black text-white px-4 py-2 text-xs font-black uppercase">Generate</button>
+                            <button type="submit" class="bg-black text-white px-4 py-2 text-xs font-black uppercase transition-all hover:bg-accent flex items-center gap-2 group" id="gen-btn">
+                                <span class="group-hover:scale-110 transition-transform">Generate</span>
+                                <div class="hidden animate-spin h-3 w-3 border-2 border-white border-t-transparent rounded-full" id="gen-loader"></div>
+                            </button>
                         </form>
                     </div>
 
-                    @if($latestSuggestion && $latestSuggestion->status === 'completed')
-                        @php
-                            $suggestions = $latestSuggestion->suggestion_json ?? [];
-                        @endphp
-                        <div class="grid grid-cols-3 gap-6">
-                            <div>
-                                <p class="text-[10px] font-black uppercase text-text-muted mb-2">Rewrite Suggestions</p>
-                                <ul class="list-disc pl-4 text-sm">
-                                    @foreach($suggestions['rewrite_suggestions'] ?? [] as $item)
-                                        <li>{{ $item }}</li>
-                                    @endforeach
-                                </ul>
+                    <div id="ai-content-area">
+                        @if($latestSuggestion && $latestSuggestion->status === 'completed')
+                            @php
+                                $suggestions = $latestSuggestion->suggestion_json ?? [];
+                            @endphp
+                            <div class="grid grid-cols-1 gap-8">
+                                <div class="bg-secondary/30 p-6 border-l-4 border-accent">
+                                    <p class="text-[10px] font-black uppercase text-accent mb-4 tracking-widest">Rewrite Suggestions</p>
+                                    <ul class="space-y-3">
+                                        @foreach($suggestions['rewrite_suggestions'] ?? [] as $item)
+                                            <li class="text-sm font-bold flex gap-3">
+                                                <span class="text-accent">→</span>
+                                                {{ $item }}
+                                            </li>
+                                        @endforeach
+                                    </ul>
+                                </div>
+                                <div class="bg-secondary/30 p-6 border-l-4 border-black">
+                                    <p class="text-[10px] font-black uppercase text-text-muted mb-4 tracking-widest">Missing Points</p>
+                                    <ul class="space-y-3">
+                                        @foreach($suggestions['missing_points'] ?? [] as $item)
+                                            <li class="text-sm font-bold flex gap-3 italic">
+                                                <span class="text-text-muted">•</span>
+                                                {{ $item }}
+                                            </li>
+                                        @endforeach
+                                    </ul>
+                                </div>
+                                <div class="bg-secondary/30 p-6 border-l-4 border-yellow-500">
+                                    <p class="text-[10px] font-black uppercase text-yellow-600 mb-4 tracking-widest">Improvement Priority</p>
+                                    <div class="flex flex-wrap gap-2">
+                                        @foreach($suggestions['improvement_priority'] ?? [] as $item)
+                                            <span class="bg-white border-2 border-black px-3 py-1 text-[10px] font-black uppercase">{{ $item }}</span>
+                                        @endforeach
+                                    </div>
+                                </div>
                             </div>
-                            <div>
-                                <p class="text-[10px] font-black uppercase text-text-muted mb-2">Missing Points</p>
-                                <ul class="list-disc pl-4 text-sm">
-                                    @foreach($suggestions['missing_points'] ?? [] as $item)
-                                        <li>{{ $item }}</li>
-                                    @endforeach
-                                </ul>
+                        @elseif($latestSuggestion && $latestSuggestion->status === 'processing')
+                            <div class="py-12 text-center animate-pulse">
+                                <div class="inline-block h-12 w-12 border-4 border-accent border-t-transparent rounded-full animate-spin mb-4"></div>
+                                <p class="font-black uppercase text-sm tracking-widest">Chally is analyzing your profile...</p>
                             </div>
-                            <div>
-                                <p class="text-[10px] font-black uppercase text-text-muted mb-2">Improvement Priority</p>
-                                <ul class="list-disc pl-4 text-sm">
-                                    @foreach($suggestions['improvement_priority'] ?? [] as $item)
-                                        <li>{{ $item }}</li>
-                                    @endforeach
-                                </ul>
-                            </div>
-                        </div>
-                    @elseif($latestSuggestion && $latestSuggestion->status === 'failed')
-                        <p class="text-red-500 font-bold text-sm uppercase">AI suggestion gagal diproses. Coba lagi.</p>
-                    @else
-                        <p class="text-yellow-500 font-bold text-sm uppercase">Belum ada hasil AI. Klik Generate untuk mulai.</p>
-                    @endif
+                        @elseif($latestSuggestion && $latestSuggestion->status === 'failed')
+                            <p class="text-red-500 font-bold text-sm uppercase">AI suggestion gagal diproses. Coba lagi.</p>
+                        @else
+                            <p class="text-yellow-500 font-bold text-sm uppercase">Belum ada hasil AI. Klik Generate untuk mulai.</p>
+                        @endif
+                    </div>
                 </section>
             </div>
 
@@ -187,6 +223,18 @@
     <script>
         (function initIndexAnim() {
             if (!window.gsap) return setTimeout(initIndexAnim, 50);
+
+            // AI Generation Form Handling
+            const genForm = document.getElementById('ai-gen-form');
+            if (genForm) {
+                genForm.addEventListener('submit', () => {
+                    const btn = document.getElementById('gen-btn');
+                    const loader = document.getElementById('gen-loader');
+                    btn.disabled = true;
+                    loader.classList.remove('hidden');
+                    btn.classList.add('opacity-70');
+                });
+            }
 
             // Kill existing animations on these targets to prevent conflicts when Swup re-navigates
             window.gsap.killTweensOf(".profile-header, .info-card, .profile-sidebar, .btn-edit-float");
