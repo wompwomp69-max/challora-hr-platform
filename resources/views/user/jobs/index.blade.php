@@ -84,21 +84,20 @@
                     class="brutalist-input-subtle" onchange="this.form.submit()">
             </div>
             <div class="filter-group relative">
-                <button type="submit"
-                    class="flex gap-2 items-center bg-accent text-surface px-8 py-4 font-black uppercase tracking-widest border-4 border-black shadow-[6px_6px_0_0_black] hover:translate-y-[2px] transition-all group filter-submit">
-                    <svg width="16" height="16" class="group-hover:scale-110 transition-transform" fill="none"
-                        stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z">
-                        </path>
+                <button type="button" 
+                    onclick="const inp = document.getElementById('top-choice-input'); inp.value = inp.value === '1' ? '0' : '1'; this.form.submit();"
+                    class="flex gap-2 items-center {{ request('top_choice') === '1' ? 'bg-accent text-white' : 'bg-white text-black' }} px-8 py-4 font-black uppercase tracking-widest border-4 border-black shadow-[6px_6px_0_0_black] hover:translate-y-[2px] transition-all group">
+                    <svg width="16" height="16" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                     </svg>
-                    Filter Analytics
+                    Top Choice
                 </button>
+                <input type="hidden" name="top_choice" id="top-choice-input" value="{{ request('top_choice', '0') }}">
             </div>
         </div>
     </form>
 
-    <div class="job-layout-grid">
+    <div class="job-list-full-width">
         <div class="job-list-area">
             @forelse ($jobs as $j)
                 @php
@@ -178,38 +177,6 @@
                 {{ $jobs->links() }}
             </div>
         </div>
-        <aside class="chally-sidebar-premium">
-            <div class="ai-card-premium">
-                <h2 class="font-black text-xs uppercase tracking-[0.2em] text-accent mb-4">Internal Intelligence</h2>
-                <div class="ai-voice-line">How can Chally AI optimize your search today?</div>
-
-                <div class="ai-suggestion-list">
-                    <div class="ai-suggestion-item">
-                        <div class="ai-dot-pulse"></div>
-                        <span>Find high-priority matches for my skill set.</span>
-                    </div>
-                    <div class="ai-suggestion-item">
-                        <div class="ai-dot-pulse"></div>
-                        <span>Enhance my CV for creative director roles.</span>
-                    </div>
-                    <div class="ai-suggestion-item">
-                        <div class="ai-dot-pulse"></div>
-                        <span>Generate interview prep for Netflix.</span>
-                    </div>
-                </div>
-
-                <div class="mt-8 pt-8 border-t-2 border-border">
-                    <div class="flex items-center gap-3 text-sm font-bold opacity-60">
-                        <svg width="16" height="16" class="text-accent" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd"
-                                d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.381z"
-                                clip-rule="evenodd"></path>
-                        </svg>
-                        <span>Profiles synchronized with V2 engine.</span>
-                    </div>
-                </div>
-            </div>
-        </aside>
     </div>
 @endsection
 

@@ -88,6 +88,53 @@
                         <p class="text-text-muted italic font-bold">No work experience added yet.</p>
                     <?php endif; ?>
                 </section>
+
+                <section class="info-card">
+                    <div class="flex items-center justify-between mb-4">
+                        <h2 class="info-card-title !mb-0">AI Profile Optimization</h2>
+                        <form action="<?php echo e(route('user.settings.ai_suggestion')); ?>" method="POST" class="flex items-center gap-2">
+                            <?php echo csrf_field(); ?>
+                            <input type="text" name="target_role" placeholder="Target role (optional)" class="border-2 border-black px-3 py-2 text-xs font-bold uppercase">
+                            <button class="bg-black text-white px-4 py-2 text-xs font-black uppercase">Generate</button>
+                        </form>
+                    </div>
+
+                    <?php if($latestSuggestion && $latestSuggestion->status === 'completed'): ?>
+                        <?php
+                            $suggestions = $latestSuggestion->suggestion_json ?? [];
+                        ?>
+                        <div class="grid grid-cols-3 gap-6">
+                            <div>
+                                <p class="text-[10px] font-black uppercase text-text-muted mb-2">Rewrite Suggestions</p>
+                                <ul class="list-disc pl-4 text-sm">
+                                    <?php $__currentLoopData = $suggestions['rewrite_suggestions'] ?? []; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $item): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                        <li><?php echo e($item); ?></li>
+                                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                                </ul>
+                            </div>
+                            <div>
+                                <p class="text-[10px] font-black uppercase text-text-muted mb-2">Missing Points</p>
+                                <ul class="list-disc pl-4 text-sm">
+                                    <?php $__currentLoopData = $suggestions['missing_points'] ?? []; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $item): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                        <li><?php echo e($item); ?></li>
+                                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                                </ul>
+                            </div>
+                            <div>
+                                <p class="text-[10px] font-black uppercase text-text-muted mb-2">Improvement Priority</p>
+                                <ul class="list-disc pl-4 text-sm">
+                                    <?php $__currentLoopData = $suggestions['improvement_priority'] ?? []; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $item): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                        <li><?php echo e($item); ?></li>
+                                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                                </ul>
+                            </div>
+                        </div>
+                    <?php elseif($latestSuggestion && $latestSuggestion->status === 'failed'): ?>
+                        <p class="text-red-500 font-bold text-sm uppercase">AI suggestion gagal diproses. Coba lagi.</p>
+                    <?php else: ?>
+                        <p class="text-yellow-500 font-bold text-sm uppercase">Belum ada hasil AI. Klik Generate untuk mulai.</p>
+                    <?php endif; ?>
+                </section>
             </div>
 
             <aside class="profile-sidebar">

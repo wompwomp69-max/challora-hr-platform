@@ -127,8 +127,12 @@
 /* Layout Utilities */
 .job-layout-grid {
     display: grid;
-    grid-template-columns: 1fr 340px;
+    grid-template-columns: 1fr 350px;
     gap: 40px;
+}
+
+.job-list-full-width {
+    width: 100%;
 }
 
 .chally-sidebar-premium {

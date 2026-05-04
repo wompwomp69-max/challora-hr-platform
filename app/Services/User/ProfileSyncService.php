@@ -6,11 +6,33 @@ use App\Models\User;
 
 class ProfileSyncService
 {
-    public function updateProfile(User $user, array $validatedData, array $workData, array $achievementData): void
+    public function updateProfile(User $user, array $validatedData, array $workData, array $achievementData, array $orgData = []): void
     {
         $user->update($validatedData);
         $this->syncWorkExperiences($user, $workData);
         $this->syncAchievements($user, $achievementData);
+        $this->syncOrganizationalExperiences($user, $orgData);
+    }
+
+    private function syncOrganizationalExperiences(User $user, array $orgData): void
+    {
+        if ($user->organizationalExperiences()) {
+            $user->organizationalExperiences()->delete();
+        }
+        
+        if (isset($orgData['org_name']) && is_array($orgData['org_name'])) {
+            foreach ($orgData['org_name'] as $i => $name) {
+                if (!empty($name)) {
+                    $user->organizationalExperiences()->create([
+                        'organization_name' => $name,
+                        'position' => $orgData['org_position'][$i] ?? '',
+                        'start_year' => $orgData['org_year_start'][$i] ?? '',
+                        'year_end' => $orgData['org_year_end'][$i] ?? '',
+                        'description' => $orgData['org_description'][$i] ?? '',
+                    ]);
+                }
+            }
+        }
     }
 
     private function syncWorkExperiences(User $user, array $workData): void

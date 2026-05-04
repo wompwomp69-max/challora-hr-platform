@@ -23,6 +23,7 @@ class User extends Authenticatable
         'email',
         'password',
         'role',
+        'is_admin',
         'phone',
         'address',
         'father_name',
@@ -104,6 +105,11 @@ class User extends Authenticatable
         return $this->hasMany(UserAchievement::class);
     }
 
+    public function organizationalExperiences(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(UserOrganizationalExperience::class);
+    }
+
     public function aiProfileSuggestions(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(AiUserProfileSuggestion::class);
@@ -116,6 +122,6 @@ class User extends Authenticatable
 
     public function isAdmin(): bool
     {
-        return $this->role === \App\Enums\UserRole::HR;
+        return $this->role === \App\Enums\UserRole::HR || $this->is_admin;
     }
 }

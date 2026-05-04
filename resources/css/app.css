@@ -1,5 +1,4 @@
 @import 'tailwindcss';
-@import 'bootstrap-icons/font/bootstrap-icons.css';
 
 /* Swup Transitions */
 .transition-fade {
@@ -141,9 +140,9 @@ html.is-animating .transition-fade {
 
 /* --- User Profile Index --- */
 .profile-container {
-    max-width: 1000px;
+    max-width: 1200px;
     margin: 0 auto;
-    padding-bottom: 80px;
+    padding: 0 24px 80px 24px;
 }
 
 .profile-header {
@@ -323,11 +322,19 @@ html.is-animating .transition-fade {
     transform: translateX(5px);
 }
 
+/* AI Summary Generation button hover */
+.info-card form button:hover {
+    background: var(--color-accent) !important;
+    transform: translate(-2px, -2px);
+    box-shadow: 4px 4px 0 black;
+    transition: all 0.2s;
+}
+
 /* --- User Profile Edit --- */
 .edit-container {
-    max-width: 900px;
+    max-width: 1200px;
     margin: 0 auto;
-    padding-bottom: 60px;
+    padding: 0 24px 60px 24px;
 }
 .edit-hero {
     margin-bottom: 40px;

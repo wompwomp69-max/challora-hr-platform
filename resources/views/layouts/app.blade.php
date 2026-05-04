@@ -9,6 +9,7 @@
 
     <!-- Token tema (warna, font, radius) -->
     <link rel="stylesheet" href="{{ asset('css/design-tokens.css') }}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
     <!-- Vite Assets (Tailwind & JS) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
