@@ -24,6 +24,7 @@ cmds = [
 [phases.build]
 cmds = [
     "npm run build",
+    "composer dump-autoload --optimize",
     "php artisan config:clear",
     "php artisan route:clear",
     "php artisan view:clear",
