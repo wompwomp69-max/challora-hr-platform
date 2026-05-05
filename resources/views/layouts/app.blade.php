@@ -99,11 +99,103 @@
             @yield('content')
         </main>
 
-        <footer class="p-10 border-t-2 border-border text-center">
-            <p class="text-sm font-bold text-text-muted lowercase tracking-tight">challora
-                v{{ $appVersion }} &nbsp;·&nbsp; no compromises in recruitment.
-            </p>
+        <footer class="bg-accent border-t border-black pt-10">
+            <!-- LAYER 1: CONTACT & CTA (Orange BG, Black Text) -->
+            <div class="px-8 md:px-20 pb-10 border-b border-black text-black">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
+                    <!-- Left: Contact info -->
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                        <div class="col-span-full mb-4">
+                            <h2 class="font-mono text-xl font-bold uppercase leading-tight">GET IN TOUCH<br>TO LEARN MORE.</h2>
+                        </div>
+                        <div>
+                            <p class="font-mono text-[10px] uppercase font-bold mb-1 opacity-70">PHONE</p>
+                            <p class="font-bold text-lg leading-tight">+1 703 810 3320</p>
+                        </div>
+                        <div>
+                            <p class="font-mono text-[10px] uppercase font-bold mb-1 opacity-70">GENERAL INQUIRIES</p>
+                            <p class="font-bold text-lg leading-tight hover:underline cursor-pointer">info@challora.io</p>
+                        </div>
+                        <div>
+                            <p class="font-mono text-[10px] uppercase font-bold mb-1 opacity-70">PRESS</p>
+                            <p class="font-bold text-lg leading-tight hover:underline cursor-pointer">press@challora.io</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Right: Newsletter -->
+                    <div class="flex flex-col justify-end">
+                        <p class="font-mono text-[10px] uppercase font-bold mb-2 opacity-70">SIGN UP FOR UPDATES</p>
+                        <div class="flex items-center border-b-2 border-black pb-2">
+                            <input type="email" placeholder="Enter your email address" class="bg-transparent border-none outline-none text-xl sm:text-2xl font-bold placeholder-black/50 w-full text-black">
+                            <button class="bg-black text-accent font-mono text-[10px] font-bold uppercase rounded-full px-6 py-3 ml-4 hover:bg-white hover:text-black transition-colors whitespace-nowrap">
+                                SUBSCRIBE
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- LAYER 2: THE CONTROL CENTER -->
+            <div class="bg-[#1A1A1A] text-white rounded-[48px] m-4 md:m-8 p-10 md:p-20 relative overflow-hidden flex flex-col justify-between" style="min-height: 60vh;">
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-10 relative z-10 mb-20">
+                    <!-- Col 1: Logo -->
+                    <div class="text-accent">
+                        <div class="w-16 h-16 border-4 border-accent flex items-center justify-center font-black text-4xl">C</div>
+                    </div>
+                    
+                    <!-- Col 2: Platform -->
+                    <div>
+                        <a href="{{ route('jobs.index') }}" class="text-accent font-bold text-xl hover:text-white transition-colors block mb-4">Platform</a>
+                    </div>
+
+                    <!-- Col 3: Solutions -->
+                    <div>
+                        <h3 class="font-mono text-[10px] uppercase tracking-widest text-[#888] mb-6 flex items-start gap-1">Solutions <span class="text-[8px]">4</span></h3>
+                        <ul class="space-y-4 font-bold text-sm">
+                            <li><a href="#" class="hover:text-accent transition-colors">↳ Cyber / EW</a></li>
+                            <li><a href="#" class="hover:text-accent transition-colors">↳ Predictive Maintenance</a></li>
+                            <li><a href="#" class="hover:text-accent transition-colors">↳ Compliance</a></li>
+                            <li><a href="#" class="hover:text-accent transition-colors">↳ Research</a></li>
+                        </ul>
+                    </div>
+
+                    <!-- Col 4: About -->
+                    <div>
+                        <h3 class="font-mono text-[10px] uppercase tracking-widest text-[#888] mb-6 flex items-start gap-1">About <span class="text-[8px]">2</span></h3>
+                        <ul class="space-y-4 font-bold text-sm">
+                            <li><a href="#" class="hover:text-accent transition-colors">↳ Company</a></li>
+                            <li><a href="#" class="hover:text-accent transition-colors">↳ Careers</a></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="flex flex-col md:flex-row justify-between items-end relative z-10 font-mono text-[10px] text-[#888] uppercase mb-10 md:mb-16">
+                    <div class="flex items-center gap-3">
+                        <div class="w-6 h-4 bg-accent flex items-center justify-center text-black font-bold text-[6px]">US</div>
+                        <span>FORGED IN AMERICA. FOR AMERICA.</span>
+                    </div>
+                    <div class="text-left md:text-right mt-8 md:mt-0">
+                        <p>CHALLORA HQ<br>1100 WILSON BLVD, STE 2100<br>ROSSLYN, VA 22209</p>
+                    </div>
+                </div>
+
+                <!-- Mega Wordmark -->
+                <div class="text-[15vw] leading-[0.7] font-black text-center tracking-tighter text-[#2a2a2a] select-none absolute bottom-[-2vw] left-0 w-full pointer-events-none">
+                    CHALLORA
+                </div>
+            </div>
+
+            <!-- LAYER 3: LEGAL STRIP -->
+            <div class="bg-accent border-t border-black py-4 px-8 md:px-20 text-black font-mono text-[10px] font-bold uppercase flex flex-col md:flex-row justify-between items-center gap-4">
+                <div>©2026 CHALLORA, INC.</div>
+                <div class="flex flex-wrap justify-center gap-6">
+                    <a href="#" class="hover:underline">LICENSE AGREEMENT</a>
+                    <a href="#" class="hover:underline">PRIVACY POLICY</a>
+                    <a href="#" class="hover:underline">TERMS OF USE</a>
+                </div>
+            </div>
         </footer>
+
     </div>
 
     <script>

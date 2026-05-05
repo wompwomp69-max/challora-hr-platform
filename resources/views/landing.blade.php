@@ -1,650 +1,406 @@
 @extends('layouts.app')
 
 @push('styles')
-    <style>
-        /* Premium Brutalist - Z-Axis Depth */
-        .brutalist-card {
-            border: 1.2px solid var(--color-accent);
-            box-shadow: 8px 8px 0px 0px black;
-            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            background: var(--color-surface);
-        }
+<style>
+    /* ── SHIFT5 REPLICA STYLES ── */
+    :root {
+        --s5-orange: #FF4D30;
+        --s5-black: #000000;
+        --s5-white: #FFFFFF;
+        --s5-grey-light: #F4F4F4;
+        --s5-grey-mid: #E5E5E5;
+        --s5-grey-dark: #888888;
+        --nav-height: 80px;
+    }
 
-        .brutalist-card:hover {
-            transform: translate(-6px, -6px);
-            box-shadow: 16px 16px 0px 0px var(--color-accent);
-        }
+    body, html {
+        font-family: "Inter", -apple-system, sans-serif !important;
+    }
 
-        .brutalist-btn {
-            border: 4px solid black;
-            box-shadow: 6px 6px 0px 0px black;
-            transition: all 0.1s ease;
-        }
+    /* ── Typography ── */
+    .s5-title-mega {
+        font-family: "Inter", sans-serif;
+        font-size: clamp(4rem, 10vw, 9rem);
+        font-weight: 900;
+        line-height: 0.85;
+        letter-spacing: -0.04em;
+        text-transform: none;
+    }
+    
+    .s5-title-section {
+        font-family: "Inter", sans-serif;
+        font-size: clamp(2rem, 4vw, 3.5rem);
+        font-weight: 800;
+        line-height: 1.1;
+        letter-spacing: -0.02em;
+    }
 
-        .brutalist-btn:active {
-            transform: translate(4px, 4px);
-            box-shadow: 0px 0px 0px 0px black;
-        }
+    .s5-mono {
+        font-family: "JetBrains Mono", monospace;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
 
-        /* Main Content */
-        .landing-content {
-            padding: 0 20vh;
-        }
+    /* ── Components ── */
+    .s5-pill-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 1rem 2rem;
+        border-radius: 999px;
+        font-weight: 700;
+        font-size: 1rem;
+        text-decoration: none;
+        transition: all 0.2s ease;
+        border: 1px solid transparent;
+        cursor: pointer;
+    }
+    .s5-pill-primary {
+        background-color: var(--s5-orange);
+        color: var(--s5-white);
+    }
+    .s5-pill-primary:hover {
+        background-color: #e6452a;
+    }
+    .s5-pill-outline {
+        background-color: transparent;
+        color: var(--s5-black);
+        border-color: var(--s5-black);
+    }
+    .s5-pill-outline:hover {
+        background-color: var(--s5-black);
+        color: var(--s5-white);
+    }
+    .s5-pill-white {
+        background-color: var(--s5-white);
+        color: var(--s5-black);
+    }
+    .s5-pill-white:hover {
+        background-color: var(--s5-grey-light);
+    }
 
-        .landing-content section {
-            margin-top: 16vh;
-            /* border: 1px solid red; */
-        }
+    /* ── Hero Layout (Split Screen) ── */
+    .s5-hero {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        min-height: 100vh;
+        width: 100vw;
+        position: relative;
+        left: 50%; right: 50%;
+        margin-left: -50vw; margin-right: -50vw;
+        border-bottom: 1px solid var(--s5-grey-mid);
+    }
 
-        /* Terminal Styles */
-        .terminal-header {
-            background: #333;
-            padding: 8px 16px;
-            display: flex;
-            gap: 8px;
-            border-bottom: 2px solid black;
-        }
+    .s5-hero-left {
+        position: relative;
+        background-color: var(--s5-grey-light);
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+        padding: 4rem;
+        border-right: 1px solid var(--s5-grey-mid);
+    }
 
-        .terminal-dot {
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            border: 1px solid black;
-        }
+    .s5-hero-image {
+        position: absolute;
+        inset: 0;
+        background-image: url('/industrial_hero_jet_1777948418524.png');
+        background-size: cover;
+        background-position: center;
+        filter: grayscale(100%) contrast(1.2) brightness(0.8);
+        z-index: 1;
+    }
 
-        .scanline {
-            width: 100%;
-            height: 100px;
-            z-index: 10;
-            background: linear-gradient(0deg, rgba(0, 255, 65, 0) 0%, rgba(0, 255, 65, 0.1) 50%, rgba(0, 255, 65, 0) 100%);
-            position: absolute;
-            top: 0;
-            left: 0;
-            pointer-events: none;
-        }
+    .s5-hero-left-text {
+        position: relative;
+        z-index: 2;
+        color: var(--s5-white);
+        font-size: clamp(1.5rem, 3vw, 2.5rem);
+        font-weight: 700;
+        line-height: 1.1;
+        max-width: 80%;
+    }
 
-        /* Marquee Edge-to-Edge */
-        .marquee-container {
-            border-top: 4px solid black;
-            border-bottom: 4px solid black;
-            overflow: hidden;
-            white-space: nowrap;
-            background: var(--color-accent);
-            color: var(--color-surface);
-            padding: 1.5rem 0;
-            width: 100vw;
-            position: relative;
-            left: 50%;
-            right: 50%;
-            margin-left: -50vw;
-            margin-right: -50vw;
-        }
+    .s5-hero-right {
+        background-color: var(--s5-black);
+        color: var(--s5-white);
+        display: flex;
+        flex-direction: column;
+        padding: calc(var(--nav-height) + 4rem) 4rem 4rem;
+        position: relative;
+    }
 
-        .marquee-content {
-            display: inline-block;
-            animation: marquee 30s linear infinite;
-            font-weight: 900;
-            text-transform: uppercase;
-            font-size: 2rem;
-            letter-spacing: 0.1em;
-        }
+    .s5-hero-right-top {
+        flex: 1;
+    }
 
-        @keyframes marquee {
-            0% {
-                transform: translateX(0);
-            }
+    /* ── System Status Block ── */
+    .s5-system-status {
+        margin-top: 4rem;
+        border-top: 1px solid rgba(255,255,255,0.2);
+        padding-top: 2rem;
+    }
+    .s5-status-title {
+        font-size: 0.85rem;
+        color: var(--s5-grey-dark);
+        margin-bottom: 1rem;
+    }
+    .s5-status-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.5rem 2rem;
+    }
+    .s5-status-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-size: 0.75rem;
+        color: var(--s5-grey-mid);
+        border-bottom: 1px solid rgba(255,255,255,0.1);
+        padding-bottom: 0.25rem;
+    }
+    .s5-status-dot {
+        width: 6px; height: 6px;
+        background-color: var(--s5-orange);
+        border-radius: 50%;
+        box-shadow: 0 0 8px var(--s5-orange);
+    }
 
-            100% {
-                transform: translateX(-50%);
-            }
-        }
+    /* ── Solutions Grid ── */
+    .s5-section {
+        padding: 8rem 4rem;
+        max-width: 1600px;
+        margin: 0 auto;
+    }
 
-        .hero-title {
-            font-size: clamp(3.5rem, 10vw, 8.5rem);
-            line-height: 0.85;
-            letter-spacing: -0.06em;
-        }
+    .s5-grid-4 {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        border-top: 1px solid var(--s5-orange);
+        border-left: 1px solid var(--s5-orange);
+        margin-top: 4rem;
+    }
 
-        /* Radar Chart Fake Stylings */
-        .radar-grid {
-            stroke: #333;
-            stroke-width: 1;
-            fill: none;
-        }
+    .s5-grid-card {
+        border-right: 1px solid var(--s5-orange);
+        border-bottom: 1px solid var(--s5-orange);
+        padding: 2rem;
+        display: flex;
+        flex-direction: column;
+        background: transparent;
+        color: var(--s5-white);
+        transition: background 0.3s;
+    }
 
-        .radar-axis {
-            stroke: #444;
-            stroke-width: 1;
-        }
+    .s5-grid-card:hover {
+        background: rgba(255, 77, 48, 0.1);
+    }
 
-        .radar-area {
-            fill: rgba(255, 69, 0, 0.4);
-            stroke: var(--color-accent);
-            stroke-width: 3;
-        }
+    .s5-card-title {
+        font-weight: 800;
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+        line-height: 1.2;
+    }
 
-        .radar-point {
-            fill: var(--color-accent);
-            stroke: black;
-            stroke-width: 2;
-        }
+    .s5-card-desc {
+        color: var(--s5-grey-dark);
+        font-size: 1rem;
+        line-height: 1.5;
+        margin-bottom: 2rem;
+        flex: 1;
+    }
 
-        /* React Bits inspired: Pixel Blast (hero-only scope) */
-        #hero-section {
-            position: relative;
-            overflow: hidden;
-            isolation: isolate;
-            width: 100vw;
-            min-height: 100vh;
-            justify-content: center;
-            left: 50%;
-            right: 50%;
-            margin-left: -50vw;
-            margin-right: -50vw;
-            padding: calc(var(--nav-height) + 2rem) 1.5rem 3rem;
-        }
+    /* ── Marquee ── */
+    .s5-marquee {
+        background-color: var(--s5-orange);
+        color: var(--s5-black);
+        padding: 1rem 0;
+        overflow: hidden;
+        white-space: nowrap;
+        font-weight: 800;
+        font-size: 1.25rem;
+        text-transform: uppercase;
+        border-bottom: 1px solid var(--s5-black);
+        width: 100vw;
+        position: relative;
+        left: 50%; right: 50%;
+        margin-left: -50vw; margin-right: -50vw;
+    }
+    .s5-marquee span {
+        display: inline-block;
+        animation: s5-scroll 30s linear infinite;
+    }
+    @keyframes s5-scroll {
+        0% { transform: translateX(0); }
+        100% { transform: translateX(-50%); }
+    }
 
-        #hero-section .rb-pixelblast-wrap {
-            position: absolute;
-            inset: 0;
-            pointer-events: auto;
-            z-index: 0;
-            overflow: hidden;
-        }
-
-        #hero-section .rb-pixelblast-react-canvas {
-            width: 100%;
-            height: 100%;
-            display: block;
-        }
-
-        #hero-section .rb-pixelblast-wrap::before {
-            content: "";
-            position: absolute;
-            inset: 0;
-            pointer-events: none;
-            z-index: 1;
-            background-image:
-                radial-gradient(circle at 20% 22%, rgba(255, 69, 0, 0.18), transparent 34%),
-                radial-gradient(circle at 78% 26%, rgba(255, 69, 0, 0.16), transparent 30%),
-                radial-gradient(circle at 50% 82%, rgba(255, 160, 0, 0.10), transparent 34%);
-            mix-blend-mode: screen;
-            animation: rbPixelBlastPulse 10s ease-in-out infinite;
-        }
-
-        #hero-section .rb-pixelblast-wrap::after {
-            content: "";
-            position: absolute;
-            inset: 0;
-            pointer-events: none;
-            background-image:
-                repeating-linear-gradient(0deg,
-                    rgba(255, 69, 0, 0.12) 0 1px,
-                    transparent 1px 18px),
-                repeating-linear-gradient(90deg,
-                    rgba(255, 69, 0, 0.12) 0 1px,
-                    transparent 1px 18px);
-            opacity: 0.24;
-            mix-blend-mode: screen;
-            animation: rbPixelGridShift 12s linear infinite;
-        }
-
-        #hero-section .hero-content {
-            position: relative;
-            z-index: 2;
-        }
-
-        @keyframes rbPixelBlastPulse {
-
-            0%,
-            100% {
-                opacity: 0.72;
-            }
-
-            50% {
-                opacity: 0.92;
-            }
-        }
-
-        @keyframes rbPixelGridShift {
-            0% {
-                transform: translate3d(-8px, 0, 0);
-            }
-
-            100% {
-                transform: translate3d(10px, -8px, 0);
-            }
-        }
-
-        @media (prefers-reduced-motion: reduce) {
-
-            #hero-section .rb-pixelblast-wrap::before,
-            #hero-section .rb-pixelblast-wrap::after {
-                animation: none;
-            }
-        }
-    </style>
+    /* ── Responsive ── */
+    @media (max-width: 1024px) {
+        .s5-hero { grid-template-columns: 1fr; }
+        .s5-hero-left { min-height: 50vh; }
+        .s5-grid-4 { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 640px) {
+        .s5-grid-4 { grid-template-columns: 1fr; }
+        .s5-hero-left, .s5-hero-right { padding: 2rem; }
+    }
+</style>
 @endpush
 
 @section('content')
-    <div class="flex flex-col gap-32 pb-32">
+<div class="flex flex-col w-full">
 
-        <!-- HERO SECTION -->
-        <section class="flex flex-col items-center text-center gap-10" id="hero-section">
-            <div class="rb-pixelblast-wrap" aria-hidden="true">
-                <div id="rb-pixelblast-react-root" class="rb-pixelblast-react-canvas"></div>
+    <!-- HERO SECTION -->
+    <section class="s5-hero">
+        <!-- Left Side: Image & Tagline -->
+        <div class="s5-hero-left">
+            <div class="s5-hero-image"></div>
+            <!-- Overlay gradient for text readability -->
+            <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent z-[1]"></div>
+            
+            <div class="s5-hero-left-text">
+                Operational Intelligence for Every Vehicle, Every Fleet, Every Mission.
             </div>
-            <div class="space-y-4 hero-content">
-                <h1 class="font-black uppercase hero-title text-text tracking-tighter">
-                    Recruiting <br>
-                    <span class="text-accent underline decoration-8 decoration-black px-4">Without</span>
-                    <br>
-                    The Guesswork.
+        </div>
+
+        <!-- Right Side: Title & Status -->
+        <div class="s5-hero-right">
+            <div class="s5-hero-right-top">
+                <p class="s5-mono text-sm text-[#888] mb-6">Powering actionable insights for defense and transportation systems.</p>
+                <h1 class="s5-title-mega mb-10">
+                    Op /<br>Intelligence
                 </h1>
+                
+                <div class="flex gap-4">
+                    <a href="{{ route('jobs.index') }}" class="s5-pill-btn s5-pill-primary">
+                        Explore Platform
+                    </a>
+                    <a href="{{ route('register') }}" class="s5-pill-btn s5-pill-white">
+                        Join Network
+                    </a>
+                </div>
             </div>
-            <p
-                class="text-xl md:text-2xl font-bold text-text-muted max-w-3xl leading-relaxed uppercase tracking-tight hero-content">
-                Stop relying on gut feelings. Chally AI analyzes competence, reduces bias, and delivers the best talent
-                directly to your desk.
-            </p>
 
-            <div class="flex flex-wrap justify-center gap-8 mt-10 hero-content">
-                <a href="{{ route('jobs.index') }}"
-                    class="brutalist-btn bg-accent text-surface font-black uppercase tracking-widest px-10 py-5 text-xl hover:translate-x-[-4px] hover:translate-y-[-4px] hover:shadow-[10px_10px_0_0_black]">
-                    Find Jobs
-                </a>
-                <a href="{{ route('register') }}"
-                    class="brutalist-btn bg-surface text-text font-black uppercase tracking-widest px-10 py-5 text-xl hover:bg-secondary">
-                    Post A Job
-                </a>
-            </div>
-        </section>
-
-        <!-- MARQUEE -->
-        <div class="marquee-container" id="marquee-section">
-            <div class="marquee-content">
-                // NO BIAS // HIGH PRECISION // CHALLY AI // 90% FASTER SCREENING // POWERED BY DATA // // NO BIAS // HIGH
-                PRECISION // CHALLY AI // 90% FASTER SCREENING // POWERED BY DATA //
+            <div class="s5-system-status">
+                <div class="s5-mono s5-status-title">System Status</div>
+                <div class="s5-mono s5-status-grid">
+                    @php $statuses = [
+                        ['01', 'GPS'], ['02', 'Radar'],
+                        ['03', 'Engines'], ['04', 'Electrical'],
+                        ['05', 'Fuel'], ['06', 'Electronic Warfare'],
+                        ['07', 'Countermeasures'], ['08', 'Environmental'],
+                        ['09', 'Communications'], ['10', 'Flight Data Links']
+                    ]; @endphp
+                    @foreach($statuses as $s)
+                    <div class="s5-status-item">
+                        <span>{{ $s[0] }}. {{ $s[1] }}</span>
+                        <div class="s5-status-dot"></div>
+                    </div>
+                    @endforeach
+                </div>
             </div>
         </div>
+    </section>
 
-        <div class="landing-content">
-            <!-- AI SCAN SIMULATOR (The Terminal) -->
-            <section class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center" id="ai-section">
-                <div class="space-y-8">
-                    <div
-                        class="inline-block bg-accent px-4 py-1 font-black uppercase text-surface border-4 border-black transform -rotate-1">
-                        AI Powered Core
-                    </div>
-                    <h2 class="text-6xl font-black uppercase leading-none text-text">Instant <br>Resume Intelligence</h2>
-                    <p class="text-xl text-text-muted font-bold max-w-lg">
-                        Chally AI dissects thousands of CVs in seconds. We extract skill-sets semantically, detect relevant
-                        experience, and eliminate data noise.
-                    </p>
-                    <ul class="space-y-4 font-mono text-accent">
-                        <li class="flex items-center gap-3">
-                            <span class="w-2 h-2 bg-accent"></span> AI Semantic Extraction (1.2s)
-                        </li>
-                        <li class="flex items-center gap-3">
-                            <span class="w-2 h-2 bg-accent"></span> Experience Validation Logic
-                        </li>
-                        <li class="flex items-center gap-3">
-                            <span class="w-2 h-2 bg-accent"></span> Diversity-First Ranking
-                        </li>
-                    </ul>
-                </div>
-
-                <div class="terminal-window rounded-none relative overflow-hidden brutalist-shadow-deep"
-                    id="terminal-emulator">
-                    <div class="terminal-header">
-                        <div class="terminal-dot bg-red-500"></div>
-                        <div class="terminal-dot bg-yellow-500"></div>
-                        <div class="terminal-dot bg-green-500"></div>
-                        <span class="ml-4 font-mono text-xs opacity-50 uppercase">chally-scanner-v3.1.0</span>
-                    </div>
-                    <div class="p-8 font-mono text-sm space-y-2 relative h-[400px] overflow-hidden">
-                        <div class="scanline" id="terminal-scanline"></div>
-                        <div id="terminal-output" class="text-terminal-text">
-                            <p class="terminal-accent text-lg mb-4">Awaiting signal...</p>
-                            <!-- Teks akan diisi oleh JS -->
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- INTELLIGENCE RADAR (Matching) -->
-            <section class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center" id="radar-section">
-                <div class="order-2 lg:order-1 flex justify-center">
-                    <div
-                        class="brutalist-card p-10 bg-secondary relative max-w-md w-full aspect-square flex items-center justify-center overflow-hidden">
-                        <svg viewBox="0 0 200 200" class="w-full h-full transform -rotate-90">
-                            <!-- Grid -->
-                            <polygon points="100,20 180,60 180,140 100,180 20,140 20,60" class="radar-grid" />
-                            <polygon points="100,40 160,70 160,130 100,160 40,130 40,70" class="radar-grid" opacity="0.5" />
-                            <!-- Axis -->
-                            <line x1="100" y1="100" x2="100" y2="20" class="radar-axis" />
-                            <line x1="100" y1="100" x2="180" y2="60" class="radar-axis" />
-                            <line x1="100" y1="100" x2="180" y2="140" class="radar-axis" />
-                            <line x1="100" y1="100" x2="100" y2="180" class="radar-axis" />
-                            <line x1="100" y1="100" x2="20" y2="140" class="radar-axis" />
-                            <line x1="100" y1="100" x2="20" y2="60" class="radar-axis" />
-                            <!-- Area -->
-                            <polygon id="radar-shape" points="100,50 160,80 140,120 100,150 40,110 50,80"
-                                class="radar-area" />
-                            <!-- Points -->
-                            <circle cx="100" cy="50" r="4" class="radar-point" />
-                            <circle cx="160" cy="80" r="4" class="radar-point" />
-                            <circle cx="140" cy="120" r="4" class="radar-point" />
-                            <circle cx="100" cy="150" r="4" class="radar-point" />
-                            <circle cx="40" cy="110" r="4" class="radar-point" />
-                            <circle cx="50" cy="80" r="4" class="radar-point" />
-                        </svg>
-                    </div>
-                </div>
-                <div class="order-1 lg:order-2 space-y-8">
-                    <h2 class="text-6xl font-black uppercase leading-none text-text">Intelligent <br>Matching Score</h2>
-                    <p class="text-xl text-text-muted font-bold">
-                        More than just keyword matching. Chally AI maps candidate competencies against your specific team
-                        needs:
-                        technical skills, cultural fit, and career stability.
-                    </p>
-                    <div class="brutalist-card bg-surface p-6 border-l-[12px] border-l-accent">
-                        <div class="text-4xl font-black text-accent mb-2">92.4%</div>
-                        <div class="font-bold text-sm uppercase tracking-widest text-text">Overall Match Confidence</div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- RECRUITMENT JOURNEY (Section 3) -->
-            <section class="flex flex-col gap-16" id="journey-section">
-                <div class="text-center space-y-4">
-                    <h2 class="text-5xl font-black uppercase tracking-tighter">Your Path to <span
-                            class="text-accent underline">Hired.</span></h2>
-                    <p class="text-text-muted font-bold text-lg">Transparent process, no drama, fully powered by AI.</p>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-4 relative">
-                    <!-- Journey Step 1 -->
-                    <div class="brutalist-card p-8 flex flex-col gap-4 relative z-10 journey-step">
-                        <div class="text-6xl font-black text-accent opacity-20 absolute top-4 right-4">01</div>
-                        <h3 class="text-2xl font-black uppercase text-text">Upload CV</h3>
-                        <p class="text-text-muted font-medium">Upload your resume in PDF format. Let Chally do the heavy
-                            lifting.</p>
-                    </div>
-                    <!-- Journey Step 2 -->
-                    <div class="brutalist-card p-8 flex flex-col gap-4 relative z-10 mt-8 md:mt-16 journey-step">
-                        <div class="text-6xl font-black text-accent opacity-20 absolute top-4 right-4">02</div>
-                        <h3 class="text-2xl font-black uppercase text-text">AI Analysis</h3>
-                        <p class="text-text-muted font-medium">The system objectively dissects your competencies within
-                            seconds.
-                        </p>
-                    </div>
-                    <!-- Journey Step 3 -->
-                    <div class="brutalist-card p-8 flex flex-col gap-4 relative z-10 journey-step">
-                        <div class="text-6xl font-black text-accent opacity-20 absolute top-4 right-4">03</div>
-                        <h3 class="text-2xl font-black uppercase text-text">Get Matched</h3>
-                        <p class="text-text-muted font-medium">Find jobs that truly fit your profile through intelligent
-                            scoring.</p>
-                    </div>
-                    <!-- Journey Step 4 -->
-                    <div
-                        class="brutalist-card p-8 bg-accent text-surface flex flex-col gap-4 relative z-10 mt-8 md:mt-16 journey-step">
-                        <div class="text-6xl font-black text-surface opacity-30 absolute top-4 right-4">04</div>
-                        <h3 class="text-2xl font-black uppercase">Direct Hire</h3>
-                        <p class="text-surface font-bold opacity-80">Bypass bureaucracy and connect directly with the hiring
-                            team.</p>
-                    </div>
-                </div>
-            </section>
-
-            <!-- AI BRANDING COACH (Section 4) -->
-            <section class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center" id="coach-section">
-                <div class="brutalist-card bg-surface p-10 relative overflow-hidden group">
-                    <div
-                        class="absolute -top-10 -right-10 w-40 h-40 bg-accent opacity-10 group-hover:scale-150 transition-transform duration-500">
-                    </div>
-                    <div class="font-mono text-sm text-accent mb-6 uppercase tracking-widest">// CHALLY COACH ADVICE //
-                    </div>
-
-                    <div class="space-y-6">
-                        <div class="bg-secondary p-4 border-2 border-black shadow-[4px_4px_0_0_black]">
-                            <p class="font-bold text-text mb-2">"My advice for your Resume:"</p>
-                            <p class="text-sm text-text-muted">"Add specific projects using <strong>Laravel 10</strong> to
-                                boost
-                                your compatibility score in the Fintech industry by up to <strong>+18%</strong>."</p>
-                        </div>
-                        <div class="flex gap-4">
-                            <div class="flex-1 bg-black p-4 text-xs font-mono text-white">
-                                <span class="text-green-400">Current Score:</span> 68/100
-                            </div>
-                            <div class="flex-1 bg-accent p-4 text-xs font-mono text-surface font-bold">
-                                <span>Potential Score:</span> 86/100
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="space-y-8">
-                    <h2 class="text-6xl font-black uppercase leading-none text-text">Your Personal <br><span
-                            class="text-accent">Branding Coach</span></h2>
-                    <p class="text-xl text-text-muted font-bold">
-                        Chally doesn't just evaluate, it guides. Get instant advice to enhance your profile and get noticed
-                        by
-                        top recruiters.
-                    </p>
-                    <a href="{{ route('register') }}"
-                        class="brutalist-btn bg-surface text-text font-black uppercase tracking-widest px-8 py-4 inline-block hover:bg-black hover:text-white transition-colors">
-                        Try Coach Mode
-                    </a>
-                </div>
-            </section>
-
-            <!-- FEATURED JOBS (Section 5) -->
-            <section class="flex flex-col gap-16" id="jobs-preview-section">
-                <div class="flex flex-col md:flex-row justify-between items-end gap-6">
-                    <div class="space-y-3">
-                        <h2 class="text-5xl font-black uppercase tracking-tighter">New <span
-                                class="text-accent">Opportunities</span></h2>
-                        <p class="text-text-muted font-bold">Don't miss the golden opportunities that hit the radar today.
-                        </p>
-                    </div>
-                    <a href="{{ route('jobs.index') }}"
-                        class="font-black uppercase text-accent hover:underline decoration-4 flex items-center gap-2">
-                        Explore All Jobs
-                        <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
-                                d="M14 5l7 7m0 0l-7 7m7-7H3">
-                            </path>
-                        </svg>
-                    </a>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                    @forelse($latestJobs as $job)
-                        <div class="brutalist-card p-6 flex flex-col gap-6 group">
-                            <div class="flex justify-between items-start">
-                                <div
-                                    class="w-12 h-12 bg-secondary border-2 border-black flex items-center justify-center font-black uppercase">
-                                    {{ strtoupper(substr($job->creator->name ?? 'TC', 0, 2)) }}
-                                </div>
-                                @php
-                                    $badgeColors = [
-                                        'full_time' => 'bg-success-bg text-success-text',
-                                        'remote' => 'bg-sky-bg text-sky-text',
-                                        'contract' => 'bg-warning-soft text-warning-text',
-                                        'freelance' => 'bg-accent text-surface',
-                                        'internship' => 'bg-info-soft text-secondary',
-                                    ];
-                                    $type = $job->job_type->value ?? 'full_time';
-                                    $color = $badgeColors[$type] ?? 'bg-secondary text-text';
-                                @endphp
-                                <span class="{{ $color }} px-3 py-1 font-black text-[10px] uppercase border-2 border-black">
-                                    {{ str_replace('_', '-', $type) }}
-                                </span>
-                            </div>
-                            <div>
-                                <h3
-                                    class="text-xl font-black uppercase text-text group-hover:text-accent transition-colors leading-tight">
-                                    {{ $job->title }}
-                                </h3>
-                                <p class="text-text-muted font-bold text-sm">{{ $job->creator->name ?? 'Anonymous' }} ·
-                                    {{ $job->location }}
-                                </p>
-                            </div>
-                            <div class="flex flex-wrap gap-2 mt-auto">
-                                @if($job->skills_json)
-                                    @foreach(array_slice($job->skills_json, 0, 3) as $skill)
-                                        <span
-                                            class="text-[10px] font-mono border border-black px-2 py-0.5">{{ strtoupper($skill) }}</span>
-                                    @endforeach
-                                @endif
-                            </div>
-                        </div>
-                    @empty
-                        <div class="col-span-full py-20 text-center">
-                            <p class="text-2xl font-black uppercase text-text-muted opacity-50">No opportunities available right
-                                now.</p>
-                        </div>
-                    @endforelse
-                </div>
-            </section>
-
-
-            <!-- FINAL CTA -->
-            <section
-                class="brutalist-card bg-primary p-16 flex flex-col md:flex-row items-center justify-between gap-8 border-[6px]">
-                <div class="max-w-xl">
-                    <h2 class="text-6xl font-black uppercase text-white mb-4 leading-none">Ready to <span
-                            class="text-accent">win</span> <br>the talent war?</h2>
-                    <p class="text-gray-400 font-bold text-lg">Join the recruitment ecosystem of the future, powered by
-                        artificial intelligence.</p>
-                </div>
-                <div class="flex flex-col gap-4 w-full md:w-auto">
-                    <a href="{{ route('register') }}"
-                        class="brutalist-btn bg-accent text-surface text-center font-black uppercase tracking-widest px-12 py-5 text-xl hover:translate-x-[-4px] hover:translate-y-[-4px] hover:shadow-[10px_10px_0_0_white]">
-                        Join Challora
-                    </a>
-                    <a href="{{ route('login') }}"
-                        class="text-center font-black text-white hover:text-accent transition-colors cursor-pointer">Already
-                        have an account? <span class="underline">Sign In</span></a>
-                </div>
-            </section>
-        </div>
-
-
+    <!-- MARQUEE -->
+    <div class="s5-marquee">
+        <span>
+            // NO BIAS &nbsp;&nbsp;&nbsp; MISSION READY &nbsp;&nbsp;&nbsp; CHALLY AI &nbsp;&nbsp;&nbsp; DEFENSE GRADE RECRUITMENT &nbsp;&nbsp;&nbsp; POWERED BY DATA &nbsp;&nbsp;&nbsp; 100% OPERATIONAL &nbsp;&nbsp;&nbsp; 
+            // NO BIAS &nbsp;&nbsp;&nbsp; MISSION READY &nbsp;&nbsp;&nbsp; CHALLY AI &nbsp;&nbsp;&nbsp; DEFENSE GRADE RECRUITMENT &nbsp;&nbsp;&nbsp; POWERED BY DATA &nbsp;&nbsp;&nbsp; 100% OPERATIONAL &nbsp;&nbsp;&nbsp;
+        </span>
     </div>
+
+    <!-- SOLUTIONS SECTION -->
+    <section class="s5-section">
+        <h2 class="s5-title-section max-w-3xl">Operational Intelligence Solutions</h2>
+        
+        <div class="s5-grid-4">
+            <div class="s5-grid-card group">
+                <h3 class="s5-card-title">Cyber / EW</h3>
+                <p class="s5-card-desc">Analyze serial bus traffic and radio frequency (RF) data to flag threats in near real-time, empowering operators to take decisive action.</p>
+                <div class="mt-auto">
+                    <a href="#" class="s5-mono text-[10px] text-accent font-bold border border-accent rounded-full px-4 py-2 group-hover:bg-accent group-hover:text-black transition-colors">EXPLORE</a>
+                </div>
+            </div>
+
+            <div class="s5-grid-card group">
+                <h3 class="s5-card-title text-accent">Predictive Maintenance</h3>
+                <p class="s5-card-desc text-[#aaa]">Transform serial bus data into proactive maintenance insights to keep operators safe and fleets mission-ready.</p>
+                <div class="mt-auto">
+                    <a href="#" class="s5-mono text-[10px] text-accent font-bold border border-accent rounded-full px-4 py-2 group-hover:bg-accent group-hover:text-black transition-colors">EXPLORE</a>
+                </div>
+            </div>
+
+            <div class="s5-grid-card group">
+                <h3 class="s5-card-title text-accent">Fleet Compliance</h3>
+                <p class="s5-card-desc text-[#aaa]">Process security log files from commercial aircraft to rapidly identify security incidents and verify compliance with aviation regulations.</p>
+                <div class="mt-auto">
+                    <a href="#" class="s5-mono text-[10px] text-accent font-bold border border-accent rounded-full px-4 py-2 group-hover:bg-accent group-hover:text-black transition-colors">EXPLORE</a>
+                </div>
+            </div>
+
+            <div class="s5-grid-card group">
+                <h3 class="s5-card-title text-accent">Research</h3>
+                <p class="s5-card-desc text-[#aaa]">Secure your most critical assets against advanced persistent threats through expert-led security assessments and specialized tooling.</p>
+                <div class="mt-auto">
+                    <a href="#" class="s5-mono text-[10px] text-accent font-bold border border-accent rounded-full px-4 py-2 group-hover:bg-accent group-hover:text-black transition-colors">EXPLORE</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- JOBS SECTION (Adapted to S5 Style) -->
+    <section class="s5-section pt-0">
+        <div class="flex justify-between items-end mb-8 border-b border-accent pb-4">
+            <h2 class="s5-title-section text-white">Mission Positions</h2>
+            <a href="{{ route('jobs.index') }}" class="s5-pill-btn text-accent border border-accent hover:bg-accent hover:text-black text-sm py-2 px-6">View All</a>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-0 border-t border-l border-accent">
+            @forelse($latestJobs as $job)
+            <div class="border-r border-b border-accent p-8 relative group hover:bg-[rgba(255,77,48,0.1)] transition-colors flex flex-col">
+                <div class="s5-mono text-[10px] text-accent font-bold mb-4">ACTIVE // {{ strtoupper($job->location) }}</div>
+                <h3 class="s5-title-section text-2xl mb-4 leading-tight text-white group-hover:text-accent transition-colors">{{ $job->title }}</h3>
+                <div class="flex flex-wrap gap-2 mb-8">
+                    @if($job->skills_json)
+                        @foreach(array_slice($job->skills_json, 0, 3) as $skill)
+                        <span class="border border-accent text-accent px-3 py-1 s5-mono text-[9px]">{{ $skill }}</span>
+                        @endforeach
+                    @endif
+                </div>
+                <div class="mt-auto">
+                    <a href="{{ route('jobs.show', $job->id) }}" class="s5-mono text-[10px] font-bold border border-accent bg-transparent text-accent rounded-full px-6 py-3 hover:bg-accent hover:text-black transition-colors">APPLY NOW</a>
+                </div>
+            </div>
+            @empty
+            <div class="col-span-full py-20 text-center s5-mono text-gray-400">No active missions.</div>
+            @endforelse
+        </div>
+    </section>
+
+
+
+</div>
 @endsection
 
 @push('scripts')
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            gsap.registerPlugin(ScrollTrigger);
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    gsap.registerPlugin(ScrollTrigger);
 
-            // Hero Entrance
-            const heroTl = gsap.timeline();
-            heroTl.from(".hero-title", { y: 100, opacity: 0, duration: 1.2, ease: "power4.out" })
-                .from(".hero-title span", { x: -50, opacity: 0, duration: 0.8 }, "-=0.8")
-                .from("#hero-section p, #hero-section .brutalist-btn", { y: 30, opacity: 0, stagger: 0.2 }, "-=0.5");
+    // Hero Animations
+    gsap.from(".s5-hero-left-text", { y: 30, opacity: 0, duration: 1, delay: 0.2 });
+    gsap.from(".s5-title-mega", { y: 50, opacity: 0, duration: 1, ease: "power3.out", delay: 0.4 });
+    gsap.from(".s5-pill-btn", { y: 20, opacity: 0, duration: 0.8, stagger: 0.1, delay: 0.6 });
+    gsap.from(".s5-status-item", { x: 20, opacity: 0, duration: 0.5, stagger: 0.05, delay: 0.8 });
 
-            // Mouse Parallax for Hero
-            document.addEventListener('mousemove', (e) => {
-                const moveX = (e.clientX - window.innerWidth / 2) * 0.01;
-                const moveY = (e.clientY - window.innerHeight / 2) * 0.01;
-                gsap.to(".hero-title", { x: moveX, y: moveY, duration: 0.5 });
-            });
-
-            // AI Terminal Typing Effect
-            const terminalOutput = document.getElementById('terminal-output');
-            const lines = [
-                "> Initializing CV Parser v3.1...",
-                "> Loading PDF: Resume_Candidate_77.pdf",
-                "> Extracting semantic markers...",
-                "> Found: [Laravel, Docker, Redis, Vue.js]",
-                "> Analyzing work history: 4.5 years",
-                "> Sentiment Analysis: Positive",
-                "> Match Confidence: 92.4%",
-                "> [COMPLETED] Profile added to Shortlist."
-            ];
-
-            let lineIdx = 0;
-            function typeLine() {
-                if (lineIdx < lines.length) {
-                    const p = document.createElement('p');
-                    p.className = 'mb-1 ' + (lineIdx === lines.length - 1 ? 'terminal-accent font-bold' : '');
-                    terminalOutput.appendChild(p);
-
-                    let charIdx = 0;
-                    const line = lines[lineIdx];
-                    const typeInterval = setInterval(() => {
-                        p.textContent += line[charIdx];
-                        charIdx++;
-                        if (charIdx === line.length) {
-                            clearInterval(typeInterval);
-                            lineIdx++;
-                            setTimeout(typeLine, 400);
-                        }
-                    }, 30);
-                }
-            }
-
-            ScrollTrigger.create({
-                trigger: "#ai-section",
-                start: "top 60%",
-                onEnter: () => {
-                    typeLine();
-                    gsap.to("#terminal-scanline", { y: 400, repeat: -1, duration: 3, ease: "none" });
-                }
-            });
-
-            // Radar Chart Animation
-            gsap.from("#radar-shape", {
-                scale: 0,
-                transformOrigin: "center center",
-                duration: 1.5,
-                ease: "elastic.out(1, 0.5)",
-                scrollTrigger: {
-                    trigger: "#radar-section",
-                    start: "top 60%"
-                }
-            });
-
-            // Journey Steps Entrance
-            gsap.from(".journey-step", {
-                y: 50,
-                opacity: 0,
-                stagger: 0.2,
-                duration: 1,
-                ease: "power3.out",
-                scrollTrigger: {
-                    trigger: "#journey-section",
-                    start: "top 70%"
-                }
-            });
-
-            // Coach Section Entrance
-            gsap.from("#coach-section > div", {
-                x: (i) => i === 0 ? -100 : 100,
-                opacity: 0,
-                duration: 1.2,
-                ease: "power4.out",
-                scrollTrigger: {
-                    trigger: "#coach-section",
-                    start: "top 70%"
-                }
-            });
-
-            // Jobs Preview Cards Entrance
-            gsap.from("#jobs-preview-section .brutalist-card", {
-                scale: 0.8,
-                opacity: 0,
-                stagger: 0.1,
-                duration: 0.8,
-                ease: "back.out(1.7)",
-                scrollTrigger: {
-                    trigger: "#jobs-preview-section",
-                    start: "top 75%"
-                }
-            });
-        });
-    </script>
+    // Grid Animations
+    gsap.from(".s5-grid-card", {
+        y: 40, opacity: 0, duration: 0.8, stagger: 0.1,
+        scrollTrigger: { trigger: ".s5-grid-4", start: "top 80%" }
+    });
+});
+</script>
 @endpush
