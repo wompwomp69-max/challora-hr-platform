@@ -1,6 +1,4 @@
 import './bootstrap';
-import './landingPixelBlast';
-import './authDotGrid';
 
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
