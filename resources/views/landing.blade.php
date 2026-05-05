@@ -261,24 +261,24 @@
             <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent z-[1]"></div>
             
             <div class="s5-hero-left-text">
-                Operational Intelligence for Every Vehicle, Every Fleet, Every Mission.
+                Smarter Hiring for Every Role, Every Team, Every Company.
             </div>
         </div>
 
         <!-- Right Side: Title & Status -->
         <div class="s5-hero-right">
             <div class="s5-hero-right-top">
-                <p class="s5-mono text-sm text-[#888] mb-6">Powering actionable insights for defense and transportation systems.</p>
+                <p class="s5-mono text-sm text-[#888] mb-6">AI-powered recruitment that finds the right person, not just the right keywords.</p>
                 <h1 class="s5-title-mega mb-10">
-                    Op /<br>Intelligence
+                    HR /<br>Intelligence
                 </h1>
                 
                 <div class="flex gap-4">
                     <a href="{{ route('jobs.index') }}" class="s5-pill-btn s5-pill-primary">
-                        Explore Platform
+                        Find Jobs
                     </a>
                     <a href="{{ route('register') }}" class="s5-pill-btn s5-pill-white">
-                        Join Network
+                        Post a Job
                     </a>
                 </div>
             </div>
@@ -287,11 +287,11 @@
                 <div class="s5-mono s5-status-title">System Status</div>
                 <div class="s5-mono s5-status-grid">
                     @php $statuses = [
-                        ['01', 'GPS'], ['02', 'Radar'],
-                        ['03', 'Engines'], ['04', 'Electrical'],
-                        ['05', 'Fuel'], ['06', 'Electronic Warfare'],
-                        ['07', 'Countermeasures'], ['08', 'Environmental'],
-                        ['09', 'Communications'], ['10', 'Flight Data Links']
+                        ['01', 'CV Parser'],       ['02', 'Match Engine'],
+                        ['03', 'Bias Filter'],      ['04', 'Skill Extractor'],
+                        ['05', 'Score Ranking'],    ['06', 'Profile Coach'],
+                        ['07', 'Job Indexer'],      ['08', 'Candidate DB'],
+                        ['09', 'HR Dashboard'],     ['10', 'Notifications'],
                     ]; @endphp
                     @foreach($statuses as $s)
                     <div class="s5-status-item">
@@ -307,45 +307,45 @@
     <!-- MARQUEE -->
     <div class="s5-marquee">
         <span>
-            // NO BIAS &nbsp;&nbsp;&nbsp; MISSION READY &nbsp;&nbsp;&nbsp; CHALLY AI &nbsp;&nbsp;&nbsp; DEFENSE GRADE RECRUITMENT &nbsp;&nbsp;&nbsp; POWERED BY DATA &nbsp;&nbsp;&nbsp; 100% OPERATIONAL &nbsp;&nbsp;&nbsp; 
-            // NO BIAS &nbsp;&nbsp;&nbsp; MISSION READY &nbsp;&nbsp;&nbsp; CHALLY AI &nbsp;&nbsp;&nbsp; DEFENSE GRADE RECRUITMENT &nbsp;&nbsp;&nbsp; POWERED BY DATA &nbsp;&nbsp;&nbsp; 100% OPERATIONAL &nbsp;&nbsp;&nbsp;
+            // NO BIAS &nbsp;&nbsp;&nbsp; SMARTER HIRING &nbsp;&nbsp;&nbsp; CHALLY AI &nbsp;&nbsp;&nbsp; FIND THE RIGHT PERSON &nbsp;&nbsp;&nbsp; NOT JUST THE RIGHT KEYWORDS &nbsp;&nbsp;&nbsp; ZERO GUESSWORK &nbsp;&nbsp;&nbsp; BUILT FOR THE FUTURE OF WORK &nbsp;&nbsp;&nbsp;
+            // NO BIAS &nbsp;&nbsp;&nbsp; SMARTER HIRING &nbsp;&nbsp;&nbsp; CHALLY AI &nbsp;&nbsp;&nbsp; FIND THE RIGHT PERSON &nbsp;&nbsp;&nbsp; NOT JUST THE RIGHT KEYWORDS &nbsp;&nbsp;&nbsp; ZERO GUESSWORK &nbsp;&nbsp;&nbsp; BUILT FOR THE FUTURE OF WORK &nbsp;&nbsp;&nbsp;
         </span>
     </div>
 
     <!-- SOLUTIONS SECTION -->
     <section class="s5-section">
-        <h2 class="s5-title-section max-w-3xl">Operational Intelligence Solutions</h2>
+        <h2 class="s5-title-section max-w-3xl">Recruitment Intelligence Solutions</h2>
         
         <div class="s5-grid-4">
             <div class="s5-grid-card group">
-                <h3 class="s5-card-title">Cyber / EW</h3>
-                <p class="s5-card-desc">Analyze serial bus traffic and radio frequency (RF) data to flag threats in near real-time, empowering operators to take decisive action.</p>
+                <h3 class="s5-card-title">AI Screening</h3>
+                <p class="s5-card-desc">Analyze thousands of CVs in seconds. Chally extracts skills semantically, validates experience, and eliminates noise — no human bias involved.</p>
                 <div class="mt-auto">
-                    <a href="#" class="s5-mono text-[10px] text-accent font-bold border border-accent rounded-full px-4 py-2 group-hover:bg-accent group-hover:text-black transition-colors">EXPLORE</a>
+                    <a href="{{ route('register') }}" class="s5-mono text-[10px] text-accent font-bold border border-accent rounded-full px-4 py-2 group-hover:bg-accent group-hover:text-black transition-colors">EXPLORE</a>
                 </div>
             </div>
 
             <div class="s5-grid-card group">
-                <h3 class="s5-card-title text-accent">Predictive Maintenance</h3>
-                <p class="s5-card-desc text-[#aaa]">Transform serial bus data into proactive maintenance insights to keep operators safe and fleets mission-ready.</p>
+                <h3 class="s5-card-title">Job Matching</h3>
+                <p class="s5-card-desc">Beyond keyword matching — Chally maps candidate competencies against your team's specific needs: technical skills, cultural fit, and career stability.</p>
                 <div class="mt-auto">
-                    <a href="#" class="s5-mono text-[10px] text-accent font-bold border border-accent rounded-full px-4 py-2 group-hover:bg-accent group-hover:text-black transition-colors">EXPLORE</a>
+                    <a href="{{ route('jobs.index') }}" class="s5-mono text-[10px] text-accent font-bold border border-accent rounded-full px-4 py-2 group-hover:bg-accent group-hover:text-black transition-colors">EXPLORE</a>
                 </div>
             </div>
 
             <div class="s5-grid-card group">
-                <h3 class="s5-card-title text-accent">Fleet Compliance</h3>
-                <p class="s5-card-desc text-[#aaa]">Process security log files from commercial aircraft to rapidly identify security incidents and verify compliance with aviation regulations.</p>
+                <h3 class="s5-card-title">Profile Coach</h3>
+                <p class="s5-card-desc">Chally doesn't just evaluate — it guides. Candidates get instant, actionable advice to strengthen their profile and get noticed by top recruiters.</p>
                 <div class="mt-auto">
-                    <a href="#" class="s5-mono text-[10px] text-accent font-bold border border-accent rounded-full px-4 py-2 group-hover:bg-accent group-hover:text-black transition-colors">EXPLORE</a>
+                    <a href="{{ route('register') }}" class="s5-mono text-[10px] text-accent font-bold border border-accent rounded-full px-4 py-2 group-hover:bg-accent group-hover:text-black transition-colors">EXPLORE</a>
                 </div>
             </div>
 
             <div class="s5-grid-card group">
-                <h3 class="s5-card-title text-accent">Research</h3>
-                <p class="s5-card-desc text-[#aaa]">Secure your most critical assets against advanced persistent threats through expert-led security assessments and specialized tooling.</p>
+                <h3 class="s5-card-title">HR Analytics</h3>
+                <p class="s5-card-desc">Give your HR team a full-picture dashboard — application pipeline, candidate scores, and hiring velocity — all in one place.</p>
                 <div class="mt-auto">
-                    <a href="#" class="s5-mono text-[10px] text-accent font-bold border border-accent rounded-full px-4 py-2 group-hover:bg-accent group-hover:text-black transition-colors">EXPLORE</a>
+                    <a href="{{ route('register') }}" class="s5-mono text-[10px] text-accent font-bold border border-accent rounded-full px-4 py-2 group-hover:bg-accent group-hover:text-black transition-colors">EXPLORE</a>
                 </div>
             </div>
         </div>
@@ -354,14 +354,14 @@
     <!-- JOBS SECTION (Adapted to S5 Style) -->
     <section class="s5-section pt-0">
         <div class="flex justify-between items-end mb-8 border-b border-accent pb-4">
-            <h2 class="s5-title-section text-white">Mission Positions</h2>
+            <h2 class="s5-title-section text-white">Open Positions</h2>
             <a href="{{ route('jobs.index') }}" class="s5-pill-btn text-accent border border-accent hover:bg-accent hover:text-black text-sm py-2 px-6">View All</a>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-0 border-t border-l border-accent">
             @forelse($latestJobs as $job)
             <div class="border-r border-b border-accent p-8 relative group hover:bg-[rgba(255,77,48,0.1)] transition-colors flex flex-col">
-                <div class="s5-mono text-[10px] text-accent font-bold mb-4">ACTIVE // {{ strtoupper($job->location) }}</div>
+                <div class="s5-mono text-[10px] text-accent font-bold mb-4">OPEN // {{ strtoupper($job->location) }}</div>
                 <h3 class="s5-title-section text-2xl mb-4 leading-tight text-white group-hover:text-accent transition-colors">{{ $job->title }}</h3>
                 <div class="flex flex-wrap gap-2 mb-8">
                     @if($job->skills_json)

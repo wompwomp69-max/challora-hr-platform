@@ -109,16 +109,16 @@
                             <h2 class="font-mono text-xl font-bold uppercase leading-tight">GET IN TOUCH<br>TO LEARN MORE.</h2>
                         </div>
                         <div>
-                            <p class="font-mono text-xs uppercase font-bold mb-1 opacity-70">PHONE</p>
-                            <p class="font-bold text-lg leading-tight">+1 703 810 3320</p>
+                            <p class="font-mono text-xs uppercase font-bold mb-1 opacity-70">GENERAL INQUIRIES</p>
+                            <p class="font-bold text-lg leading-tight hover:underline cursor-pointer">info@challora.id</p>
                         </div>
                         <div>
-                            <p class="font-mono text-xs uppercase font-bold mb-1 opacity-70">GENERAL INQUIRIES</p>
-                            <p class="font-bold text-lg leading-tight hover:underline cursor-pointer">info@challora.io</p>
+                            <p class="font-mono text-xs uppercase font-bold mb-1 opacity-70">SUPPORT</p>
+                            <p class="font-bold text-lg leading-tight hover:underline cursor-pointer">support@challora.id</p>
                         </div>
                         <div>
                             <p class="font-mono text-xs uppercase font-bold mb-1 opacity-70">PRESS</p>
-                            <p class="font-bold text-lg leading-tight hover:underline cursor-pointer">press@challora.io</p>
+                            <p class="font-bold text-lg leading-tight hover:underline cursor-pointer">press@challora.id</p>
                         </div>
                     </div>
                     
@@ -150,32 +150,31 @@
 
                     <!-- Col 3: Solutions -->
                     <div>
-                        <h3 class="font-mono text-xs uppercase tracking-widest text-[#888] mb-6 flex items-start gap-1">Solutions <span class="text-[8px]">4</span></h3>
+                        <h3 class="font-mono text-xs uppercase tracking-widest text-[#888] mb-6 flex items-start gap-1">Platform <span class="text-[8px]">4</span></h3>
                         <ul class="space-y-4 font-bold text-base">
-                            <li><a href="#" class="hover:text-accent transition-colors">↳ Cyber / EW</a></li>
-                            <li><a href="#" class="hover:text-accent transition-colors">↳ Predictive Maintenance</a></li>
-                            <li><a href="#" class="hover:text-accent transition-colors">↳ Compliance</a></li>
-                            <li><a href="#" class="hover:text-accent transition-colors">↳ Research</a></li>
+                            <li><a href="{{ route('jobs.index') }}" class="hover:text-accent transition-colors">↳ Browse Jobs</a></li>
+                            <li><a href="{{ route('register') }}" class="hover:text-accent transition-colors">↳ Post a Job</a></li>
+                            <li><a href="{{ route('register') }}" class="hover:text-accent transition-colors">↳ For Candidates</a></li>
+                            <li><a href="{{ route('register') }}" class="hover:text-accent transition-colors">↳ For HR Teams</a></li>
                         </ul>
                     </div>
 
                     <!-- Col 4: About -->
                     <div>
-                        <h3 class="font-mono text-xs uppercase tracking-widest text-[#888] mb-6 flex items-start gap-1">About <span class="text-[8px]">2</span></h3>
+                        <h3 class="font-mono text-xs uppercase tracking-widest text-[#888] mb-6 flex items-start gap-1">Account <span class="text-[8px]">2</span></h3>
                         <ul class="space-y-4 font-bold text-base">
-                            <li><a href="#" class="hover:text-accent transition-colors">↳ Company</a></li>
-                            <li><a href="#" class="hover:text-accent transition-colors">↳ Careers</a></li>
+                            <li><a href="{{ route('login') }}" class="hover:text-accent transition-colors">↳ Sign In</a></li>
+                            <li><a href="{{ route('register') }}" class="hover:text-accent transition-colors">↳ Register</a></li>
                         </ul>
                     </div>
                 </div>
 
                 <div class="flex flex-col md:flex-row justify-between items-end relative z-10 font-mono text-xs text-[#888] uppercase mb-10 md:mb-16">
                     <div class="flex items-center gap-3">
-                        <div class="w-6 h-4 bg-accent flex items-center justify-center text-black font-bold text-[6px]">US</div>
-                        <span>FORGED IN AMERICA. FOR AMERICA.</span>
+                        <span>BUILT FOR THE FUTURE OF WORK.</span>
                     </div>
                     <div class="text-left md:text-right mt-8 md:mt-0">
-                        <p>CHALLORA HQ<br>1100 WILSON BLVD, STE 2100<br>ROSSLYN, VA 22209</p>
+                        <p>CHALLORA &nbsp;·&nbsp; v{{ $appVersion }}</p>
                     </div>
                 </div>
 
