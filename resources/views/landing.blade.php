@@ -141,7 +141,7 @@
         padding-top: 2rem;
     }
     .s5-status-title {
-        font-size: 0.85rem;
+        font-size: 1rem;
         color: var(--s5-grey-dark);
         margin-bottom: 1rem;
     }
@@ -154,7 +154,7 @@
         display: flex;
         align-items: center;
         justify-content: space-between;
-        font-size: 0.75rem;
+        font-size: 0.9rem;
         color: var(--s5-grey-mid);
         border-bottom: 1px solid rgba(255,255,255,0.1);
         padding-bottom: 0.25rem;

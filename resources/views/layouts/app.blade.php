@@ -109,25 +109,25 @@
                             <h2 class="font-mono text-xl font-bold uppercase leading-tight">GET IN TOUCH<br>TO LEARN MORE.</h2>
                         </div>
                         <div>
-                            <p class="font-mono text-[10px] uppercase font-bold mb-1 opacity-70">PHONE</p>
+                            <p class="font-mono text-xs uppercase font-bold mb-1 opacity-70">PHONE</p>
                             <p class="font-bold text-lg leading-tight">+1 703 810 3320</p>
                         </div>
                         <div>
-                            <p class="font-mono text-[10px] uppercase font-bold mb-1 opacity-70">GENERAL INQUIRIES</p>
+                            <p class="font-mono text-xs uppercase font-bold mb-1 opacity-70">GENERAL INQUIRIES</p>
                             <p class="font-bold text-lg leading-tight hover:underline cursor-pointer">info@challora.io</p>
                         </div>
                         <div>
-                            <p class="font-mono text-[10px] uppercase font-bold mb-1 opacity-70">PRESS</p>
+                            <p class="font-mono text-xs uppercase font-bold mb-1 opacity-70">PRESS</p>
                             <p class="font-bold text-lg leading-tight hover:underline cursor-pointer">press@challora.io</p>
                         </div>
                     </div>
                     
                     <!-- Right: Newsletter -->
                     <div class="flex flex-col justify-end">
-                        <p class="font-mono text-[10px] uppercase font-bold mb-2 opacity-70">SIGN UP FOR UPDATES</p>
+                        <p class="font-mono text-xs uppercase font-bold mb-2 opacity-70">SIGN UP FOR UPDATES</p>
                         <div class="flex items-center border-b-2 border-black pb-2">
                             <input type="email" placeholder="Enter your email address" class="bg-transparent border-none outline-none text-xl sm:text-2xl font-bold placeholder-black/50 w-full text-black">
-                            <button class="bg-black text-accent font-mono text-[10px] font-bold uppercase rounded-full px-6 py-3 ml-4 hover:bg-white hover:text-black transition-colors whitespace-nowrap">
+                            <button class="bg-black text-accent font-mono text-xs font-bold uppercase rounded-full px-6 py-3 ml-4 hover:bg-white hover:text-black transition-colors whitespace-nowrap">
                                 SUBSCRIBE
                             </button>
                         </div>
@@ -150,8 +150,8 @@
 
                     <!-- Col 3: Solutions -->
                     <div>
-                        <h3 class="font-mono text-[10px] uppercase tracking-widest text-[#888] mb-6 flex items-start gap-1">Solutions <span class="text-[8px]">4</span></h3>
-                        <ul class="space-y-4 font-bold text-sm">
+                        <h3 class="font-mono text-xs uppercase tracking-widest text-[#888] mb-6 flex items-start gap-1">Solutions <span class="text-[8px]">4</span></h3>
+                        <ul class="space-y-4 font-bold text-base">
                             <li><a href="#" class="hover:text-accent transition-colors">↳ Cyber / EW</a></li>
                             <li><a href="#" class="hover:text-accent transition-colors">↳ Predictive Maintenance</a></li>
                             <li><a href="#" class="hover:text-accent transition-colors">↳ Compliance</a></li>
@@ -161,15 +161,15 @@
 
                     <!-- Col 4: About -->
                     <div>
-                        <h3 class="font-mono text-[10px] uppercase tracking-widest text-[#888] mb-6 flex items-start gap-1">About <span class="text-[8px]">2</span></h3>
-                        <ul class="space-y-4 font-bold text-sm">
+                        <h3 class="font-mono text-xs uppercase tracking-widest text-[#888] mb-6 flex items-start gap-1">About <span class="text-[8px]">2</span></h3>
+                        <ul class="space-y-4 font-bold text-base">
                             <li><a href="#" class="hover:text-accent transition-colors">↳ Company</a></li>
                             <li><a href="#" class="hover:text-accent transition-colors">↳ Careers</a></li>
                         </ul>
                     </div>
                 </div>
 
-                <div class="flex flex-col md:flex-row justify-between items-end relative z-10 font-mono text-[10px] text-[#888] uppercase mb-10 md:mb-16">
+                <div class="flex flex-col md:flex-row justify-between items-end relative z-10 font-mono text-xs text-[#888] uppercase mb-10 md:mb-16">
                     <div class="flex items-center gap-3">
                         <div class="w-6 h-4 bg-accent flex items-center justify-center text-black font-bold text-[6px]">US</div>
                         <span>FORGED IN AMERICA. FOR AMERICA.</span>
@@ -186,7 +186,7 @@
             </div>
 
             <!-- LAYER 3: LEGAL STRIP -->
-            <div class="bg-accent border-t border-black py-4 px-8 md:px-20 text-black font-mono text-[10px] font-bold uppercase flex flex-col md:flex-row justify-between items-center gap-4">
+            <div class="bg-accent border-t border-black py-4 px-8 md:px-20 text-black font-mono text-xs font-bold uppercase flex flex-col md:flex-row justify-between items-center gap-4">
                 <div>©2026 CHALLORA, INC.</div>
                 <div class="flex flex-wrap justify-center gap-6">
                     <a href="#" class="hover:underline">LICENSE AGREEMENT</a>
