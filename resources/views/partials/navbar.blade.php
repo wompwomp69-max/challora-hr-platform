@@ -70,8 +70,8 @@
             <a href="{{ route('user.settings.index') }}" class="hover:text-accent transition-colors border-b border-white/10 pb-4">Settings</a>
         @else
             <a href="{{ route('jobs.index') }}" class="hover:text-accent transition-colors border-b border-white/10 pb-4">Job Listings</a>
-            <a href="{{ route('login') }}" class="hover:text-accent transition-colors border-b border-white/10 pb-4">Sign In</a>
-            <a href="{{ route('register') }}" class="hover:text-accent transition-colors border-b border-white/10 pb-4">Register</a>
+            <a href="{{ route('login') }}" class="text-center border border-accent text-accent bg-transparent font-black uppercase py-4 px-6">Sign In</a>
+            <a href="{{ route('register') }}" class="text-center border border-accent text-black bg-accent font-black uppercase py-4 px-6">Register</a>
         @endif
         @auth
         <form method="POST" action="{{ route('logout') }}" class="mt-2">
