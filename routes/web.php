@@ -68,6 +68,7 @@ Route::middleware('auth')->group(function () {
     // Download / Preview File
     Route::get('/download/{type}/{id}', [DownloadController::class, 'download'])->name('download.file');
     Route::get('/preview/{type}', [DownloadController::class, 'previewUserFile'])->name('preview.user_file');
+    Route::get('/view-document/{type}/{id?}', [DownloadController::class, 'viewDocument'])->name('view.document');
     Route::get('/avatar', [DownloadController::class, 'avatar'])->name('avatar');
 
     // User / Candidate Routes

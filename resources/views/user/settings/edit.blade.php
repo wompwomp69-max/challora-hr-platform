@@ -209,7 +209,7 @@
                             @php $field = $key . '_path'; @endphp
                             @if($user->$field)
                                 <p class="text-[10px] font-bold text-success-text mb-4 uppercase">Terunggah &bull; <a
-                                        href="{{ route('preview.user_file', ['type' => $key]) }}" target="_blank"
+                                        href="{{ route('view.document', ['type' => $key]) }}"
                                         class="underline">Lihat</a></p>
                             @else
                                 <p class="text-[10px] font-bold text-red-600 mb-4 uppercase">Belum Diunggah</p>

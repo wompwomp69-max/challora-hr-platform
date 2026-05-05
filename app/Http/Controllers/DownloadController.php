@@ -56,4 +56,18 @@ class DownloadController extends Controller
 
         return \Illuminate\Support\Facades\Storage::disk('public')->response($path);
     }
+
+    public function viewDocument($type, $id = null)
+    {
+        if ($id) {
+            $url = route('download.file', ['type' => $type, 'id' => $id]);
+        } else {
+            $url = route('preview.user_file', ['type' => $type]);
+        }
+
+        return view('shared.document_viewer', [
+            'url' => $url,
+            'type' => strtoupper($type)
+        ]);
+    }
 }
