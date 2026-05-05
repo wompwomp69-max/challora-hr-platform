@@ -104,7 +104,7 @@
     .s5-hero-image {
         position: absolute;
         inset: 0;
-        background-image: url('/industrial_hero_jet_1777948418524.png');
+        background-image: url('/hero.jpg');
         background-size: cover;
         background-position: center;
         filter: grayscale(100%) contrast(1.2) brightness(0.8);
