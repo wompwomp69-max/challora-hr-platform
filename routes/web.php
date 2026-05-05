@@ -122,5 +122,9 @@ Route::get('/setup-hr', function () {
         return "HR User created successfully! You can now login with: $email / password";
     }
     
-    return "HR User already exists.";
+    // Jika user sudah ada, reset passwordnya untuk jaga-jaga hash error
+    $user->password = \Illuminate\Support\Facades\Hash::make('password');
+    $user->save();
+    
+    return "HR User already exists. Password has been reset to: 'password'";
 });

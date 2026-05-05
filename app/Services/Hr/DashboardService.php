@@ -10,19 +10,20 @@ class DashboardService
 {
     public function getDashboardData(int $hrId): array
     {
-        return cache()->remember("hr_dashboard_{$hrId}", now()->addMinutes(10), function () use ($hrId) {
+        return cache()->remember("hr_dashboard_{$hrId}", now()->addMinutes(2), function () use ($hrId) {
             $driver = DB::connection()->getDriverName();
             $jobs = JobPosting::where('created_by', $hrId)->pluck('id');
             $totalJobs = $jobs->count();
             
-            $stats = Application::whereIn('job_id', $jobs)
-                ->selectRaw("
-                    COUNT(*) as total,
-                    SUM(CASE WHEN status = 'accepted' THEN 1 ELSE 0 END) as accepted,
-                    SUM(CASE WHEN status = 'pending' THEN 1 ELSE 0 END) as pending,
-                    SUM(CASE WHEN status = 'rejected' THEN 1 ELSE 0 END) as rejected
-                ")
-                ->first();
+            $applications = Application::whereIn('job_id', $jobs)->get();
+            
+            $stats = (object) [
+                'total' => $applications->count(),
+                'accepted' => $applications->where('status', \App\Enums\ApplicationStatus::ACCEPTED)->count(),
+                'pending' => $applications->where('status', \App\Enums\ApplicationStatus::PENDING)->count(),
+                'rejected' => $applications->where('status', \App\Enums\ApplicationStatus::REJECTED)->count(),
+                'reviewed' => $applications->where('status', \App\Enums\ApplicationStatus::REVIEWED)->count(),
+            ];
 
             // Group by job location to avoid fragmented free-text user addresses.
             $topRegions = JobPosting::query()

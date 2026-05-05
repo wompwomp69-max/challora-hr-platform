@@ -21,7 +21,11 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        URL::forceScheme('https');
+        if (app()->environment('production')) {
+            URL::forceScheme('https');
+        } else {
+            URL::forceScheme('http');
+        }
 
         $version = '2.2.1';
         View::share('appVersion', $version);

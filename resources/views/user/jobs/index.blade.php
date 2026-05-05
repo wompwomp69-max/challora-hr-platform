@@ -150,15 +150,13 @@
                             style="width: 100%; margin: 10px 0 0 0; display: flex; align-items: end; justify-content: end;"
                             onclick="event.stopPropagation()">
                             @csrf
-                            <button type="submit" class="hover:text-accent transition-colors save-btn">
+                            <button type="submit" class="save-btn {{ $isSaved ? 'text-accent' : 'text-text-muted hover:text-accent' }} transition-all hover:scale-110">
                                 @if ($isSaved)
-                                    <svg width="24" height="24" fill="var(--color-accent)" stroke="var(--color-accent)"
-                                        stroke-width="2.5" viewBox="0 0 24 24" stroke-linejoin="miter">
+                                    <svg width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
                                         <path d="M5 2h14v20l-7-6-7 6V2z"></path>
                                     </svg>
                                 @else
-                                    <svg width="24" height="24" fill="none" stroke="var(--color-accent)" stroke-width="2.5"
-                                        viewBox="0 0 24 24" stroke-linejoin="miter">
+                                    <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
                                         <path d="M5 2h14v20l-7-6-7 6V2z"></path>
                                     </svg>
                                 @endif

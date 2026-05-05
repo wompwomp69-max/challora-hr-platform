@@ -207,20 +207,27 @@
                         </td>
                         <td>
                             <div class="flex gap-2">
-                                @if($a->user->cv_path)
-                                    <a href="{{ route('download.file', ['type' => 'cv', 'id' => $a->user->id]) }}" class="premium-btn-icon" title="CV">
+                                @if($a->cv_path)
+                                    <a href="{{ route('view.document', ['type' => 'cv', 'id' => $a->id]) }}" class="premium-btn-icon" title="CV">
                                         <i class="bi bi-file-earmark-person"></i>
                                     </a>
                                 @endif
-                                @if($a->user->diploma_path)
-                                    <a href="{{ route('download.file', ['type' => 'diploma', 'id' => $a->user->id]) }}" class="premium-btn-icon" title="Ijazah">
+                                @if($a->diploma_path)
+                                    <a href="{{ route('view.document', ['type' => 'diploma', 'id' => $a->id]) }}" class="premium-btn-icon" title="Ijazah">
                                         <i class="bi bi-mortarboard"></i>
+                                    </a>
+                                @endif
+                                @if($a->photo_path)
+                                    <a href="{{ route('view.document', ['type' => 'photo', 'id' => $a->id]) }}" class="premium-btn-icon" title="Pas Foto">
+                                        <i class="bi bi-image"></i>
                                     </a>
                                 @endif
                             </div>
                         </td>
                         <td class="text-right">
                             <div class="flex justify-end items-center gap-4">
+                            <a href="{{ route('hr.intelligence.candidates.show', $a->id) }}" class="action-select-premium bg-accent text-white no-underline text-center">View Profile</a>
+                            
                             <form method="post" action="{{ route('hr.applications.ai_refresh', $a->id) }}">
                                 @csrf
                                 <button class="action-select-premium" type="submit">Refresh AI</button>

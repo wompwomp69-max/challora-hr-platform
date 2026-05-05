@@ -60,6 +60,9 @@ class ApplicationController extends Controller
 
         $this->applicationService->updateStatus($application, $request->status);
 
+        // Clear HR dashboard cache to ensure analytics are fresh
+        cache()->forget("hr_dashboard_" . auth()->id());
+
         return back()->with('flash_toast', [
             'message' => 'Application status successfully updated to ' . $request->status,
         ]);

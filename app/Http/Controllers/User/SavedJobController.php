@@ -30,7 +30,11 @@ class SavedJobController extends Controller
 
     public function save(JobPosting $job)
     {
-        $this->savedJobService->saveJob(auth()->user(), $job->id);
+        $user = auth()->user();
+        $this->savedJobService->saveJob($user, $job->id);
+
+        // Clear cache so the UI updates immediately
+        cache()->forget("user_{$user->id}_saved_jobs");
 
         return back()->with('flash_toast', [
             'message' => 'Job saved successfully.',
@@ -39,7 +43,11 @@ class SavedJobController extends Controller
 
     public function unsave(JobPosting $job)
     {
-        $this->savedJobService->unsaveJob(auth()->user(), $job->id);
+        $user = auth()->user();
+        $this->savedJobService->unsaveJob($user, $job->id);
+
+        // Clear cache so the UI updates immediately
+        cache()->forget("user_{$user->id}_saved_jobs");
 
         return back()->with('flash_toast', [
             'message' => 'Job removed from saved list.',

@@ -10,10 +10,16 @@
     </span>
 </div>
 
-<div class="bg-black border-2 border-border shadow-[8px_8px_0_var(--color-border)] overflow-hidden relative" style="height: calc(100vh - 250px);">
+<div class="bg-black border-2 border-border shadow-[8px_8px_0_var(--color-border)] overflow-hidden relative" 
+     style="height: calc(100vh - 250px);"
+     oncontextmenu="return false;">
+    
     <iframe src="{{ $url }}" class="w-full h-full border-0" title="Document Viewer"></iframe>
     
-    <!-- Read Only Overlay (Optional, but gives a visual cue) -->
+    <!-- Shielding Overlay (Prevents most clicks/selections inside the iframe) -->
+    <div class="absolute inset-0 bg-transparent z-10 pointer-events-none"></div>
+
+    <!-- Read Only Label -->
     <div class="absolute top-0 right-0 p-4 pointer-events-none">
         <div class="bg-accent text-white px-3 py-1 text-[9px] font-black uppercase tracking-tighter border border-black">
             Locked Document
