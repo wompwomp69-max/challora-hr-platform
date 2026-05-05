@@ -108,14 +108,14 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-
-            // Entrance animation for main content
-            gsap.from(".main-container", {
-                opacity: 0,
-                y: 20,
-                duration: 0.8,
-                ease: "power3.out"
-            });
+            if (typeof gsap !== 'undefined') {
+                gsap.from(".main-container", {
+                    opacity: 0,
+                    y: 20,
+                    duration: 0.8,
+                    ease: "power3.out"
+                });
+            }
         });
     </script>
     @stack('scripts')
