@@ -47,36 +47,36 @@
         @endauth
 
         <!-- Hamburger (mobile only) -->
-        <button id="mobile-menu-toggle" class="md:hidden flex flex-col gap-1.5 p-2" aria-label="Menu">
-            <span class="block w-6 h-0.5 bg-white transition-all"></span>
-            <span class="block w-6 h-0.5 bg-white transition-all"></span>
-            <span class="block w-6 h-0.5 bg-white transition-all"></span>
+        <button id="mobile-menu-toggle" class="md:hidden flex flex-col justify-center gap-1.5 p-2 z-50" aria-label="Menu">
+            <span class="block w-6 h-0.5 bg-white"></span>
+            <span class="block w-6 h-0.5 bg-white"></span>
+            <span class="block w-6 h-0.5 bg-white"></span>
         </button>
     </div>
 </header>
 
 <!-- Mobile Menu Drawer -->
-<div id="mobile-menu" class="fixed inset-0 z-[999] bg-black flex flex-col p-8 pt-24 hidden md:hidden">
-    <button id="mobile-menu-close" class="absolute top-6 right-6 text-white text-2xl font-black">✕</button>
-    <nav class="flex flex-col gap-6 text-xl font-black uppercase text-white">
+<div id="mobile-menu" class="fixed inset-0 z-[9999] bg-black flex flex-col p-8 pt-20 hidden">
+    <button id="mobile-menu-close" class="absolute top-5 right-5 text-white font-black text-3xl leading-none">✕</button>
+    <nav class="flex flex-col gap-6 text-2xl font-black uppercase text-white mt-4">
         @if(auth()->check() && auth()->user()->isAdmin())
-            <a href="{{ route('hr.dashboard') }}" class="hover:text-accent transition-colors">Analytics</a>
-            <a href="{{ route('hr.jobs.index') }}" class="hover:text-accent transition-colors">Positions</a>
-            <a href="{{ route('hr.applications.index') }}" class="hover:text-accent transition-colors">Pipelines</a>
+            <a href="{{ route('hr.dashboard') }}" class="hover:text-accent transition-colors border-b border-white/10 pb-4">Analytics</a>
+            <a href="{{ route('hr.jobs.index') }}" class="hover:text-accent transition-colors border-b border-white/10 pb-4">Positions</a>
+            <a href="{{ route('hr.applications.index') }}" class="hover:text-accent transition-colors border-b border-white/10 pb-4">Pipelines</a>
         @elseif(auth()->check())
-            <a href="{{ route('jobs.index') }}" class="hover:text-accent transition-colors">Job Listings</a>
-            <a href="{{ route('user.applications.index') }}" class="hover:text-accent transition-colors">Applied Jobs</a>
-            <a href="{{ route('user.jobs.saved') }}" class="hover:text-accent transition-colors">Saved Board</a>
-            <a href="{{ route('user.settings.index') }}" class="hover:text-accent transition-colors">Settings</a>
+            <a href="{{ route('jobs.index') }}" class="hover:text-accent transition-colors border-b border-white/10 pb-4">Job Listings</a>
+            <a href="{{ route('user.applications.index') }}" class="hover:text-accent transition-colors border-b border-white/10 pb-4">Applied Jobs</a>
+            <a href="{{ route('user.jobs.saved') }}" class="hover:text-accent transition-colors border-b border-white/10 pb-4">Saved Board</a>
+            <a href="{{ route('user.settings.index') }}" class="hover:text-accent transition-colors border-b border-white/10 pb-4">Settings</a>
         @else
-            <a href="{{ route('jobs.index') }}" class="hover:text-accent transition-colors">Job Listings</a>
-            <a href="{{ route('login') }}" class="hover:text-accent transition-colors">Sign In</a>
-            <a href="{{ route('register') }}" class="hover:text-accent transition-colors">Register</a>
+            <a href="{{ route('jobs.index') }}" class="hover:text-accent transition-colors border-b border-white/10 pb-4">Job Listings</a>
+            <a href="{{ route('login') }}" class="hover:text-accent transition-colors border-b border-white/10 pb-4">Sign In</a>
+            <a href="{{ route('register') }}" class="hover:text-accent transition-colors border-b border-white/10 pb-4">Register</a>
         @endif
         @auth
-        <form method="POST" action="{{ route('logout') }}" class="mt-4">
+        <form method="POST" action="{{ route('logout') }}" class="mt-2">
             @csrf
-            <button type="submit" class="text-accent font-black uppercase text-xl">Sign Out</button>
+            <button type="submit" class="text-accent font-black uppercase text-2xl">Sign Out</button>
         </form>
         @endauth
     </nav>
