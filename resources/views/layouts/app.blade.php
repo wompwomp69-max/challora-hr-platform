@@ -34,8 +34,14 @@
             min-height: calc(100vh - var(--nav-height));
             max-width: 1600px;
             margin: 0 auto;
-            padding: 60px 80px;
-            /* Desired horizontal padding */
+            padding: 60px 20px;
+        }
+
+        @media (min-width: 768px) {
+            .main-container,
+            .hr-main-content {
+                padding: 60px 80px;
+            }
         }
 
         /* Landing-only: merge hero with navbar */

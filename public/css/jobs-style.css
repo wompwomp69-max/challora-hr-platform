@@ -267,3 +267,43 @@
         order: -1;
     }
 }
+
+@media (max-width: 640px) {
+    .jobs-title-giant,
+    .saved-title-giant {
+        font-size: 40px;
+        letter-spacing: -2px;
+    }
+
+    .filter-bar-premium {
+        grid-template-columns: 1fr;
+        padding: 20px;
+        gap: 16px;
+        margin-bottom: 32px;
+    }
+
+    .job-card-premium {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 16px;
+        padding: 24px;
+    }
+
+    .job-role-title {
+        font-size: 22px;
+        letter-spacing: -0.5px;
+    }
+
+    .job-company-line {
+        font-size: 15px;
+    }
+
+    .job-meta-line {
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .salary-tag-premium {
+        font-size: 20px;
+    }
+}

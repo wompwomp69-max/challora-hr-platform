@@ -239,12 +239,22 @@
     /* ── Responsive ── */
     @media (max-width: 1024px) {
         .s5-hero { grid-template-columns: 1fr; }
-        .s5-hero-left { min-height: 50vh; }
+        .s5-hero-left { min-height: 40vh; }
         .s5-grid-4 { grid-template-columns: 1fr 1fr; }
+        .s5-hero-right { padding: calc(var(--nav-height) + 2rem) 2rem 2rem; }
+        .s5-section { padding: 4rem 1.5rem; }
     }
     @media (max-width: 640px) {
         .s5-grid-4 { grid-template-columns: 1fr; }
-        .s5-hero-left, .s5-hero-right { padding: 2rem; }
+        .s5-hero-left, .s5-hero-right { padding: 1.5rem; }
+        .s5-hero-right { padding-top: calc(var(--nav-height) + 1.5rem); }
+        .s5-title-mega { font-size: clamp(3rem, 15vw, 5rem); }
+        .s5-title-section { font-size: clamp(1.5rem, 7vw, 2.5rem); }
+        .s5-pill-btn { padding: 0.75rem 1.25rem; font-size: 0.875rem; }
+        .s5-system-status { margin-top: 2rem; }
+        .s5-status-grid { grid-template-columns: 1fr; }
+        .s5-section { padding: 3rem 1rem; }
+        .s5-marquee { font-size: 1rem; }
     }
 </style>
 @endpush
