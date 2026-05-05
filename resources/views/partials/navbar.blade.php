@@ -48,9 +48,9 @@
 
         <!-- Hamburger (mobile only) -->
         <button id="mobile-menu-toggle" class="md:hidden flex flex-col justify-center gap-1.5 p-2 z-50" aria-label="Menu">
-            <span class="block w-6 h-0.5 bg-white"></span>
-            <span class="block w-6 h-0.5 bg-white"></span>
-            <span class="block w-6 h-0.5 bg-white"></span>
+            <span class="block w-6 h-0.5 bg-accent"></span>
+            <span class="block w-6 h-0.5 bg-accent"></span>
+            <span class="block w-6 h-0.5 bg-accent"></span>
         </button>
     </div>
 </header>
