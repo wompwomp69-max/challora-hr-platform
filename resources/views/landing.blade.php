@@ -256,7 +256,7 @@
     <section class="s5-hero">
         <!-- Left Side: Image & Tagline -->
         <div class="s5-hero-left">
-            <div class="s5-hero-image"><img src="/hero.jpg" alt="Hero" style="width:100%;height:100%;object-fit:cover;object-position:center;filter:grayscale(100%) contrast(1.2) brightness(0.8);"></div>
+            <div class="s5-hero-image"><img src="{{ asset('hero.jpg') }}" alt="Hero" style="width:100%;height:100%;object-fit:cover;object-position:center;filter:grayscale(100%) contrast(1.2) brightness(0.8);"></div>
             <!-- Overlay gradient for text readability -->
             <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent z-[1]"></div>
             
