@@ -57,7 +57,7 @@
 
 <!-- Mobile Menu Drawer -->
 <div id="mobile-menu" class="fixed inset-0 z-[9999] bg-black flex flex-col p-8 pt-20 hidden">
-    <button id="mobile-menu-close" class="absolute top-5 right-5 text-white font-black text-3xl leading-none">✕</button>
+    <button id="mobile-menu-close" class="absolute top-5 right-5 text-accent-500 font-black text-3xl leading-none">✕</button>
     <nav class="flex flex-col gap-6 text-2xl font-black uppercase text-white mt-4">
         @if(auth()->check() && auth()->user()->isAdmin())
             <a href="{{ route('hr.dashboard') }}" class="hover:text-accent transition-colors border-b border-white/10 pb-4">Analytics</a>
