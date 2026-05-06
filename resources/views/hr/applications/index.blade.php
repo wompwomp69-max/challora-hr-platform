@@ -213,7 +213,7 @@
                                     </a>
                                 @endif
                                 @if($a->user->diploma_path)
-                                    <a href="{{ route('download.file', ['type' => 'diploma', 'id' => $a->user->id]) }}" class="premium-btn-icon" title="Ijazah">
+                                    <a href="{{ route('download.file', ['type' => 'diploma', 'id' => $a->user->id]) }}" class="premium-btn-icon" title="Diploma">
                                         <i class="bi bi-mortarboard"></i>
                                     </a>
                                 @endif

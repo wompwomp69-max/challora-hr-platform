@@ -120,9 +120,12 @@ class ProfileController extends Controller
             abort(404);
         }
 
-        $request->validate([
-            $field => ['required', 'file', 'max:2048'],
-        ]);
+        $rules = match($field) {
+            'cv', 'diploma' => ['required', 'file', 'mimes:pdf', 'max:2048'],
+            'photo'         => ['required', 'image', 'mimes:jpg,jpeg,png', 'max:2048'],
+        };
+
+        $request->validate([$field => $rules]);
 
         /** @var \App\Models\User $user */
         $user = Auth::user();
@@ -134,7 +137,8 @@ class ProfileController extends Controller
         
         $user->update([$dbField => $path]);
 
-        return back()->with('flash_toast', ['message' => ucfirst($field) . ' updated successfully.']);
+        $labels = ['cv' => 'CV', 'diploma' => 'Diploma', 'photo' => 'Photo'];
+        return back()->with('flash_toast', ['message' => $labels[$field] . ' updated successfully.']);
     }
 
     public function requestAiSuggestion(Request $request)

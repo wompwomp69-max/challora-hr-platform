@@ -265,7 +265,7 @@
                 Supporting Documents
             </h2>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                @foreach(['cv' => 'CV / Resume', 'diploma' => 'Ijazah', 'photo' => 'Pas Foto Formal'] as $key => $label)
+                @foreach(['cv' => 'CV / Resume', 'diploma' => 'Diploma', 'photo' => 'Photo Formal'] as $key => $label)
                     <div class="bg-secondary p-6 border-2 border-dashed border-border flex flex-col justify-between">
                         <div>
                             <h4 class="font-black text-xs uppercase tracking-widest mb-1">{{ $label }}</h4>

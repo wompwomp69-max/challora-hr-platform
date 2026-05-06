@@ -85,8 +85,8 @@ class JobController extends Controller
             $isSaved = $user->savedJobs()->where('job_postings.id', $job->id)->exists();
             
             if (empty($user->cv_path)) $missingDocs[] = 'CV';
-            if (empty($user->diploma_path)) $missingDocs[] = 'ijazah';
-            if (empty($user->photo_path)) $missingDocs[] = 'pas foto';
+            if (empty($user->diploma_path)) $missingDocs[] = 'Diploma';
+            if (empty($user->photo_path)) $missingDocs[] = 'Photo';
         }
 
         $relatedJobs = \App\Models\JobPosting::where('id', '!=', $job->id)
