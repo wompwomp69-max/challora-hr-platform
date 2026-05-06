@@ -99,7 +99,10 @@ class ProfileController extends Controller
     public function uploadAvatar(Request $request)
     {
         $request->validate([
-            'avatar' => ['required', 'image', 'mimes:jpg,jpeg,png', 'max:5120'],
+            'avatar' => ['required', 'image', 'mimes:jpg,jpeg,png', 'max:1024'],
+        ], [
+            'avatar.max' => 'The photo must not be larger than 1MB.',
+            'avatar.mimes' => 'Only JPG, JPEG, and PNG files are allowed.',
         ]);
 
         /** @var \App\Models\User $user */
@@ -121,11 +124,19 @@ class ProfileController extends Controller
         }
 
         $rules = match($field) {
-            'cv', 'diploma' => ['required', 'file', 'mimes:pdf', 'max:2048'],
-            'photo'         => ['required', 'image', 'mimes:jpg,jpeg,png', 'max:2048'],
+            'cv', 'diploma' => ['required', 'file', 'mimes:pdf', 'max:1024'],
+            'photo'         => ['required', 'image', 'mimes:jpg,jpeg,png', 'max:1024'],
         };
 
-        $request->validate([$field => $rules]);
+        $messages = [
+            "{$field}.max"   => 'The file must not be larger than 1MB.',
+            "{$field}.mimes" => match($field) {
+                'cv', 'diploma' => 'Only PDF files are allowed.',
+                'photo'         => 'Only JPG, JPEG, and PNG files are allowed.',
+            },
+        ];
+
+        $request->validate([$field => $rules], $messages);
 
         /** @var \App\Models\User $user */
         $user = Auth::user();
