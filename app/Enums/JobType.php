@@ -9,4 +9,5 @@ enum JobType: string
     case INTERNSHIP = 'internship';
     case FREELANCE = 'freelance';
     case CONTRACT = 'contract';
+    case REMOTE = 'remote';
 }
