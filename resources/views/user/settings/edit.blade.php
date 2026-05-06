@@ -346,6 +346,32 @@
     </template>
 
     <script>
+        const MAX_SIZE = 1 * 1024 * 1024; // 1MB
+
+        function checkFileSize(input, form) {
+            if (input.files[0] && input.files[0].size > MAX_SIZE) {
+                alert('File is too large. Maximum allowed size is 1MB.');
+                input.value = '';
+                return false;
+            }
+            return true;
+        }
+
+        // Avatar form
+        document.querySelector('form[action*="avatar"] input[type="file"]')
+            ?.closest('form')
+            ?.addEventListener('submit', function(e) {
+                const input = this.querySelector('input[type="file"]');
+                if (!checkFileSize(input, this)) e.preventDefault();
+            });
+
+        // Document upload forms (auto-submit on change)
+        document.querySelectorAll('input[type="file"][id^="file-"]').forEach(input => {
+            input.addEventListener('change', function() {
+                if (!checkFileSize(this)) this.value = '';
+            });
+        });
+
         document.addEventListener('DOMContentLoaded', () => {
             const setupAddButton = (btnId, containerId, templateId) => {
                 const btn = document.getElementById(btnId);
