@@ -2,8 +2,10 @@
 
 namespace App\Services\Hr;
 
+use App\Mail\ApplicationStatusMail;
 use App\Models\Application;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\Mail;
 
 class ApplicationManagementService
 {
@@ -38,6 +40,13 @@ class ApplicationManagementService
 
     public function updateStatus(Application $application, string $status): bool
     {
-        return $application->update(['status' => $status]);
+        $updated = $application->update(['status' => $status]);
+
+        if ($updated) {
+            $application->load(['user', 'job']);
+            Mail::to($application->user->email)->send(new ApplicationStatusMail($application));
+        }
+
+        return $updated;
     }
 }
