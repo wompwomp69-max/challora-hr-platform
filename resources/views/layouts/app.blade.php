@@ -101,7 +101,7 @@
             </div>
         @endif
 
-        <main id="swup" class="main-container flex-1 transition-fade">
+        <main class="main-container flex-1">
             @yield('content')
         </main>
 
