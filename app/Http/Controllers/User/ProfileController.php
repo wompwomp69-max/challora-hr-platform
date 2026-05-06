@@ -99,7 +99,7 @@ class ProfileController extends Controller
     public function uploadAvatar(Request $request)
     {
         $request->validate([
-            'avatar' => ['required', 'image', 'max:1024'],
+            'avatar' => ['required', 'image', 'mimes:jpg,jpeg,png', 'max:5120'],
         ]);
 
         /** @var \App\Models\User $user */
