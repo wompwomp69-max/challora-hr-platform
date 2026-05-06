@@ -67,6 +67,32 @@
                             <option value="perempuan" {{ $user->gender === 'perempuan' ? 'selected' : '' }}>Female</option>
                         </select>
                     </div>
+                    <div class="form-group">
+                        <label class="form-label">Birth Place</label>
+                        <input type="text" name="birth_place" class="form-input" value="{{ old('birth_place', $user->birth_place) }}">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Birth Date</label>
+                        <input type="date" name="birth_date" class="form-input" value="{{ old('birth_date', $user->birth_date ? $user->birth_date->format('Y-m-d') : '') }}">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Religion</label>
+                        <select name="religion" class="form-select">
+                            <option value="">— Select —</option>
+                            @foreach(['Islam', 'Kristen', 'Katolik', 'Hindu', 'Budha', 'Konghucu'] as $r)
+                                <option value="{{ $r }}" {{ $user->religion === $r ? 'selected' : '' }}>{{ $r }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Marital Status</label>
+                        <select name="marital_status" class="form-select">
+                            <option value="">— Select —</option>
+                            @foreach(['Lajang', 'Menikah', 'Cerai'] as $m)
+                                <option value="{{ $m }}" {{ $user->marital_status === $m ? 'selected' : '' }}>{{ $m }}</option>
+                            @endforeach
+                        </select>
+                    </div>
                 </div>
                 <div class="form-group">
                     <label class="form-label">Full Address</label>
@@ -156,6 +182,43 @@
                 </div>
             </div>
 
+            <!-- Achievements Section -->
+            <div class="edit-section" id="achievements">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="edit-section-title" style="margin:0;">
+                        <svg width="20" height="20" class="text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
+                        </svg>
+                        Achievements
+                    </h2>
+                    <button type="button" class="btn-cancel py-1 px-4 text-xs tracking-widest" id="add-ach">ADD NEW</button>
+                </div>
+                <div id="ach-container">
+                    @foreach($user->achievements as $ach)
+                        <div class="dynamic-list-item flex-col items-start gap-4 mb-6">
+                            <div class="grid grid-cols-2 gap-4 w-full">
+                                <input type="text" name="ach_title[]" class="form-input" placeholder="Achievement Title" value="{{ $ach->title }}">
+                                <select name="ach_type[]" class="form-select">
+                                    <option value="Sertifikat" {{ $ach->type === 'Sertifikat' ? 'selected' : '' }}>Certificate</option>
+                                    <option value="Penghargaan" {{ $ach->type === 'Penghargaan' ? 'selected' : '' }}>Award</option>
+                                    <option value="Lomba" {{ $ach->type === 'Lomba' ? 'selected' : '' }}>Competition</option>
+                                </select>
+                            </div>
+                            <div class="grid grid-cols-2 gap-4 w-full">
+                                <input type="text" name="ach_organizer[]" class="form-input" placeholder="Organizer" value="{{ $ach->organizer }}">
+                                <input type="text" name="ach_year[]" class="form-input" placeholder="Year" value="{{ $ach->year }}">
+                            </div>
+                            <div class="flex gap-4 w-full">
+                                <input type="text" name="ach_level[]" class="form-input" placeholder="Level (e.g. Nasional)" value="{{ $ach->level }}">
+                                <input type="text" name="ach_certificate_link[]" class="form-input" placeholder="Certificate Link / URL" value="{{ $ach->certificate_link }}">
+                                <button type="button" class="bg-red-600 text-white px-4 border-2 border-black" onclick="this.parentElement.parentElement.remove()">X</button>
+                            </div>
+                            <textarea name="ach_description[]" class="form-textarea" placeholder="Description...">{{ $ach->description }}</textarea>
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+
             <!-- Organizational Experience Section -->
             <div class="edit-section" id="org-experience">
                 <div class="flex justify-between items-center mb-6">
@@ -168,7 +231,7 @@
                     <button type="button" class="btn-cancel py-1 px-4 text-xs tracking-widest" id="add-org">ADD NEW</button>
                 </div>
                 <div id="org-container">
-                    @foreach($user->organizationalExperiences ?? [] as $org)
+                    @foreach($user->organizationalExperiences as $org)
                         <div class="dynamic-list-item flex-col items-start gap-4 mb-6">
                             <div class="grid grid-cols-2 gap-4 w-full">
                                 <input type="text" name="org_name[]" class="form-input" placeholder="Organization Name" value="{{ $org->organization_name }}">
@@ -209,7 +272,7 @@
                             @php $field = $key . '_path'; @endphp
                             @if($user->$field)
                                 <p class="text-[10px] font-bold text-success-text mb-4 uppercase">Terunggah &bull; <a
-                                        href="{{ route('preview.user_file', ['type' => $key]) }}" target="_blank"
+                                        href="{{ route('view.document', ['type' => $key]) }}"
                                         class="underline">Lihat</a></p>
                             @else
                                 <p class="text-[10px] font-bold text-red-600 mb-4 uppercase">Belum Diunggah</p>
@@ -244,6 +307,29 @@
         </div>
     </template>
 
+    <template id="ach-template">
+        <div class="dynamic-list-item flex-col items-start gap-4 mb-6">
+            <div class="grid grid-cols-2 gap-4 w-full">
+                <input type="text" name="ach_title[]" class="form-input" placeholder="Achievement Title">
+                <select name="ach_type[]" class="form-select">
+                    <option value="Sertifikat">Certificate</option>
+                    <option value="Penghargaan">Award</option>
+                    <option value="Lomba">Competition</option>
+                </select>
+            </div>
+            <div class="grid grid-cols-2 gap-4 w-full">
+                <input type="text" name="ach_organizer[]" class="form-input" placeholder="Organizer">
+                <input type="text" name="ach_year[]" class="form-input" placeholder="Year">
+            </div>
+            <div class="flex gap-4 w-full">
+                <input type="text" name="ach_level[]" class="form-input" placeholder="Level (e.g. Nasional)">
+                <input type="text" name="ach_certificate_link[]" class="form-input" placeholder="Certificate Link / URL">
+                <button type="button" class="bg-red-600 text-white px-4 border-2 border-black" onclick="this.parentElement.parentElement.remove()">X</button>
+            </div>
+            <textarea name="ach_description[]" class="form-textarea" placeholder="Description..."></textarea>
+        </div>
+    </template>
+
     <template id="org-template">
         <div class="dynamic-list-item flex-col items-start gap-4 mb-6">
             <div class="grid grid-cols-2 gap-4 w-full">
@@ -258,40 +344,31 @@
             <textarea name="org_description[]" class="form-textarea" placeholder="Describe your role and impact..."></textarea>
         </div>
     </template>
+
     <script>
-        (function initEditAnim() {
-            console.log('initEditAnim running...');
-            if (!window.gsap) return setTimeout(initEditAnim, 50);
+        document.addEventListener('DOMContentLoaded', () => {
+            const setupAddButton = (btnId, containerId, templateId) => {
+                const btn = document.getElementById(btnId);
+                const container = document.getElementById(containerId);
+                const template = document.getElementById(templateId);
+                
+                if (btn && container && template) {
+                    btn.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        const clone = template.content.cloneNode(true);
+                        container.appendChild(clone);
+                    });
+                }
+            };
 
-            const addExpBtn = document.getElementById('add-exp');
-            if (addExpBtn && !addExpBtn.dataset.listenerAttached) {
-                addExpBtn.dataset.listenerAttached = 'true';
-                addExpBtn.addEventListener('click', () => {
-                    const container = document.getElementById('exp-container');
-                    const template = document.getElementById('exp-template');
-                    container.appendChild(template.content.cloneNode(true));
-                });
+            setupAddButton('add-exp', 'exp-container', 'exp-template');
+            setupAddButton('add-ach', 'ach-container', 'ach-template');
+            setupAddButton('add-org', 'org-container', 'org-template');
+
+            if (window.gsap) {
+                gsap.fromTo(".edit-hero", { opacity: 0, x: -30 }, { opacity: 1, x: 0, duration: 0.8, ease: "power4.out" });
+                gsap.fromTo(".edit-section", { opacity: 0, y: 30 }, { opacity: 1, y: 0, stagger: 0.1, duration: 1, ease: "power4.out", delay: 0.2 });
             }
-
-            const addOrgBtn = document.getElementById('add-org');
-            if (addOrgBtn && !addOrgBtn.dataset.listenerAttached) {
-                addOrgBtn.dataset.listenerAttached = 'true';
-                addOrgBtn.addEventListener('click', () => {
-                    const container = document.getElementById('org-container');
-                    const template = document.getElementById('org-template');
-                    container.appendChild(template.content.cloneNode(true));
-                });
-            }
-
-            window.gsap.killTweensOf(".edit-hero, .edit-section");
-            window.gsap.fromTo(".edit-hero",
-                { opacity: 0, x: -30 },
-                { opacity: 1, x: 0, duration: 0.8, ease: "power4.out" }
-            );
-            window.gsap.fromTo(".edit-section",
-                { opacity: 0, y: 30 },
-                { opacity: 1, y: 0, stagger: 0.1, duration: 1, ease: "power4.out", delay: 0.2 }
-            );
-        })();
+        });
     </script>
 @endsection

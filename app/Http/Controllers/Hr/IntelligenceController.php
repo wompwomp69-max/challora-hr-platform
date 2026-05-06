@@ -23,19 +23,17 @@ class IntelligenceController extends Controller
         ], $data));
     }
 
-    public function showCandidate(Application $application): JsonResponse
+    public function showCandidate(Application $application)
     {
         $detail = $this->intelligenceService->getCandidateDetailByApplication((int) Auth::id(), $application->id);
+        
         if (!$detail) {
-            return response()->json([
-                'ok' => false,
-                'message' => 'Candidate not found or unauthorized.',
-            ], 404);
+            abort(404, 'Candidate not found or unauthorized.');
         }
 
-        return response()->json([
-            'ok' => true,
-            'data' => $detail,
+        return view('hr.candidates.show', [
+            'data' => (object) $detail,
+            'pageTitle' => 'Candidate Intelligence: ' . $detail['candidate']['name']
         ]);
     }
 }
