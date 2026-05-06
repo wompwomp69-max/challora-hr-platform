@@ -281,7 +281,8 @@
                         <form action="{{ route('user.settings.upload', $key) }}" method="POST" enctype="multipart/form-data">
                             @csrf
                             <input type="file" name="{{ $key }}" class="hidden" id="file-{{ $key }}"
-                                onchange="this.form.submit()">
+                                accept="{{ in_array($key, ['cv','diploma']) ? '.pdf' : '.jpg,.jpeg,.png' }}"
+                                data-field="{{ $key }}">
                             <label for="file-{{ $key }}"
                                 class="btn-cancel py-2 px-4 text-[10px] block text-center cursor-pointer">UPLOAD NEW</label>
                         </form>
@@ -368,7 +369,8 @@
         // Document upload forms (auto-submit on change)
         document.querySelectorAll('input[type="file"][id^="file-"]').forEach(input => {
             input.addEventListener('change', function() {
-                if (!checkFileSize(this)) this.value = '';
+                if (!checkFileSize(this)) { this.value = ''; return; }
+                this.closest('form').submit();
             });
         });
 
