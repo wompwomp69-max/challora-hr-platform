@@ -25,7 +25,7 @@ class DownloadController extends Controller
         $path = $application->$pathField ?: $application->user->$pathField;
 
         if (!$path || !\Illuminate\Support\Facades\Storage::disk('public')->exists($path)) {
-            abort(404, "File [$type] not found in storage.");
+            abort(404, "File [$type] not found. Path: " . ($path ?? 'null') . " | App path: " . ($application->$pathField ?? 'null') . " | User path: " . ($application->user->$pathField ?? 'null'));
         }
 
         return \Illuminate\Support\Facades\Storage::disk('public')->response($path);
