@@ -5,7 +5,7 @@
     <div class="flex justify-between items-center">
         <div>
             <h1 class="text-xl font-bold text-white">HR Intelligence</h1>
-            <p class="text-sm text-gray-400">Top kandidat, compatible list, dan AI insight per job.</p>
+            <p class="text-sm text-gray-400">Top candidates, compatibility list, and AI insights per job.</p>
         </div>
         <a href="{{ route('hr.applications.index') }}" class="px-3 py-2 text-xs rounded bg-accent text-black font-bold uppercase">Manage Pipeline</a>
     </div>
@@ -14,7 +14,7 @@
 <div class="grid md:grid-cols-2 gap-5">
     <div class="space-y-5">
         <div class="bg-[#1a1a1a] border-4 border-black rounded p-5">
-            <h2 class="text-xs uppercase tracking-wider font-bold text-gray-400 mb-3">Top Kandidat Per Job</h2>
+            <h2 class="text-xs uppercase tracking-wider font-bold text-gray-400 mb-3">Top Candidates Per Job</h2>
             @forelse($topCandidatesByJob as $item)
                 <div class="mb-4">
                     <div class="text-white font-bold mb-2">{{ $item['job']['title'] }}</div>
@@ -28,7 +28,7 @@
                     @endforeach
                 </div>
             @empty
-                <p class="text-sm text-gray-400">Belum ada kandidat ber-AI score.</p>
+                <p class="text-sm text-gray-400">No candidates with AI score yet.</p>
             @endforelse
         </div>
 
@@ -43,7 +43,7 @@
                     <div class="text-xs text-gray-400">{{ $candidate['job_title'] }}</div>
                 </button>
             @empty
-                <p class="text-sm text-gray-400">Belum ada compatible candidate.</p>
+                <p class="text-sm text-gray-400">No compatible candidates yet.</p>
             @endforelse
         </div>
     </div>
@@ -51,7 +51,7 @@
     <div class="bg-[#1a1a1a] border-4 border-black rounded p-5">
         <h2 class="text-xs uppercase tracking-wider font-bold text-gray-400 mb-3">Candidate Insight</h2>
         <div id="insight-empty" class="{{ $selectedCandidateDetail ? 'hidden' : '' }}">
-            <p class="text-sm text-gray-400">Pilih kandidat untuk melihat insight.</p>
+            <p class="text-sm text-gray-400">Select a candidate to view insights.</p>
         </div>
         <div id="insight-body" class="{{ $selectedCandidateDetail ? '' : 'hidden' }}">
             <div class="mb-3">
@@ -132,9 +132,9 @@
             document.getElementById('insight-job').textContent = detail.job?.title ?? '-';
             document.getElementById('insight-score').textContent = detail.ai?.score_total ?? 0;
             document.getElementById('insight-confidence').textContent = `${Math.round((detail.ai?.confidence ?? 0) * 100)}%`;
-            document.getElementById('insight-summary').textContent = detail.ai?.summary_text ?? 'Belum ada summary AI.';
-            renderList('insight-pros', detail.ai?.pros, 'Belum ada poin plus.');
-            renderList('insight-cons', detail.ai?.cons, 'Belum ada poin minus.');
+            document.getElementById('insight-summary').textContent = detail.ai?.summary_text ?? 'No AI summary available.';
+            renderList('insight-pros', detail.ai?.pros, 'No strengths listed.');
+            renderList('insight-cons', detail.ai?.cons, 'No weaknesses listed.');
         };
 
         const loadDetail = async (applicationId) => {
@@ -160,3 +160,4 @@
     document.addEventListener('app:page-ready', initHrIntelligence);
 </script>
 @endpush
+

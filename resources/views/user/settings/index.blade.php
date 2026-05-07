@@ -168,9 +168,9 @@
                                 <p class="font-black uppercase text-sm tracking-widest">Chally is analyzing your profile...</p>
                             </div>
                         @elseif($latestSuggestion && $latestSuggestion->status === 'failed')
-                            <p class="text-red-500 font-bold text-sm uppercase">AI suggestion gagal diproses. Coba lagi.</p>
+                            <p class="text-accent font-bold text-sm uppercase">AI suggestion failed to process. Please try again.</p>
                         @else
-                            <p class="text-yellow-500 font-bold text-sm uppercase">Belum ada hasil AI. Klik Generate untuk mulai.</p>
+                            <p class="text-yellow-500 font-bold text-sm uppercase">No AI results yet. Click Generate to start.</p>
                         @endif
                     </div>
                 </section>

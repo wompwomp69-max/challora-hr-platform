@@ -192,7 +192,7 @@
                                 <div class="font-black text-xl">{{ $a->aiScore->score_total }}/100</div>
                                 <div class="text-[10px] font-bold uppercase text-text-muted mt-1">{{ $a->aiScore->core_strength }}</div>
                             @elseif($a->aiScore && $a->aiScore->status === 'failed')
-                                <span class="text-red-500 font-bold text-xs uppercase">AI Failed</span>
+                                <span class="text-accent font-bold text-xs uppercase">AI Failed</span>
                             @else
                                 <div class="flex flex-col items-center">
                                     <div class="h-6 w-6 border-4 border-accent border-t-transparent rounded-full animate-spin"></div>

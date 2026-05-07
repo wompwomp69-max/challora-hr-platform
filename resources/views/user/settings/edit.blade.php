@@ -271,11 +271,11 @@
                             <h4 class="font-black text-xs uppercase tracking-widest mb-1">{{ $label }}</h4>
                             @php $field = $key . '_path'; @endphp
                             @if($user->$field)
-                                <p class="text-[10px] font-bold text-success-text mb-4 uppercase">Terunggah &bull; <a
+                                <p class="text-[10px] font-bold text-success-text mb-4 uppercase">Uploaded &bull; <a
                                         href="{{ route('view.document', ['type' => $key]) }}"
-                                        class="underline">Lihat</a></p>
+                                        class="underline">View</a></p>
                             @else
-                                <p class="text-[10px] font-bold text-red-600 mb-4 uppercase">Belum Diunggah</p>
+                                <p class="text-[10px] font-bold text-red-600 mb-4 uppercase">Not Uploaded</p>
                             @endif
                         </div>
                         <form action="{{ route('user.settings.upload', $key) }}" method="POST" enctype="multipart/form-data">
@@ -400,3 +400,4 @@
         });
     </script>
 @endsection
+
