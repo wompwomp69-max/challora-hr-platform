@@ -8,10 +8,8 @@ class DownloadController extends Controller
 {
     public function download($type, $id)
     {
-        $application = \App\Models\Application::with('job')->findOrFail($id);
+        $application = \App\Models\Application::with(['job', 'user'])->findOrFail($id);
         
-        // Authorization check: Only owner of the job (HR) or the candidate themselves
-        // Relax check for local development if needed, but let's keep it robust
         if (auth()->user()->role === \App\Enums\UserRole::HR) {
             if ($application->job->created_by !== auth()->id() && !app()->environment('local')) {
                 abort(403, 'Anda bukan pemilik lowongan ini.');
@@ -23,11 +21,11 @@ class DownloadController extends Controller
         }
 
         $pathField = $type . '_path';
-        $path = $application->$pathField;
+        // Fall back to user's file if application doesn't have its own copy
+        $path = $application->$pathField ?: $application->user->$pathField;
 
         if (!$path || !\Illuminate\Support\Facades\Storage::disk('public')->exists($path)) {
-            // Jika file tidak ada, jangan 500, tapi 404 dengan pesan jelas
-            abort(404, "File [$type] tidak ditemukan di storage.");
+            abort(404, "File [$type] not found in storage.");
         }
 
         return \Illuminate\Support\Facades\Storage::disk('public')->response($path);
