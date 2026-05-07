@@ -64,25 +64,20 @@ class DownloadController extends Controller
     public function viewDocument($type, $id = null)
     {
         if ($id) {
-            // HR viewing candidate document via application ID
             $application = \App\Models\Application::with('user')->findOrFail($id);
             $pathField = $type . '_path';
             $path = $application->$pathField ?: $application->user->$pathField;
-            if (!$path || !\Illuminate\Support\Facades\Storage::disk('public')->exists($path)) {
-                abort(404, "File [$type] not found.");
-            }
-            $fileUrl = \Illuminate\Support\Facades\Storage::disk('public')->url($path);
         } else {
-            // User viewing their own document
             $user = auth()->user();
             $pathField = $type . '_path';
             $path = $user->$pathField;
-            if (!$path || !\Illuminate\Support\Facades\Storage::disk('public')->exists($path)) {
-                abort(404, "File [$type] not found.");
-            }
-            $fileUrl = \Illuminate\Support\Facades\Storage::disk('public')->url($path);
         }
 
+        if (!$path || !\Illuminate\Support\Facades\Storage::disk('public')->exists($path)) {
+            abort(404, "File [$type] not found.");
+        }
+
+        $fileUrl = str_replace('http://', 'https://', \Illuminate\Support\Facades\Storage::disk('public')->url($path));
         $fileUrl .= '#toolbar=0&navpanes=0&scrollbar=0';
 
         return view('shared.document_viewer', [
