@@ -17,6 +17,21 @@ Route::get('/up', function () {
     return response('OK', 200);
 });
 
+Route::get('/filecheck/{id}', function ($id) {
+    $app = \App\Models\Application::with('user')->find($id);
+    if (!$app) return response()->json(['error' => 'application not found']);
+    $disk = \Illuminate\Support\Facades\Storage::disk('public');
+    return response()->json([
+        'app_cv' => $app->cv_path,
+        'app_diploma' => $app->diploma_path,
+        'user_cv' => $app->user->cv_path,
+        'user_diploma' => $app->user->diploma_path,
+        'user_cv_exists' => $app->user->cv_path ? $disk->exists($app->user->cv_path) : false,
+        'user_diploma_exists' => $app->user->diploma_path ? $disk->exists($app->user->diploma_path) : false,
+        'storage_root' => storage_path('app/public'),
+    ]);
+});
+
 Route::get('/dbcheck', function () {
     return response()->json([
         'host' => env('DB_HOST'),
