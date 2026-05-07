@@ -17,19 +17,6 @@ Route::get('/up', function () {
     return response('OK', 200);
 });
 
-Route::get('/aicheck', function () {
-    $gateway = app(\App\Services\Ai\AiGatewayService::class);
-    $result = $gateway->rateCv([
-        'job_description' => 'Test job',
-        'candidate_name' => 'Test',
-        'candidate_profile' => [],
-    ]);
-    return response()->json([
-        'base_url' => config('ai.base_url'),
-        'result' => $result,
-    ]);
-});
-
 Route::get('/dbcheck', function () {
     return response()->json([
         'host' => env('DB_HOST'),
