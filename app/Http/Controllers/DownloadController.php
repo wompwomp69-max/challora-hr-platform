@@ -25,7 +25,7 @@ class DownloadController extends Controller
         $path = $application->$pathField ?: $application->user->$pathField;
 
         if (!$path || !\Illuminate\Support\Facades\Storage::disk('public')->exists($path)) {
-            abort(404, "File [$type] not found. Path: " . ($path ?? 'null') . " | App path: " . ($application->$pathField ?? 'null') . " | User path: " . ($application->user->$pathField ?? 'null'));
+            abort(404, "File [$type] not found in storage.");
         }
 
         return \Illuminate\Support\Facades\Storage::disk('public')->response($path);
@@ -64,16 +64,29 @@ class DownloadController extends Controller
     public function viewDocument($type, $id = null)
     {
         if ($id) {
-            $url = route('download.file', ['type' => $type, 'id' => $id]);
+            // HR viewing candidate document via application ID
+            $application = \App\Models\Application::with('user')->findOrFail($id);
+            $pathField = $type . '_path';
+            $path = $application->$pathField ?: $application->user->$pathField;
+            if (!$path || !\Illuminate\Support\Facades\Storage::disk('public')->exists($path)) {
+                abort(404, "File [$type] not found.");
+            }
+            $fileUrl = \Illuminate\Support\Facades\Storage::disk('public')->url($path);
         } else {
-            $url = route('preview.user_file', ['type' => $type]);
+            // User viewing their own document
+            $user = auth()->user();
+            $pathField = $type . '_path';
+            $path = $user->$pathField;
+            if (!$path || !\Illuminate\Support\Facades\Storage::disk('public')->exists($path)) {
+                abort(404, "File [$type] not found.");
+            }
+            $fileUrl = \Illuminate\Support\Facades\Storage::disk('public')->url($path);
         }
 
-        // Tambahkan parameter untuk menonaktifkan toolbar PDF browser agar tidak bisa diedit/didownload dengan mudah
-        $url .= '#toolbar=0&navpanes=0&scrollbar=0';
+        $fileUrl .= '#toolbar=0&navpanes=0&scrollbar=0';
 
         return view('shared.document_viewer', [
-            'url' => $url,
+            'url' => $fileUrl,
             'type' => strtoupper($type)
         ]);
     }

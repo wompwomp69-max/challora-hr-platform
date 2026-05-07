@@ -134,7 +134,7 @@
                 </div>
                 @if($user->$path)
                     <div class="flex gap-4">
-                        <a href="{{ route('download.file', ['type' => $key, 'id' => $application->id]) }}" target="_blank" class="btn-brutalist-sm">
+                        <a href="{{ route('view.document', ['type' => $key, 'id' => $application->id]) }}" target="_blank" class="btn-brutalist-sm">
                             View Document
                         </a>
                     </div>
