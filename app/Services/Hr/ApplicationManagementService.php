@@ -44,7 +44,11 @@ class ApplicationManagementService
 
         if ($updated) {
             $application->load(['user', 'job']);
-            Mail::to($application->user->email)->send(new ApplicationStatusMail($application));
+            try {
+                Mail::to($application->user->email)->send(new ApplicationStatusMail($application));
+            } catch (\Exception $e) {
+                \Log::warning('Failed to send status email: ' . $e->getMessage());
+            }
         }
 
         return $updated;
