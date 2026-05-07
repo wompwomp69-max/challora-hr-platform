@@ -119,7 +119,7 @@
     <div class="flex gap-4 gsap-reveal">
         <form action="{{ route('hr.applications.index') }}" method="GET" class="flex gap-4">
             <div class="flex flex-col gap-1">
-                <label class="text-[10px] font-black uppercase text-text-muted">Job Posting</label>
+                <label class="text-xs font-black uppercase text-text-muted">Job Posting</label>
                 <select name="job_id" class="action-select-premium" onchange="this.form.submit()">
                     <option value="">All Positions</option>
                     @foreach($jobs as $job)
@@ -131,7 +131,7 @@
             </div>
 
             <div class="flex flex-col gap-1">
-                <label class="text-[10px] font-black uppercase text-text-muted">Status</label>
+                <label class="text-xs font-black uppercase text-text-muted">Status</label>
                 <select name="status" class="action-select-premium" onchange="this.form.submit()">
                     <option value="">All Statuses</option>
                     @foreach(\App\Enums\ApplicationStatus::cases() as $status)
@@ -143,7 +143,7 @@
             </div>
 
             <div class="flex flex-col gap-1">
-                <label class="text-[10px] font-black uppercase text-text-muted">Sort by Rating</label>
+                <label class="text-xs font-black uppercase text-text-muted">Sort by Rating</label>
                 <select name="sort_rating" class="action-select-premium" onchange="this.form.submit()">
                     <option value="">Newest First</option>
                     <option value="high" {{ request('sort_rating') === 'high' ? 'selected' : '' }}>High to Low</option>
@@ -179,24 +179,24 @@
                         <td>
                             <div class="applicant-name">{{ $a->user->name }}</div>
                             @if(($topApplicationId ?? null) === $a->id)
-                                <div class="text-[10px] font-black uppercase text-accent mt-1">Top Candidate</div>
+                                <div class="text-xs font-black uppercase text-accent mt-1">Top Candidate</div>
                             @endif
                             <div class="applicant-contact">{{ $a->user->email }}</div>
                         </td>
                         <td>
                             <div class="font-bold uppercase text-xs tracking-widest text-accent">{{ $a->job->title }}</div>
-                            <div class="text-[10px] font-bold text-text-muted mt-1">{{ $a->created_at->format('d M Y') }}</div>
+                            <div class="text-xs font-bold text-text-muted mt-1">{{ $a->created_at->format('d M Y') }}</div>
                         </td>
                         <td>
                             @if($a->aiScore && $a->aiScore->status === 'completed')
                                 <div class="font-black text-xl">{{ $a->aiScore->score_total }}/100</div>
-                                <div class="text-[10px] font-bold uppercase text-text-muted mt-1">{{ $a->aiScore->core_strength }}</div>
+                                <div class="text-xs font-bold uppercase text-text-muted mt-1">{{ $a->aiScore->core_strength }}</div>
                             @elseif($a->aiScore && $a->aiScore->status === 'failed')
                                 <span class="text-accent font-bold text-xs uppercase">AI Failed</span>
                             @else
                                 <div class="flex flex-col items-center">
                                     <div class="h-6 w-6 border-4 border-accent border-t-transparent rounded-full animate-spin"></div>
-                                    <span class="text-yellow-600 font-bold text-[10px] uppercase mt-2 animate-pulse">Analyzing...</span>
+                                    <span class="text-yellow-600 font-bold text-xs uppercase mt-2 animate-pulse">Analyzing...</span>
                                 </div>
                             @endif
                         </td>
@@ -271,3 +271,4 @@
     });
 </script>
 @endpush
+

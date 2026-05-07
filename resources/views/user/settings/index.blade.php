@@ -111,69 +111,6 @@
                         <p class="text-text-muted italic font-bold">No organizational history added yet.</p>
                     @endforelse
                 </section>
-
-                <section class="info-card" id="ai-optimization-section">
-                    <div class="flex items-center justify-between mb-4">
-                        <h2 class="info-card-title !mb-0">AI Profile Optimization</h2>
-                        <form action="{{ route('user.settings.ai_suggestion') }}" method="POST" class="flex items-center gap-2" id="ai-gen-form">
-                            @csrf
-                            <input type="text" name="target_role" placeholder="Target role (optional)" class="border-2 border-black px-3 py-2 text-xs font-bold uppercase">
-                            <button type="submit" class="bg-black text-white px-4 py-2 text-xs font-black uppercase transition-all hover:bg-accent flex items-center gap-2 group" id="gen-btn">
-                                <span class="group-hover:scale-110 transition-transform">Generate</span>
-                                <div class="hidden animate-spin h-3 w-3 border-2 border-white border-t-transparent rounded-full" id="gen-loader"></div>
-                            </button>
-                        </form>
-                    </div>
-
-                    <div id="ai-content-area">
-                        @if($latestSuggestion && $latestSuggestion->status === 'completed')
-                            @php
-                                $suggestions = $latestSuggestion->suggestion_json ?? [];
-                            @endphp
-                            <div class="grid grid-cols-1 gap-8">
-                                <div class="bg-secondary/30 p-6 border-l-4 border-accent">
-                                    <p class="text-[10px] font-black uppercase text-accent mb-4 tracking-widest">Rewrite Suggestions</p>
-                                    <ul class="space-y-3">
-                                        @foreach($suggestions['rewrite_suggestions'] ?? [] as $item)
-                                            <li class="text-sm font-bold flex gap-3">
-                                                <span class="text-accent">→</span>
-                                                {{ $item }}
-                                            </li>
-                                        @endforeach
-                                    </ul>
-                                </div>
-                                <div class="bg-secondary/30 p-6 border-l-4 border-black">
-                                    <p class="text-[10px] font-black uppercase text-text-muted mb-4 tracking-widest">Missing Points</p>
-                                    <ul class="space-y-3">
-                                        @foreach($suggestions['missing_points'] ?? [] as $item)
-                                            <li class="text-sm font-bold flex gap-3 italic">
-                                                <span class="text-text-muted">•</span>
-                                                {{ $item }}
-                                            </li>
-                                        @endforeach
-                                    </ul>
-                                </div>
-                                <div class="bg-secondary/30 p-6 border-l-4 border-yellow-500">
-                                    <p class="text-[10px] font-black uppercase text-yellow-600 mb-4 tracking-widest">Improvement Priority</p>
-                                    <div class="flex flex-wrap gap-2">
-                                        @foreach($suggestions['improvement_priority'] ?? [] as $item)
-                                            <span class="bg-white border-2 border-black px-3 py-1 text-[10px] font-black uppercase">{{ $item }}</span>
-                                        @endforeach
-                                    </div>
-                                </div>
-                            </div>
-                        @elseif($latestSuggestion && $latestSuggestion->status === 'processing')
-                            <div class="py-12 text-center animate-pulse">
-                                <div class="inline-block h-12 w-12 border-4 border-accent border-t-transparent rounded-full animate-spin mb-4"></div>
-                                <p class="font-black uppercase text-sm tracking-widest">Chally is analyzing your profile...</p>
-                            </div>
-                        @elseif($latestSuggestion && $latestSuggestion->status === 'failed')
-                            <p class="text-accent font-bold text-sm uppercase">AI suggestion failed to process. Please try again.</p>
-                        @else
-                            <p class="text-yellow-500 font-bold text-sm uppercase">No AI results yet. Click Generate to start.</p>
-                        @endif
-                    </div>
-                </section>
             </div>
 
             <aside class="profile-sidebar">

@@ -5,7 +5,7 @@
     <div class="flex justify-between items-center">
         <div>
             <h1 class="text-xl font-bold text-white">HR Intelligence</h1>
-            <p class="text-sm text-gray-400">Top candidates, compatibility list, and AI insights per job.</p>
+            <p class="text-base text-gray-300">Top candidates, compatibility list, and AI insights per job.</p>
         </div>
         <a href="{{ route('hr.applications.index') }}" class="px-3 py-2 text-xs rounded bg-accent text-black font-bold uppercase">Manage Pipeline</a>
     </div>
@@ -14,7 +14,7 @@
 <div class="grid md:grid-cols-2 gap-5">
     <div class="space-y-5">
         <div class="bg-[#1a1a1a] border-4 border-black rounded p-5">
-            <h2 class="text-xs uppercase tracking-wider font-bold text-gray-400 mb-3">Top Candidates Per Job</h2>
+            <h2 class="text-sm uppercase tracking-wider font-bold text-gray-400 mb-3">Top Candidates Per Job</h2>
             @forelse($topCandidatesByJob as $item)
                 <div class="mb-4">
                     <div class="text-white font-bold mb-2">{{ $item['job']['title'] }}</div>
@@ -28,12 +28,12 @@
                     @endforeach
                 </div>
             @empty
-                <p class="text-sm text-gray-400">No candidates with AI score yet.</p>
+                <p class="text-base text-gray-300">No candidates with AI score yet.</p>
             @endforelse
         </div>
 
         <div class="bg-[#1a1a1a] border-4 border-black rounded p-5">
-            <h2 class="text-xs uppercase tracking-wider font-bold text-gray-400 mb-3">Available Compatible Candidate</h2>
+            <h2 class="text-sm uppercase tracking-wider font-bold text-gray-400 mb-3">Available Compatible Candidate</h2>
             @forelse($availableCompatibleCandidates as $candidate)
                 <button class="candidate-trigger w-full text-left border-b border-gray-700 py-2 {{ ($defaultSelectedApplicationId ?? null) === $candidate['application_id'] ? 'text-accent' : 'text-white' }}" data-application-id="{{ $candidate['application_id'] }}">
                     <div class="flex justify-between">
@@ -43,20 +43,20 @@
                     <div class="text-xs text-gray-400">{{ $candidate['job_title'] }}</div>
                 </button>
             @empty
-                <p class="text-sm text-gray-400">No compatible candidates yet.</p>
+                <p class="text-base text-gray-300">No compatible candidates yet.</p>
             @endforelse
         </div>
     </div>
 
     <div class="bg-[#1a1a1a] border-4 border-black rounded p-5">
-        <h2 class="text-xs uppercase tracking-wider font-bold text-gray-400 mb-3">Candidate Insight</h2>
+        <h2 class="text-sm uppercase tracking-wider font-bold text-gray-400 mb-3">Candidate Insight</h2>
         <div id="insight-empty" class="{{ $selectedCandidateDetail ? 'hidden' : '' }}">
-            <p class="text-sm text-gray-400">Select a candidate to view insights.</p>
+            <p class="text-base text-gray-300">Select a candidate to view insights.</p>
         </div>
         <div id="insight-body" class="{{ $selectedCandidateDetail ? '' : 'hidden' }}">
             <div class="mb-3">
                 <div id="insight-name" class="text-lg font-bold text-white"></div>
-                <div id="insight-job" class="text-sm text-gray-400"></div>
+                <div id="insight-job" class="text-base text-gray-300"></div>
             </div>
             <div class="grid grid-cols-2 gap-3 mb-4">
                 <div class="border border-gray-700 rounded p-2 text-center">
@@ -70,15 +70,15 @@
             </div>
             <div class="mb-3">
                 <h3 class="text-sm font-bold text-green-400">Plus</h3>
-                <ul id="insight-pros" class="list-disc list-inside text-sm text-gray-200"></ul>
+                <ul id="insight-pros" class="list-disc list-inside text-base text-gray-300"></ul>
             </div>
             <div class="mb-3">
                 <h3 class="text-sm font-bold text-red-400">Minus</h3>
-                <ul id="insight-cons" class="list-disc list-inside text-sm text-gray-200"></ul>
+                <ul id="insight-cons" class="list-disc list-inside text-base text-gray-300"></ul>
             </div>
             <div>
                 <h3 class="text-sm font-bold text-accent">Summary</h3>
-                <p id="insight-summary" class="text-sm text-gray-300"></p>
+                <p id="insight-summary" class="text-base text-gray-300"></p>
             </div>
         </div>
     </div>
@@ -160,4 +160,5 @@
     document.addEventListener('app:page-ready', initHrIntelligence);
 </script>
 @endpush
+
 
