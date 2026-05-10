@@ -142,8 +142,8 @@
             </div>
 
             <!-- LAYER 2: THE CONTROL CENTER -->
-            <div class="bg-[#1A1A1A] text-white rounded-[48px] m-4 md:m-8 p-10 md:p-20 relative overflow-hidden flex flex-col justify-between" style="min-height: 60vh;">
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-10 relative z-10 mb-20">
+            <div class="bg-[#1A1A1A] text-white rounded-[48px] m-4 md:m-8 p-10 md:p-20 relative flex flex-col justify-between" style="min-height: 60vh;">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-10 relative z-10 mb-20">
                     <!-- Col 1: Logo -->
                     <div class="text-accent">
                         <div class="w-16 h-16 border-4 border-accent flex items-center justify-center font-black text-4xl">C</div>
@@ -164,14 +164,6 @@
                             <li><a href="{{ route('register') }}" class="hover:text-accent transition-colors">↳ For HR Teams</a></li>
                         </ul>
                     </div>
-
-                    <!-- Col 4: About -->
-                    <div>
-                        <h3 class="font-mono text-xs uppercase tracking-widest text-[#888] mb-6 flex items-start gap-1">Contact <span class="text-[8px]">1</span></h3>
-                        <ul class="space-y-4 font-bold text-base">
-                            <li><a href="mailto:admin.challora@gmail.com" class="hover:text-accent transition-colors">↳ admin.challora@gmail.com</a></li>
-                        </ul>
-                    </div>
                 </div>
 
                 <div class="flex flex-col md:flex-row justify-between items-end relative z-10 font-mono text-xs text-[#888] uppercase mb-10 md:mb-16">
@@ -184,7 +176,7 @@
                 </div>
 
                 <!-- Mega Wordmark -->
-                <div class="text-[15vw] leading-[0.7] font-black text-center tracking-tighter text-[#2a2a2a] select-none absolute bottom-[-2vw] left-0 w-full pointer-events-none">
+                <div class="text-[15vw] leading-[0.75] font-black text-center tracking-tighter text-[#2a2a2a] select-none absolute bottom-0 left-0 w-full pointer-events-none overflow-hidden rounded-b-[48px]" style="height: 12vw;">
                     CHALLORA
                 </div>
             </div>
