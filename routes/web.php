@@ -17,6 +17,33 @@ Route::get('/up', function () {
     return response('OK', 200);
 });
 
+Route::get('/debug-file/{appId}', function ($appId) {
+    $app = \App\Models\Application::with('user')->find($appId);
+    if (!$app) return response()->json(['error' => "Application $appId not found"]);
+
+    $disk = \Illuminate\Support\Facades\Storage::disk('public');
+    $fields = ['cv_path', 'diploma_path', 'photo_path'];
+    $result = ['application_id' => $appId, 'files' => []];
+
+    foreach ($fields as $field) {
+        $appPath  = $app->$field;
+        $userPath = $app->user->$field ?? null;
+        $result['files'][$field] = [
+            'on_application'       => $appPath,
+            'on_user'              => $userPath,
+            'app_exists_in_disk'   => $appPath  ? $disk->exists($appPath)  : false,
+            'user_exists_in_disk'  => $userPath ? $disk->exists($userPath) : false,
+            'storage_root'         => storage_path('app/public'),
+            'storage_link_exists'  => file_exists(public_path('storage')),
+        ];
+    }
+
+    // List actual files in storage/app/public
+    $result['disk_listing'] = $disk->allFiles();
+
+    return response()->json($result, 200, [], JSON_PRETTY_PRINT);
+});
+
 Route::get('/dbcheck', function () {
     return response()->json([
         'host' => env('DB_HOST'),
