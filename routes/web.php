@@ -23,23 +23,30 @@ Route::get('/debug-file/{appId}', function ($appId) {
 
     $disk = \Illuminate\Support\Facades\Storage::disk('public');
     $fields = ['cv_path', 'diploma_path', 'photo_path'];
-    $result = ['application_id' => $appId, 'files' => []];
+    $result = [
+        'application_id'      => $appId,
+        'storage_path_app'    => storage_path('app/public'),
+        'base_path'           => base_path(),
+        'public_path_storage' => public_path('storage'),
+        'symlink_target'      => is_link(public_path('storage')) ? readlink(public_path('storage')) : 'not a symlink',
+        'disk_root'           => $disk->path(''),
+        'files' => [],
+    ];
 
     foreach ($fields as $field) {
         $appPath  = $app->$field;
         $userPath = $app->user->$field ?? null;
         $result['files'][$field] = [
-            'on_application'       => $appPath,
-            'on_user'              => $userPath,
-            'app_exists_in_disk'   => $appPath  ? $disk->exists($appPath)  : false,
-            'user_exists_in_disk'  => $userPath ? $disk->exists($userPath) : false,
-            'storage_root'         => storage_path('app/public'),
-            'storage_link_exists'  => file_exists(public_path('storage')),
+            'on_application'      => $appPath,
+            'on_user'             => $userPath,
+            'app_exists_in_disk'  => $appPath  ? $disk->exists($appPath)  : false,
+            'user_exists_in_disk' => $userPath ? $disk->exists($userPath) : false,
+            'app_real_path'       => $appPath  ? $disk->path($appPath)    : null,
+            'user_real_path'      => $userPath ? $disk->path($userPath)   : null,
+            'app_file_exists'     => $appPath  ? file_exists($disk->path($appPath))  : false,
+            'user_file_exists'    => $userPath ? file_exists($disk->path($userPath)) : false,
         ];
     }
-
-    // List actual files in storage/app/public
-    $result['disk_listing'] = $disk->allFiles();
 
     return response()->json($result, 200, [], JSON_PRETTY_PRINT);
 });
