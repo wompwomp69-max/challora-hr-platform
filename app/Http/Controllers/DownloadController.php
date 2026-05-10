@@ -21,8 +21,12 @@ class DownloadController extends Controller
         }
 
         $pathField = $type . '_path';
-        // Fall back to user's file if application doesn't have its own copy
-        $path = $application->$pathField ?: $application->user->$pathField;
+        // Prefer application snapshot if it exists on disk, otherwise use user's current file
+        $appFilePath  = $application->$pathField;
+        $userFilePath = $application->user->$pathField;
+        $path = ($appFilePath && \Illuminate\Support\Facades\Storage::disk('public')->exists($appFilePath))
+            ? $appFilePath
+            : $userFilePath;
 
         if (!$path || !\Illuminate\Support\Facades\Storage::disk('public')->exists($path)) {
             return response(view('shared.document_not_found', [
@@ -84,9 +88,15 @@ class DownloadController extends Controller
             }
 
             $pathField = $type . '_path';
-            // cv_path, diploma_path, photo_path are stored on the user profile,
-            // but may also be snapshotted on the application — fall back to user
-            $path = $application->$pathField ?: $application->user->$pathField;
+            // Application snapshot may be stale (file deleted/replaced) — prefer
+            // the application's own copy only if it physically exists on disk,
+            // otherwise fall back to the user's current profile file.
+            $disk = \Illuminate\Support\Facades\Storage::disk('public');
+            $appFilePath  = $application->$pathField;
+            $userFilePath = $application->user->$pathField;
+            $path = ($appFilePath && $disk->exists($appFilePath))
+                ? $appFilePath
+                : $userFilePath;
         } else {
             $user = auth()->user();
             $pathField = $type . '_path';
