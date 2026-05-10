@@ -23,7 +23,14 @@ class AppServiceProvider extends ServiceProvider
     {
         URL::forceScheme('https');
 
-        $version = env('APP_VERSION', '2.2.1');
+        $version = env('APP_VERSION');
+
+        // If APP_VERSION not set (e.g. local dev), try to read from git tag
+        if (!$version) {
+            $tag = trim(shell_exec('git describe --tags --abbrev=0 2>/dev/null') ?? '');
+            $version = $tag ?: '4.3.8';
+        }
+
         View::share('appVersion', $version);
     }
 }
