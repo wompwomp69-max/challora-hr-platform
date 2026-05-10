@@ -25,7 +25,10 @@ class DownloadController extends Controller
         $path = $application->$pathField ?: $application->user->$pathField;
 
         if (!$path || !\Illuminate\Support\Facades\Storage::disk('public')->exists($path)) {
-            abort(404, "File [$type] not found in storage.");
+            return response(view('shared.document_not_found', [
+                'type' => $type,
+                'message' => 'File not found in storage.',
+            ]), 200);
         }
 
         return \Illuminate\Support\Facades\Storage::disk('public')->response($path);
@@ -38,7 +41,10 @@ class DownloadController extends Controller
         $path = $user->$pathField;
 
         if (!$path || !\Illuminate\Support\Facades\Storage::disk('public')->exists($path)) {
-            abort(404, 'Berkas belum diunggah.');
+            return response(view('shared.document_not_found', [
+                'type' => $type,
+                'message' => 'You have not uploaded this document yet.',
+            ]), 200);
         }
 
         return \Illuminate\Support\Facades\Storage::disk('public')->response($path);
@@ -88,7 +94,10 @@ class DownloadController extends Controller
         }
 
         if (!$path || !\Illuminate\Support\Facades\Storage::disk('public')->exists($path)) {
-            abort(404, "File [$type] not found.");
+            return response(view('shared.document_not_found', [
+                'type' => $type,
+                'message' => 'This file could not be found on the server.',
+            ]), 200);
         }
 
         $fileUrl = str_replace('http://', 'https://', \Illuminate\Support\Facades\Storage::disk('public')->url($path));
