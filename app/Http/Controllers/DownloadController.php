@@ -64,8 +64,22 @@ class DownloadController extends Controller
     public function viewDocument($type, $id = null)
     {
         if ($id) {
-            $application = \App\Models\Application::with('user')->findOrFail($id);
+            $application = \App\Models\Application::with(['user', 'job'])->findOrFail($id);
+
+            // Authorization: HR must own the job, candidate must own the application
+            if (auth()->user()->role === \App\Enums\UserRole::HR) {
+                if ($application->job->created_by !== auth()->id() && !app()->environment('local')) {
+                    abort(403, 'Anda bukan pemilik lowongan ini.');
+                }
+            } else {
+                if ($application->user_id !== auth()->id() && !app()->environment('local')) {
+                    abort(403, 'Ini bukan berkas Anda.');
+                }
+            }
+
             $pathField = $type . '_path';
+            // cv_path, diploma_path, photo_path are stored on the user profile,
+            // but may also be snapshotted on the application — fall back to user
             $path = $application->$pathField ?: $application->user->$pathField;
         } else {
             $user = auth()->user();
