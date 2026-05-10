@@ -133,7 +133,7 @@
                         <p class="font-mono text-xs uppercase font-bold mb-2 opacity-70">SIGN UP FOR UPDATES</p>
                         <div class="flex items-center border-b-2 border-black pb-2">
                             <input type="email" placeholder="Enter your email address" class="bg-transparent border-none outline-none text-xl sm:text-2xl font-bold placeholder-black/50 w-full text-black">
-                            <button class="bg-black text-accent font-mono text-xs font-bold uppercase rounded-full px-6 py-3 ml-4 hover:bg-white hover:text-black transition-colors whitespace-nowrap">
+                            <button class="bg-black text-white font-mono text-xs font-bold uppercase rounded-full px-6 py-3 ml-4 hover:bg-white hover:text-black transition-colors whitespace-nowrap">
                                 SUBSCRIBE
                             </button>
                         </div>
@@ -167,10 +167,9 @@
 
                     <!-- Col 4: About -->
                     <div>
-                        <h3 class="font-mono text-xs uppercase tracking-widest text-[#888] mb-6 flex items-start gap-1">Account <span class="text-[8px]">2</span></h3>
+                        <h3 class="font-mono text-xs uppercase tracking-widest text-[#888] mb-6 flex items-start gap-1">Contact <span class="text-[8px]">1</span></h3>
                         <ul class="space-y-4 font-bold text-base">
-                            <li><a href="{{ route('login') }}" class="hover:text-accent transition-colors">↳ Sign In</a></li>
-                            <li><a href="{{ route('register') }}" class="hover:text-accent transition-colors">↳ Register</a></li>
+                            <li><a href="mailto:admin.challora@gmail.com" class="hover:text-accent transition-colors">↳ admin.challora@gmail.com</a></li>
                         </ul>
                     </div>
                 </div>

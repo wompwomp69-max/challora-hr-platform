@@ -23,7 +23,7 @@ class AppServiceProvider extends ServiceProvider
     {
         URL::forceScheme('https');
 
-        $version = '2.2.1';
+        $version = env('APP_VERSION', '2.2.1');
         View::share('appVersion', $version);
     }
 }
