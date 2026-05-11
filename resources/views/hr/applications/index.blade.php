@@ -193,11 +193,19 @@
                                 <div class="text-xs font-bold uppercase text-text-muted mt-1">{{ $a->aiScore->core_strength }}</div>
                             @elseif($a->aiScore && $a->aiScore->status === 'failed')
                                 <span class="text-accent font-bold text-xs uppercase">AI Failed</span>
-                            @else
-                                <div class="flex flex-col items-center">
+                            @elseif($a->aiScore && in_array($a->aiScore->status, ['processing', 'pending']))
+                                <div class="flex flex-col items-center" data-app-id="{{ $a->id }}">
                                     <div class="h-6 w-6 border-4 border-accent border-t-transparent rounded-full animate-spin"></div>
                                     <span class="text-yellow-600 font-bold text-xs uppercase mt-2 animate-pulse">Analyzing...</span>
                                 </div>
+                            @else
+                                {{-- No score yet — show Rate button --}}
+                                <form method="post" action="{{ route('hr.applications.ai_refresh', $a->id) }}" class="rate-form">
+                                    @csrf
+                                    <button type="submit" class="bg-accent text-white font-black text-[10px] uppercase tracking-widest px-3 py-2 border-2 border-black shadow-[3px_3px_0_black] hover:translate-y-[1px] transition-all whitespace-nowrap">
+                                        ★ Rate it Chally
+                                    </button>
+                                </form>
                             @endif
                         </td>
                         <td>
@@ -321,13 +329,12 @@
             }, 3000);
         }
 
-        // Find all rows with a spinner and start polling
+        // Find all rows with a spinner (processing state) and start polling
         document.querySelectorAll('.ax-premium-table tbody tr').forEach(row => {
             const spinner = row.querySelector('.animate-spin');
             if (!spinner) return;
 
             const scoreCell = spinner.closest('td');
-            // Extract application ID from the berkas link in the same row
             const berkasLink = row.querySelector('a[href*="/berkas"]');
             if (!berkasLink) return;
 

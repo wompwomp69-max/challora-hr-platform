@@ -41,8 +41,9 @@
                 <p class="message">Your application status has been updated. Please log in to your account for more details.</p>
             @endif
             <p class="message" style="margin-top:32px;">
-                <a href="{{ config('app.url') }}/user/applications" style="background:#FF4500;color:#fff;padding:12px 28px;font-weight:800;text-decoration:none;text-transform:uppercase;font-size:13px;">
+                <a href="{{ route('user.applications.index') }}" style="background:#FF4500;color:#fff;padding:12px 28px;font-weight:800;text-decoration:none;text-transform:uppercase;font-size:13px;">
                     View My Applications
+                </a>
                 </a>
             </p>
         </div>

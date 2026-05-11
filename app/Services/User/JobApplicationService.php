@@ -2,6 +2,8 @@
 
 namespace App\Services\User;
 
+use App\Jobs\Ai\GenerateCvRatingJob;
+use App\Jobs\Ai\GenerateCandidateSummaryJob;
 use App\Models\JobPosting;
 use App\Models\User;
 use App\Enums\ApplicationStatus;
@@ -40,12 +42,16 @@ class JobApplicationService
             throw new Exception('MISSING_DOCS:' . implode(', ', $missingDocs));
         }
 
-        $user->applications()->create([
-            'job_id' => $job->id,
-            'cv_path' => $user->cv_path,
+        $application = $user->applications()->create([
+            'job_id'       => $job->id,
+            'cv_path'      => $user->cv_path,
             'diploma_path' => $user->diploma_path,
-            'photo_path' => $user->photo_path,
-            'status' => ApplicationStatus::PENDING,
+            'photo_path'   => $user->photo_path,
+            'status'       => ApplicationStatus::PENDING,
         ]);
+
+        // Automatically trigger AI scoring when a candidate applies
+        GenerateCvRatingJob::dispatch($application->id);
+        GenerateCandidateSummaryJob::dispatch($application->id);
     }
 }
