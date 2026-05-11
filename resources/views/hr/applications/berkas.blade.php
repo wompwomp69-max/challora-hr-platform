@@ -79,11 +79,30 @@
     <div class="info-grid">
         <div class="info-group">
             <h4>Identity</h4>
+            <p>{{ $user->name }}</p>
             <p>{{ $user->email }}</p>
             <p>{{ $user->phone ?: 'No phone provided' }}</p>
-            <p>{{ ucfirst($user->gender ?: 'Not specified') }}</p>
+            <p>{{ ucfirst($user->gender ?: 'Not specified') }} &bull; {{ $user->religion ?: '-' }}</p>
+            <p>{{ $user->marital_status ? ucfirst($user->marital_status) : 'Marital status not specified' }}</p>
         </div>
-        
+
+        <div class="info-group">
+            <h4>Birth</h4>
+            <p>{{ $user->birth_place ?: '-' }}</p>
+            <p>{{ $user->birth_date ? $user->birth_date->format('d F Y') : '-' }}</p>
+        </div>
+
+        <div class="info-group">
+            <h4>Address</h4>
+            <p>{{ $user->address ?: 'No address provided' }}</p>
+            @if($user->address_type)
+                <p class="text-sm text-text-muted">{{ ucfirst($user->address_type) }}</p>
+            @endif
+            @if($user->address_family)
+                <p class="text-sm text-text-muted">Family: {{ $user->address_family }}</p>
+            @endif
+        </div>
+
         <div class="info-group">
             <h4>Education</h4>
             <p>{{ $user->education_level ?: '-' }} &bull; {{ $user->education_university ?: '-' }}</p>
@@ -95,7 +114,34 @@
             <p class="text-accent">{{ $job->title }}</p>
             <p>Status: {{ strtoupper($application->status->value) }}</p>
         </div>
-        
+
+        <div class="info-group">
+            <h4>Emergency Contact</h4>
+            <p>{{ $user->emergency_name ?: '-' }}</p>
+            <p>{{ $user->emergency_phone ?: '-' }}</p>
+        </div>
+
+        <div class="info-group">
+            <h4>Father</h4>
+            <p>{{ $user->father_name ?: '-' }}</p>
+            <p>{{ $user->father_job ?: '-' }} &bull; {{ $user->father_education ?: '-' }}</p>
+            <p>{{ $user->father_phone ?: '-' }}</p>
+        </div>
+
+        <div class="info-group">
+            <h4>Mother</h4>
+            <p>{{ $user->mother_name ?: '-' }}</p>
+            <p>{{ $user->mother_job ?: '-' }} &bull; {{ $user->mother_education ?: '-' }}</p>
+            <p>{{ $user->mother_phone ?: '-' }}</p>
+        </div>
+
+        @if($user->social_media)
+        <div class="info-group">
+            <h4>Social Media</h4>
+            <p>{{ $user->social_media }}</p>
+        </div>
+        @endif
+
         <div class="info-group col-span-full">
             <h4>Professional Summary</h4>
             <p class="font-medium leading-relaxed">{{ $user->user_summary ?: 'No summary provided.' }}</p>
