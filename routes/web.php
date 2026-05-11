@@ -17,58 +17,6 @@ Route::get('/up', function () {
     return response('OK', 200);
 });
 
-Route::get('/run-seeder', function () {
-    // One-time seeder route — remove after use
-    $alreadySeeded = \App\Models\User::where('role', \App\Enums\UserRole::HR)->exists()
-        && \App\Models\Application::count() >= 10;
-
-    if ($alreadySeeded) {
-        return response()->json(['status' => 'skipped', 'message' => 'Data already seeded.']);
-    }
-
-    try {
-        \Illuminate\Support\Facades\Artisan::call('db:seed', ['--class' => 'DummyDataSeeder', '--force' => true]);
-        $output = \Illuminate\Support\Facades\Artisan::output();
-        return response()->json(['status' => 'ok', 'message' => 'Seeder ran successfully.', 'output' => $output]);
-    } catch (\Exception $e) {
-        return response()->json(['status' => 'error', 'message' => $e->getMessage()], 500);
-    }
-});
-
-Route::get('/debug-file/{appId}', function ($appId) {
-    $app = \App\Models\Application::with('user')->find($appId);
-    if (!$app) return response()->json(['error' => "Application $appId not found"]);
-
-    $disk = \Illuminate\Support\Facades\Storage::disk('public');
-    $fields = ['cv_path', 'diploma_path', 'photo_path'];
-    $result = [
-        'application_id'      => $appId,
-        'storage_path_app'    => storage_path('app/public'),
-        'base_path'           => base_path(),
-        'public_path_storage' => public_path('storage'),
-        'symlink_target'      => is_link(public_path('storage')) ? readlink(public_path('storage')) : 'not a symlink',
-        'disk_root'           => $disk->path(''),
-        'files' => [],
-    ];
-
-    foreach ($fields as $field) {
-        $appPath  = $app->$field;
-        $userPath = $app->user->$field ?? null;
-        $result['files'][$field] = [
-            'on_application'      => $appPath,
-            'on_user'             => $userPath,
-            'app_exists_in_disk'  => $appPath  ? $disk->exists($appPath)  : false,
-            'user_exists_in_disk' => $userPath ? $disk->exists($userPath) : false,
-            'app_real_path'       => $appPath  ? $disk->path($appPath)    : null,
-            'user_real_path'      => $userPath ? $disk->path($userPath)   : null,
-            'app_file_exists'     => $appPath  ? file_exists($disk->path($appPath))  : false,
-            'user_file_exists'    => $userPath ? file_exists($disk->path($userPath)) : false,
-        ];
-    }
-
-    return response()->json($result, 200, [], JSON_PRETTY_PRINT);
-});
-
 Route::get('/dbcheck', function () {
     return response()->json([
         'host' => env('DB_HOST'),
