@@ -111,12 +111,6 @@
                         placeholder="PHP, Laravel, React, MySQL, Docker..."
                         value="{{ old('skills', $user->skills) }}">
                 </div>
-                <div class="form-group">
-                    <label class="form-label">Skills</label>
-                    <textarea name="skills" class="form-textarea"
-                        placeholder="Comma-separated skills e.g., PHP, Laravel, Communication"
-                        rows="3">{{ old('skills', $user->skills) }}</textarea>
-                </div>
             </div>
 
             <div class="edit-section" id="education">

@@ -96,9 +96,6 @@
         const bootstrapNode = document.getElementById('intel-bootstrap');
         if (!bootstrapNode || bootstrapNode.dataset.initialized === '1') return;
         bootstrapNode.dataset.initialized = '1';
-        // #region agent log
-        fetch('http://127.0.0.1:7350/ingest/c818bfbd-be6c-4592-be05-7c13ac4640b8',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'1358cc'},body:JSON.stringify({sessionId:'1358cc',runId:'run1',hypothesisId:'H5',location:'hr/intelligence.blade.php:init',message:'Frontend intelligence init',data:{hasBootstrap:!!bootstrapNode},timestamp:Date.now()})}).catch(()=>{});
-        // #endregion
 
         const emptyState = document.getElementById('insight-empty');
         const bodyState = document.getElementById('insight-body');

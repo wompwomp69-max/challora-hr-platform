@@ -37,6 +37,11 @@ class IntelligenceController extends Controller
             abort(404, 'Candidate not found or unauthorized.');
         }
 
+        // Return JSON for AJAX requests (intelligence page sidebar)
+        if (request()->ajax() || request()->wantsJson()) {
+            return response()->json(['ok' => true, 'data' => $detail]);
+        }
+
         return view('hr.candidates.show', [
             'data' => (object) $detail,
             'pageTitle' => 'Candidate Intelligence: ' . $detail['candidate']['name']
