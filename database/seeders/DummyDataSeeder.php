@@ -17,10 +17,14 @@ use Illuminate\Support\Facades\Hash;
 
 class DummyDataSeeder extends Seeder
 {
+    private function pick(array $arr): mixed
+    {
+        return $arr[array_rand($arr)];
+    }
+
     public function run(): void
     {
-        // Use Laravel's fake() helper — works in production (no fakerphp/faker dev dep needed)
-        $faker = fake('id_ID');
+        // No Faker — fully static data, works in production with --no-dev
 
         // 1. Create HR User (skip if already exists)
         $hr = User::firstOrCreate(
@@ -47,141 +51,166 @@ class DummyDataSeeder extends Seeder
             'Office Administrator', 'Warehouse Supervisor',
         ];
 
-        $allSkills  = ['PHP', 'Laravel', 'React', 'Vue', 'Node.js', 'Python', 'SQL', 'AWS', 'Docker', 'Git', 'Figma', 'Agile'];
+        $allSkills   = ['PHP', 'Laravel', 'React', 'Vue', 'Node.js', 'Python', 'SQL', 'AWS', 'Docker', 'Git', 'Figma', 'Agile'];
         $allBenefits = ['Gaji Kompetitif', 'Asuransi Kesehatan', 'Bonus Tahunan', 'Remote Work', 'Pelatihan & Sertifikasi', 'BPJS'];
-        $cities     = ['Jakarta', 'Bandung', 'Surabaya', 'Yogyakarta', 'Medan', 'Semarang', 'Makassar', 'Denpasar'];
+        $cities      = ['Jakarta', 'Bandung', 'Surabaya', 'Yogyakarta', 'Medan', 'Semarang', 'Makassar', 'Denpasar'];
+        $provinces   = ['DKI Jakarta', 'Jawa Barat', 'Jawa Timur', 'Jawa Tengah', 'Bali'];
+        $kecamatans  = ['Menteng', 'Kebayoran', 'Cibiru', 'Lowokwaru', 'Denpasar Utara'];
+        $jobTypes    = JobType::cases();
+        $eduLevels   = EducationLevel::cases();
+        $expLevels   = ExperienceLevel::cases();
+        $statuses    = ApplicationStatus::cases();
 
         $jobs = [];
-        foreach ($jobTitles as $title) {
-            $skillCount   = rand(3, 6);
-            $benefitCount = rand(2, 4);
-            $shuffledSkills   = $allSkills;
-            $shuffledBenefits = $allBenefits;
-            shuffle($shuffledSkills);
-            shuffle($shuffledBenefits);
-
+        foreach ($jobTitles as $idx => $title) {
+            shuffle($allSkills);
+            shuffle($allBenefits);
             $jobs[] = JobPosting::create([
-                'title'           => $title,
-                'description'     => "Kami sedang mencari {$title} yang berbakat untuk bergabung dengan tim kami. " . $faker->paragraph(3),
+                'title'            => $title,
+                'description'      => "Kami sedang mencari {$title} yang berbakat untuk bergabung dengan tim kami. Kandidat akan bertanggung jawab atas pengembangan, pemeliharaan, dan peningkatan sistem yang ada. Kami mencari individu yang proaktif, mampu bekerja dalam tim, dan memiliki semangat belajar tinggi.",
                 'short_description' => "Lowongan kerja {$title} di perusahaan teknologi terkemuka.",
-                'location'        => $faker->randomElement($cities),
-                'salary_range'    => 'Rp ' . rand(5, 10) . 'jt - Rp ' . rand(11, 25) . 'jt',
-                'min_salary'      => rand(5000000, 10000000),
-                'max_salary'      => rand(11000000, 30000000),
-                'job_type'        => $faker->randomElement(JobType::cases()),
-                'min_education'   => $faker->randomElement(EducationLevel::cases()),
-                'is_urgent'       => rand(0, 4) === 0,
-                'provinsi'        => $faker->randomElement(['DKI Jakarta', 'Jawa Barat', 'Jawa Timur', 'Jawa Tengah', 'Bali']),
-                'kota'            => $faker->randomElement($cities),
-                'kecamatan'       => 'Kec. ' . $faker->randomElement(['Menteng', 'Kebayoran', 'Cibiru', 'Lowokwaru', 'Denpasar Utara']),
-                'deadline'        => now()->addDays(rand(14, 45)),
-                'max_applicants'  => rand(30, 150),
-                'skills_json'     => array_slice($shuffledSkills, 0, $skillCount),
-                'benefits_json'   => array_slice($shuffledBenefits, 0, $benefitCount),
-                'experience_level' => $faker->randomElement(ExperienceLevel::cases()),
-                'created_by'      => $hr->id,
+                'location'         => $this->pick($cities),
+                'salary_range'     => 'Rp ' . rand(5, 10) . 'jt - Rp ' . rand(11, 25) . 'jt',
+                'min_salary'       => rand(5000000, 10000000),
+                'max_salary'       => rand(11000000, 30000000),
+                'job_type'         => $this->pick($jobTypes),
+                'min_education'    => $this->pick($eduLevels),
+                'is_urgent'        => ($idx % 5 === 0),
+                'provinsi'         => $this->pick($provinces),
+                'kota'             => $this->pick($cities),
+                'kecamatan'        => 'Kec. ' . $this->pick($kecamatans),
+                'deadline'         => now()->addDays(rand(14, 45)),
+                'max_applicants'   => rand(30, 150),
+                'skills_json'      => array_slice($allSkills, 0, rand(3, 6)),
+                'benefits_json'    => array_slice($allBenefits, 0, rand(2, 4)),
+                'experience_level' => $this->pick($expLevels),
+                'created_by'       => $hr->id,
             ]);
         }
 
-        // 3. Create 10 Regular Users with full profiles
-        $majors     = ['Teknik Informatika', 'Sistem Informasi', 'Manajemen', 'Akuntansi', 'Ilmu Komunikasi', 'Teknik Elektro', 'Psikologi'];
-        $religions  = ['Islam', 'Kristen', 'Katolik', 'Hindu', 'Budha', 'Konghucu'];
-        $eduLevels  = ['S1', 'D3', 'SMA/SMK'];
-        $jobTitlesSimple = ['Programmer', 'Desainer', 'Analis', 'Konsultan', 'Manajer Proyek', 'Akuntan', 'Marketing'];
-        $companies  = ['PT Maju Bersama', 'CV Teknologi Nusantara', 'PT Digital Solusi', 'Startup Inovasi', 'PT Global Tech', 'CV Kreatif Media'];
+        // 3. Create 10 Regular Users with full profiles — no Faker
+        $streets   = ['Merdeka', 'Sudirman', 'Gatot Subroto', 'Diponegoro', 'Imam Bonjol'];
+        $fatherFirstNames = ['Suharto', 'Bambang', 'Sutrisno', 'Agus', 'Hendra', 'Wahyu', 'Joko', 'Rudi', 'Darmawan', 'Sigit'];
+        $motherFirstNames = ['Sri', 'Siti', 'Dewi', 'Ratna', 'Endah', 'Yanti', 'Wati', 'Lestari', 'Murni', 'Suci'];
+        $univs     = ['Universitas Indonesia', 'ITB', 'UGM', 'ITS', 'Universitas Brawijaya', 'BINUS University'];
+        $religions = ['Islam', 'Kristen', 'Katolik', 'Hindu', 'Budha'];
+        $eduStr    = ['S1', 'D3', 'SMA/SMK'];
+        $fatherJobs = ['PNS', 'Wiraswasta', 'Karyawan Swasta', 'Guru', 'Dokter'];
+        $motherJobs = ['Ibu Rumah Tangga', 'Guru', 'Perawat', 'Pedagang', 'PNS'];
 
-        $maleNames   = ['Andi Pratama', 'Budi Setiawan', 'Cahyo Nugroho', 'Deni Firmansyah', 'Eko Saputra', 'Fajar Hidayat', 'Gilang Ramadhan'];
-        $femaleNames = ['Sari Dewi', 'Rina Kusuma', 'Tika Rahayu', 'Wulan Sari', 'Yuni Astuti', 'Nadia Putri', 'Laras Ayu'];
+        $userData = [
+            ['name'=>'Andi Pratama',    'gender'=>'Laki-laki', 'major'=>'Teknik Informatika', 'univ'=>'Universitas Indonesia', 'role'=>'Backend Developer',    'city'=>'Jakarta'],
+            ['name'=>'Sari Dewi',       'gender'=>'Perempuan', 'major'=>'Sistem Informasi',   'univ'=>'ITB',                   'role'=>'UI/UX Designer',       'city'=>'Bandung'],
+            ['name'=>'Budi Setiawan',   'gender'=>'Laki-laki', 'major'=>'Teknik Elektro',     'univ'=>'ITS',                   'role'=>'DevOps Engineer',      'city'=>'Surabaya'],
+            ['name'=>'Rina Kusuma',     'gender'=>'Perempuan', 'major'=>'Manajemen',           'univ'=>'UGM',                   'role'=>'Product Manager',      'city'=>'Yogyakarta'],
+            ['name'=>'Cahyo Nugroho',   'gender'=>'Laki-laki', 'major'=>'Ilmu Komunikasi',    'univ'=>'Universitas Brawijaya', 'role'=>'Marketing Specialist', 'city'=>'Malang'],
+            ['name'=>'Tika Rahayu',     'gender'=>'Perempuan', 'major'=>'Akuntansi',           'univ'=>'BINUS University',      'role'=>'Data Analyst',         'city'=>'Jakarta'],
+            ['name'=>'Deni Firmansyah', 'gender'=>'Laki-laki', 'major'=>'Teknik Informatika', 'univ'=>'Universitas Indonesia', 'role'=>'Frontend Developer',   'city'=>'Depok'],
+            ['name'=>'Wulan Sari',      'gender'=>'Perempuan', 'major'=>'Psikologi',           'univ'=>'UGM',                   'role'=>'HR Generalist',        'city'=>'Yogyakarta'],
+            ['name'=>'Eko Saputra',     'gender'=>'Laki-laki', 'major'=>'Sistem Informasi',   'univ'=>'ITS',                   'role'=>'Fullstack Developer',  'city'=>'Surabaya'],
+            ['name'=>'Nadia Putri',     'gender'=>'Perempuan', 'major'=>'Teknik Informatika', 'univ'=>'ITB',                   'role'=>'Data Scientist',       'city'=>'Bandung'],
+        ];
+
+        $workPool = [
+            ['title'=>'Junior Developer',   'company'=>'PT Maju Bersama',        'desc'=>'Mengembangkan fitur baru pada aplikasi web menggunakan Laravel dan React. Berkolaborasi dengan tim desain untuk implementasi UI.'],
+            ['title'=>'Software Engineer',  'company'=>'CV Teknologi Nusantara', 'desc'=>'Bertanggung jawab atas arsitektur backend sistem e-commerce. Meningkatkan performa query database sebesar 35%.'],
+            ['title'=>'Frontend Developer', 'company'=>'PT Digital Solusi',      'desc'=>'Membangun antarmuka pengguna responsif menggunakan Vue.js dan Tailwind CSS dalam metodologi Agile.'],
+            ['title'=>'Data Analyst',       'company'=>'Startup Inovasi',        'desc'=>'Menganalisis data penjualan dan membuat dashboard laporan menggunakan Python dan Tableau.'],
+            ['title'=>'IT Support',         'company'=>'PT Global Tech',         'desc'=>'Memberikan dukungan teknis kepada 200+ pengguna internal. Mengelola infrastruktur jaringan kantor.'],
+            ['title'=>'UI Designer',        'company'=>'CV Kreatif Media',       'desc'=>'Merancang wireframe dan prototype aplikasi mobile menggunakan Figma. Melakukan user research dan usability testing.'],
+        ];
+
+        $achPool = [
+            ['title'=>'Juara 1 Hackathon Nasional',    'type'=>'Lomba',       'org'=>'Kemenkominfo',           'rank'=>'Juara 1', 'level'=>'Nasional'],
+            ['title'=>'AWS Certified Developer',       'type'=>'Sertifikat',  'org'=>'Amazon Web Services',   'rank'=>'Lulus',   'level'=>'Internasional'],
+            ['title'=>'Google IT Support Certificate', 'type'=>'Sertifikat',  'org'=>'Google',                'rank'=>'Lulus',   'level'=>'Internasional'],
+            ['title'=>'Best Employee Q3',              'type'=>'Penghargaan', 'org'=>'PT Digital Solusi',     'rank'=>'Terbaik', 'level'=>'Perusahaan'],
+            ['title'=>'Finalis Lomba Inovasi Digital', 'type'=>'Lomba',       'org'=>'Universitas Indonesia', 'rank'=>'Finalis', 'level'=>'Nasional'],
+            ['title'=>'Microsoft Azure Fundamentals',  'type'=>'Sertifikat',  'org'=>'Microsoft',             'rank'=>'Lulus',   'level'=>'Internasional'],
+        ];
 
         $users = [];
-        for ($i = 1; $i <= 10; $i++) {
-            $isMale  = ($i % 2 === 1);
-            $gender  = $isMale ? 'Laki-laki' : 'Perempuan';
-            $namePool = $isMale ? $maleNames : $femaleNames;
-            $name    = $namePool[($i - 1) % count($namePool)];
-            $major   = $majors[array_rand($majors)];
-            $jobRole = $jobTitlesSimple[array_rand($jobTitlesSimple)];
-
+        foreach ($userData as $i => $u) {
+            $num = $i + 1;
             $user = User::firstOrCreate(
-                ['email' => "user{$i}@challora.com"],
+                ['email' => "user{$num}@challora.com"],
                 [
-                    'name'                 => $name,
+                    'name'                 => $u['name'],
                     'password'             => Hash::make('password'),
                     'role'                 => UserRole::USER,
-                    'phone'                => '08' . rand(100000000, 999999999),
-                    'address'              => 'Jl. ' . $faker->randomElement(['Merdeka', 'Sudirman', 'Gatot Subroto', 'Diponegoro']) . ' No. ' . rand(1, 99) . ', ' . $faker->randomElement($cities),
-                    'father_name'          => 'Bapak ' . $faker->randomElement(['Suharto', 'Bambang', 'Sutrisno', 'Agus', 'Hendra']),
-                    'mother_name'          => 'Ibu ' . $faker->randomElement(['Sri', 'Siti', 'Dewi', 'Ratna', 'Endah']),
-                    'marital_status'       => $faker->randomElement(['Lajang', 'Menikah']),
-                    'education_level'      => $faker->randomElement($eduLevels),
-                    'graduation_year'      => rand(2018, 2024),
-                    'education_major'      => $major,
-                    'education_university' => $faker->randomElement(['Universitas Indonesia', 'ITB', 'UGM', 'ITS', 'Universitas Brawijaya', 'BINUS University']),
-                    'gender'               => $gender,
-                    'religion'             => $faker->randomElement($religions),
-                    'social_media'         => 'linkedin.com/in/' . strtolower(str_replace(' ', '-', $name)),
-                    'birth_place'          => $faker->randomElement($cities),
-                    'birth_date'           => date('Y-m-d', mktime(0, 0, 0, rand(1, 12), rand(1, 28), rand(1995, 2002))),
-                    'father_job'           => $faker->randomElement($jobTitlesSimple),
-                    'mother_job'           => $faker->randomElement(['Ibu Rumah Tangga', 'Guru', 'Perawat', 'Pedagang']),
-                    'father_education'     => $faker->randomElement($eduLevels),
-                    'mother_education'     => $faker->randomElement($eduLevels),
-                    'father_phone'         => '08' . rand(100000000, 999999999),
-                    'mother_phone'         => '08' . rand(100000000, 999999999),
-                    'address_type'         => $faker->randomElement(['Domisili', 'KTP']),
-                    'address_family'       => 'Jl. Keluarga No. ' . rand(1, 50) . ', ' . $faker->randomElement($cities),
-                    'emergency_name'       => 'Kontak ' . $faker->randomElement(['Darurat', 'Keluarga']),
-                    'emergency_phone'      => '08' . rand(100000000, 999999999),
-                    'user_summary'         => "Saya adalah {$jobRole} dengan latar belakang {$major}. Berpengalaman dalam lingkungan kerja yang dinamis dan berorientasi pada hasil. Memiliki kemampuan komunikasi yang baik dan mampu bekerja dalam tim maupun mandiri.",
+                    'phone'                => '08' . str_pad((string)rand(100000000, 999999999), 9, '0'),
+                    'address'              => 'Jl. ' . $streets[$i % count($streets)] . ' No. ' . rand(1, 99) . ', ' . $u['city'],
+                    'father_name'          => 'Bapak ' . $fatherFirstNames[$i],
+                    'mother_name'          => 'Ibu ' . $motherFirstNames[$i],
+                    'marital_status'       => $i < 7 ? 'Lajang' : 'Menikah',
+                    'education_level'      => 'S1',
+                    'graduation_year'      => 2018 + ($i % 6),
+                    'education_major'      => $u['major'],
+                    'education_university' => $u['univ'],
+                    'gender'               => $u['gender'],
+                    'religion'             => $religions[$i % count($religions)],
+                    'social_media'         => 'linkedin.com/in/' . strtolower(str_replace(' ', '-', $u['name'])),
+                    'birth_place'          => $u['city'],
+                    'birth_date'           => date('Y-m-d', mktime(0, 0, 0, ($i % 12) + 1, ($i % 28) + 1, 1995 + $i)),
+                    'father_job'           => $fatherJobs[$i % count($fatherJobs)],
+                    'mother_job'           => $motherJobs[$i % count($motherJobs)],
+                    'father_education'     => $eduStr[$i % count($eduStr)],
+                    'mother_education'     => $eduStr[($i + 1) % count($eduStr)],
+                    'father_phone'         => '08' . str_pad((string)rand(100000000, 999999999), 9, '0'),
+                    'mother_phone'         => '08' . str_pad((string)rand(100000000, 999999999), 9, '0'),
+                    'address_type'         => 'Domisili',
+                    'address_family'       => 'Jl. Keluarga No. ' . rand(1, 50) . ', ' . $u['city'],
+                    'emergency_name'       => 'Bapak ' . $fatherFirstNames[$i],
+                    'emergency_phone'      => '08' . str_pad((string)rand(100000000, 999999999), 9, '0'),
+                    'user_summary'         => "Saya adalah {$u['role']} dengan latar belakang {$u['major']} dari {$u['univ']}. Berpengalaman dalam lingkungan kerja yang dinamis dan berorientasi pada hasil. Memiliki kemampuan komunikasi yang baik dan mampu bekerja dalam tim maupun mandiri.",
                 ]
             );
 
-            // Work Experiences (2-3 per user)
-            $expCount = rand(2, 3);
-            for ($j = 0; $j < $expCount; $j++) {
-                $startYear = rand(2018, 2022);
-                UserWorkExperience::create([
-                    'user_id'      => $user->id,
-                    'title'        => $faker->randomElement($jobTitlesSimple),
-                    'company_name' => $faker->randomElement($companies),
-                    'year_start'   => $startYear,
-                    'year_end'     => $startYear + rand(1, 3),
-                    'description'  => "Bertanggung jawab atas pengembangan dan pemeliharaan sistem. Berkolaborasi dengan tim lintas fungsi untuk mencapai target perusahaan. Meningkatkan efisiensi proses sebesar " . rand(10, 40) . "%.",
-                ]);
-            }
+            if ($user->wasRecentlyCreated) {
+                $expCount = ($i % 3) + 1;
+                for ($j = 0; $j < $expCount; $j++) {
+                    $w = $workPool[($i + $j) % count($workPool)];
+                    UserWorkExperience::create([
+                        'user_id'      => $user->id,
+                        'title'        => $w['title'],
+                        'company_name' => $w['company'],
+                        'year_start'   => 2019 + $j,
+                        'year_end'     => 2020 + $j + ($i % 2),
+                        'description'  => $w['desc'],
+                    ]);
+                }
 
-            // Achievements (1-2 per user)
-            $achCount = rand(1, 2);
-            for ($k = 0; $k < $achCount; $k++) {
-                UserAchievement::create([
-                    'user_id'          => $user->id,
-                    'type'             => $faker->randomElement(['Sertifikat', 'Penghargaan', 'Lomba']),
-                    'title'            => $faker->randomElement(['Juara Hackathon', 'Sertifikasi AWS', 'Best Employee', 'Lomba Inovasi', 'Google Developer Certification']),
-                    'description'      => 'Penghargaan atas kontribusi dan prestasi di bidang teknologi.',
-                    'organizer'        => $faker->randomElement(['Google', 'Microsoft', 'Kemenkominfo', 'Universitas Indonesia', 'AWS']),
-                    'year'             => rand(2020, 2024),
-                    'rank'             => $faker->randomElement(['Juara 1', 'Juara 2', 'Finalis', 'Peserta Terbaik']),
-                    'level'            => $faker->randomElement(['Nasional', 'Internasional', 'Provinsi']),
-                ]);
+                $achCount = ($i % 2) + 1;
+                for ($k = 0; $k < $achCount; $k++) {
+                    $a = $achPool[($i + $k) % count($achPool)];
+                    UserAchievement::create([
+                        'user_id'     => $user->id,
+                        'type'        => $a['type'],
+                        'title'       => $a['title'],
+                        'description' => 'Penghargaan atas kontribusi dan prestasi di bidang teknologi.',
+                        'organizer'   => $a['org'],
+                        'year'        => 2020 + ($i % 5),
+                        'rank'        => $a['rank'],
+                        'level'       => $a['level'],
+                    ]);
+                }
             }
 
             $users[] = $user;
         }
 
-        // 4. Each user applies to 3 random jobs
-        foreach ($users as $user) {
-            $shuffledJobs = $jobs;
-            shuffle($shuffledJobs);
-            $picked = array_slice($shuffledJobs, 0, 3);
-
+        // 4. Each user applies to 3 random jobs (no duplicates)
+        $appStatuses = ApplicationStatus::cases();
+        foreach ($users as $idx => $user) {
+            $shuffled = $jobs;
+            shuffle($shuffled);
+            $picked = array_slice($shuffled, 0, 3);
             foreach ($picked as $job) {
-                // Avoid duplicate applications
-                $exists = Application::where('user_id', $user->id)->where('job_id', $job->id)->exists();
-                if (!$exists) {
+                if (!Application::where('user_id', $user->id)->where('job_id', $job->id)->exists()) {
                     Application::create([
                         'user_id'      => $user->id,
                         'job_id'       => $job->id,
-                        'status'       => $faker->randomElement(ApplicationStatus::cases()),
+                        'status'       => $appStatuses[$idx % count($appStatuses)],
                         'cv_path'      => null,
                         'diploma_path' => null,
                         'photo_path'   => null,
