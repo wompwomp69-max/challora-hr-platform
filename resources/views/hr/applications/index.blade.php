@@ -150,6 +150,16 @@
                     <option value="low" {{ request('sort_rating') === 'low' ? 'selected' : '' }}>Low to High</option>
                 </select>
             </div>
+
+            <div class="flex flex-col gap-1">
+                <label class="text-xs font-black uppercase text-text-muted">Show</label>
+                <select name="per_page" class="action-select-premium" onchange="this.form.submit()">
+                    <option value="10" {{ request('per_page', 10) == 10 ? 'selected' : '' }}>10 Rows</option>
+                    <option value="25" {{ request('per_page') == 25 ? 'selected' : '' }}>25 Rows</option>
+                    <option value="50" {{ request('per_page') == 50 ? 'selected' : '' }}>50 Rows</option>
+                    <option value="100" {{ request('per_page') == 100 ? 'selected' : '' }}>100 Rows</option>
+                </select>
+            </div>
         </form>
     </div>
 </div>
@@ -191,8 +201,15 @@
                             @if($a->aiScore && $a->aiScore->status === 'completed')
                                 <div class="font-black text-xl">{{ $a->aiScore->score_total }}/100</div>
                                 <div class="text-xs font-bold uppercase text-text-muted mt-1">{{ $a->aiScore->core_strength }}</div>
+                                <form method="post" action="{{ route('hr.applications.ai_refresh', $a->id) }}" class="mt-1">
+                                    @csrf
+                                    <button type="submit" class="text-[9px] font-black uppercase text-text-muted hover:text-accent transition-colors underline">re-rate</button>
+                                </form>
                             @elseif($a->aiScore && $a->aiScore->status === 'failed')
-                                <span class="text-accent font-bold text-xs uppercase">AI Failed</span>
+                                <form method="post" action="{{ route('hr.applications.ai_refresh', $a->id) }}">
+                                    @csrf
+                                    <button type="submit" class="text-accent font-bold text-xs uppercase">AI Failed — Retry</button>
+                                </form>
                             @elseif($a->aiScore && in_array($a->aiScore->status, ['processing', 'pending']))
                                 <div class="flex flex-col items-center" data-app-id="{{ $a->id }}">
                                     <div class="h-6 w-6 border-4 border-accent border-t-transparent rounded-full animate-spin"></div>
@@ -255,7 +272,7 @@
     </div>
     
     <div class="mt-8">
-        {{ $applications->links() }}
+        {{ $applications->appends(request()->query())->links('components.premium-pagination') }}
     </div>
 @endif
 @endsection

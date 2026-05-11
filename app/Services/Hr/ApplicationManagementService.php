@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Mail;
 
 class ApplicationManagementService
 {
-    public function getApplications(int $hrId, ?string $status, ?int $jobId, ?string $sortRating = null): LengthAwarePaginator
+    public function getApplications(int $hrId, ?string $status, ?int $jobId, ?string $sortRating = null, ?int $perPage = 10): LengthAwarePaginator
     {
         $query = Application::whereHas('job', function($q) use ($hrId) {
             $q->where('created_by', $hrId);
@@ -35,7 +35,7 @@ class ApplicationManagementService
             $query->latest();
         }
 
-        return $query->paginate(10);
+        return $query->paginate($perPage ?? 10);
     }
 
     public function updateStatus(Application $application, string $status): bool
