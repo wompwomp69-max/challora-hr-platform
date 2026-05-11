@@ -37,6 +37,30 @@
                 ease: "power3.out",
                 delay: 0.3
             });
+
+            // ── Eye toggle for all password inputs ──────────────────────
+            document.querySelectorAll('input[type="password"]').forEach(input => {
+                const wrapper = document.createElement('div');
+                wrapper.style.cssText = 'position:relative;';
+                input.parentNode.insertBefore(wrapper, input);
+                wrapper.appendChild(input);
+
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.setAttribute('aria-label', 'Toggle password visibility');
+                btn.style.cssText = 'position:absolute;right:14px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#888;padding:0;display:flex;align-items:center;';
+                btn.innerHTML = `<svg class="eye-icon" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                    <circle cx="12" cy="12" r="3"/>
+                </svg>`;
+                wrapper.appendChild(btn);
+
+                btn.addEventListener('click', () => {
+                    const isPassword = input.type === 'password';
+                    input.type = isPassword ? 'text' : 'password';
+                    btn.style.color = isPassword ? 'var(--color-accent, #FF4D30)' : '#888';
+                });
+            });
         });
     </script>
     @stack('scripts')

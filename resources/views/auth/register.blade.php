@@ -116,6 +116,9 @@
                     Already Has An Account? <a href="{{ route('login') }}"
                         class="text-accent-500 hover:text-white transition-colors duration-300">Log-In</a>
                 </p>
+                <p class="text-[11px] font-bold text-gray-500 uppercase tracking-widest mt-3">
+                    <a href="{{ route('landing') }}" class="hover:text-white transition-colors duration-300">← Back to Home</a>
+                </p>
             </div>
         </form>
     </div>
