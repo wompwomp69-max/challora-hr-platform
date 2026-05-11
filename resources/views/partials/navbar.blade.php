@@ -11,6 +11,7 @@
                 <a href="{{ route('hr.dashboard') }}" class="nav-link-image {{ request()->is('hr/dashboard*') ? 'active' : '' }}">Analytics</a>
                 <a href="{{ route('hr.jobs.index') }}" class="nav-link-image {{ request()->is('hr/jobs*') ? 'active' : '' }}">Positions</a>
                 <a href="{{ route('hr.applications.index') }}" class="nav-link-image {{ request()->is('hr/applications*') ? 'active' : '' }}">Pipelines</a>
+                <a href="{{ route('hr.intelligence') }}" class="nav-link-image {{ request()->is('hr/intelligence*') ? 'active' : '' }}">Intelligence</a>
             @else
                 <a href="{{ route('jobs.index') }}" class="nav-link-image {{ (request()->is('jobs*') || request()->routeIs('landing')) && !request()->routeIs('user.jobs.saved') ? 'active' : '' }}">Job Listings</a>
                 <a href="{{ route('user.applications.index') }}" class="nav-link-image {{ request()->is('user/applications*') ? 'active' : '' }}">Applied Jobs</a>
@@ -63,6 +64,7 @@
             <a href="{{ route('hr.dashboard') }}" class="hover:text-accent transition-colors border-b border-white/10 pb-4">Analytics</a>
             <a href="{{ route('hr.jobs.index') }}" class="hover:text-accent transition-colors border-b border-white/10 pb-4">Positions</a>
             <a href="{{ route('hr.applications.index') }}" class="hover:text-accent transition-colors border-b border-white/10 pb-4">Pipelines</a>
+            <a href="{{ route('hr.intelligence') }}" class="hover:text-accent transition-colors border-b border-white/10 pb-4">Intelligence</a>
         @elseif(auth()->check())
             <a href="{{ route('jobs.index') }}" class="hover:text-accent transition-colors border-b border-white/10 pb-4">Job Listings</a>
             <a href="{{ route('user.applications.index') }}" class="hover:text-accent transition-colors border-b border-white/10 pb-4">Applied Jobs</a>
