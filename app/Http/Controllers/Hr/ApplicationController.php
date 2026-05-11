@@ -46,6 +46,7 @@ class ApplicationController extends Controller
         return view('hr.applications.berkas', [
             'application' => $application,
             'user' => $application->user,
+            'job' => $application->job,
             'pageTitle' => 'Applicant Files: ' . $application->user->name,
         ]);
     }
