@@ -38,7 +38,12 @@ return [
     'mailers' => [
 
         'gmail' => [
-            'transport' => 'gmail',
+            'transport' => 'smtp',
+            'host'      => 'smtp.gmail.com',
+            'port'      => 465,
+            'scheme'    => 'ssl',
+            'username'  => env('MAIL_USERNAME'),
+            'password'  => env('MAIL_PASSWORD'),
         ],
 
         'smtp' => [
