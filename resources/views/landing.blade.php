@@ -54,6 +54,7 @@
         transition: all 0.2s ease;
         border: 1px solid transparent;
         cursor: pointer;
+        visibility: visible !important;
     }
     .s5-pill-primary {
         background-color: var(--s5-orange);
@@ -284,7 +285,7 @@
                     HR /<br>Intelligence
                 </h1>
                 
-                <div class="flex gap-4">
+                <div class="flex gap-4" style="position: relative; z-index: 3;">
                     <a href="{{ route('jobs.index') }}" class="s5-pill-btn s5-pill-primary">
                         Find Jobs
                     </a>
@@ -404,7 +405,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // Hero Animations
     gsap.from(".s5-hero-left-text", { y: 30, opacity: 0, duration: 1, delay: 0.2 });
     gsap.from(".s5-title-mega", { y: 50, opacity: 0, duration: 1, ease: "power3.out", delay: 0.4 });
-    gsap.from(".s5-pill-btn", { y: 20, opacity: 0, duration: 0.8, stagger: 0.1, delay: 0.6 });
     gsap.from(".s5-status-item", { x: 20, opacity: 0, duration: 0.5, stagger: 0.05, delay: 0.8 });
 
     // Grid Animations
