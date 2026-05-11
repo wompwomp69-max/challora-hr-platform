@@ -80,7 +80,7 @@
                     </svg>
                     Min Salary
                 </label>
-                <input type="number" name="min_salary" value="{{ request('min_salary') }}" placeholder="Min IDR"
+                <input type="number" name="min_salary" value="{{ request('min_salary') }}" placeholder="e.g. 5000000"
                     class="brutalist-input-subtle" onchange="this.form.submit()">
             </div>
             <div class="filter-group relative">

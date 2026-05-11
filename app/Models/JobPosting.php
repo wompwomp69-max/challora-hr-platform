@@ -73,16 +73,19 @@ class JobPosting extends Model
     public function scopeLocation($query, $location)
     {
         if ($location) {
-            return $query->where('location', 'like', "%{$location}%")
-                         ->orWhere('provinsi', 'like', "%{$location}%")
-                         ->orWhere('kota', 'like', "%{$location}%");
+            return $query->where(function ($q) use ($location) {
+                $q->where('location', 'like', "%{$location}%")
+                  ->orWhere('provinsi', 'like', "%{$location}%")
+                  ->orWhere('kota', 'like', "%{$location}%");
+            });
         }
     }
 
     public function scopeSalary($query, $min = null, $max = null)
     {
-        if ($min) $query->where('max_salary', '>=', $min);
-        if ($max) $query->where('min_salary', '<=', $max);
+        // Filter jobs where the job's minimum salary meets or exceeds the user's minimum requirement
+        if ($min) $query->where('min_salary', '>=', (int) $min);
+        if ($max) $query->where('min_salary', '<=', (int) $max);
         return $query;
     }
 
