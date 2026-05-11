@@ -43,6 +43,7 @@
                             @endforeach
                         </div>
                     </section>
+                @endif
 
                 <section class="info-card">
                     <h2 class="info-card-title">Personal Data</h2>
