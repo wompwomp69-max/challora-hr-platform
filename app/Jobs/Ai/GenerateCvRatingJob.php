@@ -103,6 +103,6 @@ class GenerateCvRatingJob implements ShouldQueue
         ]);
 
         // Bust HR intelligence dashboard cache so fresh scores appear immediately
-        cache()->forget("hr_dashboard_" . $application->job?->created_by);
+        cache()->forget("hr_intelligence_dashboard_" . $application->job?->created_by);
     }
 }

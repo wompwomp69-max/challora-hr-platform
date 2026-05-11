@@ -11,7 +11,7 @@ class IntelligenceService
 {
     public function getDashboardData(int $hrId): array
     {
-        return cache()->remember("hr_dashboard_{$hrId}", now()->addMinutes(2), function () use ($hrId) {
+        return cache()->remember("hr_intelligence_dashboard_{$hrId}", now()->addMinutes(2), function () use ($hrId) {
             return $this->buildDashboardData($hrId);
         });
     }

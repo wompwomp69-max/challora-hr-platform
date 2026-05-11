@@ -61,8 +61,9 @@ class ApplicationController extends Controller
 
         $this->applicationService->updateStatus($application, $request->status);
 
-        // Clear HR dashboard cache to ensure analytics are fresh
-        cache()->forget("hr_dashboard_" . auth()->id());
+        // Clear HR dashboard caches to ensure analytics are fresh
+        cache()->forget("hr_stats_dashboard_" . auth()->id());
+        cache()->forget("hr_intelligence_dashboard_" . auth()->id());
 
         return back()->with('flash_toast', [
             'message' => 'Application status successfully updated to ' . $request->status,
@@ -78,8 +79,9 @@ class ApplicationController extends Controller
         $application->aiScore?->update(['status' => 'processing']);
         $application->aiSummary?->update(['status' => 'processing']);
 
-        // Bust the HR intelligence dashboard cache
-        cache()->forget("hr_dashboard_" . auth()->id());
+        // Bust the HR dashboard caches
+        cache()->forget("hr_stats_dashboard_" . auth()->id());
+        cache()->forget("hr_intelligence_dashboard_" . auth()->id());
 
         GenerateCvRatingJob::dispatch($application->id);
         GenerateCandidateSummaryJob::dispatch($application->id);

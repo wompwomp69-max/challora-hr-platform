@@ -10,7 +10,7 @@ class DashboardService
 {
     public function getDashboardData(int $hrId): array
     {
-        return cache()->remember("hr_dashboard_{$hrId}", now()->addMinutes(2), function () use ($hrId) {
+        return cache()->remember("hr_stats_dashboard_{$hrId}", now()->addMinutes(2), function () use ($hrId) {
             $driver = DB::connection()->getDriverName();
             $jobs = JobPosting::where('created_by', $hrId)->pluck('id');
             $totalJobs = $jobs->count();

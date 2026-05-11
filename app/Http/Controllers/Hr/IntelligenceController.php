@@ -20,7 +20,7 @@ class IntelligenceController extends Controller
 
         // If cache returned empty collections but jobs/applications exist, bust and reload
         if (empty($data['topCandidatesByJob']) || $data['topCandidatesByJob']->isEmpty()) {
-            cache()->forget("hr_dashboard_" . Auth::id());
+            cache()->forget("hr_intelligence_dashboard_" . Auth::id());
             $data = $this->intelligenceService->getDashboardData((int) Auth::id());
         }
 
