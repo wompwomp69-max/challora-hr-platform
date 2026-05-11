@@ -83,6 +83,7 @@ class ProfileController extends Controller
             'education_major' => ['nullable', 'string'],
             'education_university' => ['nullable', 'string'],
             'user_summary' => ['nullable', 'string'],
+            'skills' => ['nullable', 'string'],
         ]);
 
         $this->profileSyncService->updateProfile(

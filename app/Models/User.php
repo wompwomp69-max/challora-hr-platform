@@ -49,6 +49,7 @@ class User extends Authenticatable
         'emergency_name',
         'emergency_phone',
         'user_summary',
+        'skills',
         'avatar_path',
         'cv_path',
         'diploma_path',

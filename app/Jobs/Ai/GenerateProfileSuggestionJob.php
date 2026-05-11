@@ -36,6 +36,7 @@ class GenerateProfileSuggestionJob implements ShouldQueue
             'profile' => [
                 'name' => $user->name,
                 'summary' => $user->user_summary,
+                'skills' => $user->skills,
                 'education_level' => $user->education_level,
                 'education_major' => $user->education_major,
                 'education_university' => $user->education_university,
