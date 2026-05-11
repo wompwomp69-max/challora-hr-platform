@@ -94,7 +94,7 @@ class ProfileController extends Controller
             $request->only(['org_name', 'org_position', 'org_year_start', 'org_year_end', 'org_description'])
         );
 
-        return back()->with('flash_toast', ['message' => 'Profile updated successfully.']);
+        return redirect()->route('user.settings.index')->with('flash_toast', ['message' => 'Profile updated successfully.']);
     }
 
     public function uploadAvatar(Request $request)
