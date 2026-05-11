@@ -133,6 +133,7 @@ class IntelligenceService
                 'education_major' => $application->user?->education_major,
                 'graduation_year' => $application->user?->graduation_year,
                 'user_summary' => $application->user?->user_summary,
+                'skills' => $application->user?->skills,
                 'experiences' => $application->user?->workExperiences,
                 'achievements' => $application->user?->achievements,
                 'org_experiences' => $application->user?->organizationalExperiences,

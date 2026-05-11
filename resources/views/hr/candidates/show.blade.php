@@ -200,6 +200,22 @@
                 @endforelse
             </div>
 
+            <!-- Skills Section -->
+            <div class="section-premium gsap-section">
+                <h2 class="section-label-giant">Skills</h2>
+                @if($data->candidate['skills'])
+                    <div class="flex flex-wrap gap-3 mt-6">
+                        @foreach(array_filter(array_map('trim', explode(',', $data->candidate['skills']))) as $skill)
+                            <span class="bg-black text-white px-4 py-2 text-xs font-black uppercase tracking-widest border-2 border-black hover:bg-accent hover:border-accent transition-colors cursor-default">
+                                {{ $skill }}
+                            </span>
+                        @endforeach
+                    </div>
+                @else
+                    <p class="font-bold text-text-muted italic">No skills listed.</p>
+                @endif
+            </div>
+
             <!-- Organization Section -->
             <div class="section-premium gsap-section">
                 <h2 class="section-label-giant">Organizational Experience</h2>
