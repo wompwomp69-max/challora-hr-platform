@@ -203,12 +203,15 @@
                                 <div class="text-xs font-bold uppercase text-text-muted mt-1">{{ $a->aiScore->core_strength }}</div>
                                 <form method="post" action="{{ route('hr.applications.ai_refresh', $a->id) }}" class="mt-1">
                                     @csrf
-                                    <button type="submit" class="text-[9px] font-black uppercase text-text-muted hover:text-accent transition-colors underline">re-rate</button>
+                                    <button type="submit" class="text-[9px] font-black uppercase text-accent hover:opacity-70 transition-opacity underline">re-rate</button>
                                 </form>
                             @elseif($a->aiScore && $a->aiScore->status === 'failed')
                                 <form method="post" action="{{ route('hr.applications.ai_refresh', $a->id) }}">
                                     @csrf
-                                    <button type="submit" class="text-accent font-bold text-xs uppercase">AI Failed — Retry</button>
+                                    <button type="submit"
+                                        class="bg-accent text-white font-black text-[10px] uppercase tracking-widest px-3 py-2 border-2 border-black shadow-[3px_3px_0_black] hover:translate-y-[1px] transition-all whitespace-nowrap">
+                                        ⚠ AI Failed — Retry
+                                    </button>
                                 </form>
                             @elseif($a->aiScore && in_array($a->aiScore->status, ['processing', 'pending']))
                                 <div class="flex flex-col items-center" data-app-id="{{ $a->id }}">
@@ -302,16 +305,23 @@
         // and update the cell live without a page reload.
         const pollingIntervals = {};
 
-        function renderScoreCell(cell, data) {
+        function renderScoreCell(cell, data, appId) {
             const score   = data.score;
             const summary = data.summary;
+            const csrfToken = document.querySelector('meta[name=csrf-token]')?.content || '';
 
             if (score.status === 'completed') {
                 cell.innerHTML = `
                     <div class="font-black text-xl">${score.score_total}/100</div>
                     <div class="text-xs font-bold uppercase text-text-muted mt-1">${score.core_strength || ''}</div>`;
             } else if (score.status === 'failed') {
-                cell.innerHTML = `<span class="text-accent font-bold text-xs uppercase">AI Failed</span>`;
+                cell.innerHTML = `
+                    <form method="post" action="/hr/applications/${appId}/ai-refresh">
+                        <input type="hidden" name="_token" value="${csrfToken}">
+                        <button type="submit" class="bg-accent text-white font-black text-[10px] uppercase tracking-widest px-3 py-2 border-2 border-black shadow-[3px_3px_0_black] hover:translate-y-[1px] transition-all whitespace-nowrap">
+                            ⚠ AI Failed — Retry
+                        </button>
+                    </form>`;
             } else {
                 // Still processing — keep spinner
                 cell.innerHTML = `
@@ -334,7 +344,7 @@
                     const data = await res.json();
 
                     const done = (data.score.status === 'completed' || data.score.status === 'failed');
-                    renderScoreCell(scoreCell, data);
+                    renderScoreCell(scoreCell, data, appId);
 
                     if (done) {
                         clearInterval(pollingIntervals[appId]);

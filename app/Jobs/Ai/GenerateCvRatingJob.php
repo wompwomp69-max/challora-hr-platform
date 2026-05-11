@@ -49,6 +49,7 @@ class GenerateCvRatingJob implements ShouldQueue
 
                 // Candidate data
                 'summary'    => $application->user?->user_summary,
+                'skills'     => $application->user?->skills,
                 'education'  => [
                     'level'           => $application->user?->education_level,
                     'major'           => $application->user?->education_major,
@@ -90,8 +91,22 @@ class GenerateCvRatingJob implements ShouldQueue
         }
 
         $data = $response['data'];
+        $scoreTotal = (int) ($data['score_total'] ?? 0);
+
+        // Guard against a malformed AI response that returned a default 0 score.
+        // A legitimate score of 0 is theoretically possible but practically means
+        // the model failed to parse — mark as failed so the job retries.
+        if ($scoreTotal === 0 && empty($data['core_strength']) && empty($data['reasoning'])) {
+            $score->update([
+                'status'        => 'failed',
+                'error_message' => 'AI returned an empty/zero score — likely a parse failure. Will retry.',
+            ]);
+            // Throw so the queue retries (up to $tries limit)
+            throw new \RuntimeException('AI returned zero score with no reasoning — retrying.');
+        }
+
         $score->update([
-            'score_total'    => (int) ($data['score_total'] ?? 0),
+            'score_total'    => $scoreTotal,
             'breakdown_json' => $data['score_breakdown'] ?? [],
             'reasoning_json' => $data['technical_reasoning'] ?? [],
             'core_strength'  => $data['core_strength'] ?? null,

@@ -169,7 +169,7 @@
         </table>
     </div>
     <div class="mt-6">
-        {{ $jobs->links() }}
+        {{ $jobs->appends(request()->query())->links('components.premium-pagination') }}
     </div>
 </div>
 @endsection

@@ -183,7 +183,7 @@
                 </div>
             @endforelse
             <div class="mt-12">
-                {{ $jobs->links() }}
+                {{ $jobs->appends(request()->query())->links('components.premium-pagination') }}
             </div>
         </div>
     </div>
