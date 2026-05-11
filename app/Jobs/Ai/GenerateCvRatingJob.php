@@ -20,7 +20,12 @@ class GenerateCvRatingJob implements ShouldQueue
 
     public function handle(AiGatewayService $aiGateway): void
     {
-        $application = Application::with(['job', 'user.workExperiences', 'user.achievements'])->find($this->applicationId);
+        $application = Application::with([
+            'job',
+            'user.workExperiences',
+            'user.achievements',
+            'user.organizationalExperiences',
+        ])->find($this->applicationId);
         if (!$application) {
             return;
         }
@@ -33,27 +38,45 @@ class GenerateCvRatingJob implements ShouldQueue
         ])->save();
 
         $response = $aiGateway->rateCv([
-            'job_description' => $application->job?->description ?? '',
-            'candidate_name' => $application->user?->name ?? 'Candidate',
+            'job_description'  => $application->job?->description ?? '',
+            'candidate_name'   => $application->user?->name ?? 'Candidate',
             'candidate_profile' => [
-                'summary' => $application->user?->user_summary,
-                'education' => [
-                    'level' => $application->user?->education_level,
-                    'major' => $application->user?->education_major,
-                    'university' => $application->user?->education_university,
+                // Job context — sent inside profile so the AI has full picture in one block
+                'job_title'              => $application->job?->title,
+                'job_required_skills'    => $application->job?->skills_json ?? [],
+                'job_experience_level'   => $application->job?->experience_level?->value ?? '',
+                'job_min_education'      => $application->job?->min_education?->value ?? '',
+
+                // Candidate data
+                'summary'    => $application->user?->user_summary,
+                'education'  => [
+                    'level'           => $application->user?->education_level,
+                    'major'           => $application->user?->education_major,
+                    'university'      => $application->user?->education_university,
                     'graduation_year' => $application->user?->graduation_year,
                 ],
                 'work_experiences' => $application->user?->workExperiences?->map(fn ($exp) => [
-                    'title' => $exp->title,
+                    'title'        => $exp->title,
                     'company_name' => $exp->company_name,
-                    'year_start' => $exp->year_start,
-                    'year_end' => $exp->year_end,
-                    'description' => $exp->description,
+                    'year_start'   => $exp->year_start,
+                    'year_end'     => $exp->year_end,
+                    'description'  => $exp->description,
                 ])->toArray() ?? [],
-                'achievements' => $application->user?->achievements?->map(fn ($achievement) => [
-                    'title' => $achievement->title,
-                    'type' => $achievement->type,
-                    'description' => $achievement->description,
+                'organizational_experiences' => $application->user?->organizationalExperiences?->map(fn ($org) => [
+                    'organization' => $org->organization_name,
+                    'position'     => $org->position,
+                    'year_start'   => $org->start_year,
+                    'year_end'     => $org->year_end,
+                    'description'  => $org->description,
+                ])->toArray() ?? [],
+                'achievements' => $application->user?->achievements?->map(fn ($a) => [
+                    'title'       => $a->title,
+                    'type'        => $a->type,
+                    'organizer'   => $a->organizer,
+                    'year'        => $a->year,
+                    'rank'        => $a->rank,
+                    'level'       => $a->level,
+                    'description' => $a->description,
                 ])->toArray() ?? [],
             ],
         ]);
@@ -68,15 +91,15 @@ class GenerateCvRatingJob implements ShouldQueue
 
         $data = $response['data'];
         $score->update([
-            'score_total' => (int) ($data['score_total'] ?? 0),
+            'score_total'    => (int) ($data['score_total'] ?? 0),
             'breakdown_json' => $data['score_breakdown'] ?? [],
             'reasoning_json' => $data['technical_reasoning'] ?? [],
-            'core_strength' => $data['core_strength'] ?? null,
-            'confidence' => (float) ($data['confidence'] ?? 0),
-            'model_version' => config('ai.model_version'),
-            'status' => 'completed',
-            'error_message' => null,
-            'generated_at' => now(),
+            'core_strength'  => $data['core_strength'] ?? null,
+            'confidence'     => (float) ($data['confidence'] ?? 0),
+            'model_version'  => config('ai.model_version'),
+            'status'         => 'completed',
+            'error_message'  => null,
+            'generated_at'   => now(),
         ]);
     }
 }
