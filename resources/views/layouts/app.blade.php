@@ -116,18 +116,7 @@
                         </div>
                         <div>
                             <p class="font-mono text-xs uppercase font-bold mb-1 opacity-70">GENERAL INQUIRIES</p>
-                            <p class="font-bold text-lg leading-tight hover:underline cursor-pointer">admin.challora</p>
-                        </div>
-                    </div>
-                    
-                    <!-- Right: Newsletter -->
-                    <div class="flex flex-col justify-end">
-                        <p class="font-mono text-xs uppercase font-bold mb-2 opacity-70">SIGN UP FOR UPDATES</p>
-                        <div class="flex items-center border-b-2 border-black pb-2">
-                            <input type="email" placeholder="Enter your email address" class="bg-transparent border-none outline-none text-xl sm:text-2xl font-bold placeholder-black/50 w-full text-black">
-                            <button class="bg-black text-white font-mono text-xs font-bold uppercase rounded-full px-6 py-3 ml-4 hover:bg-white hover:text-black transition-colors whitespace-nowrap">
-                                SUBSCRIBE
-                            </button>
+                            <p class="font-bold text-lg leading-tight hover:underline cursor-pointer">admin.challora@gmail.com</p>
                         </div>
                     </div>
                 </div>
@@ -163,7 +152,7 @@
                 </div>
 
                 <!-- Mega Wordmark — flush to bottom of card -->
-                <div class="text-[15vw] leading-none font-black text-center tracking-tighter text-[#2a2a2a] select-none absolute bottom-0 left-0 w-full pointer-events-none overflow-hidden rounded-b-[48px]">
+                <div class="text-[15vw] font-black text-center tracking-tighter text-[#2a2a2a] select-none absolute bottom-0 left-0 w-full pointer-events-none overflow-hidden rounded-b-[48px]" style="line-height:0.8; margin-bottom: 0;">
                     CHALLORA
                 </div>
             </div>
