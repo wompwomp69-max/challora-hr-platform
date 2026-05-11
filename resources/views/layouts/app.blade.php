@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ $pageTitle ?? config('app.name', 'Challora') }}</title>
+    <link rel="icon" type="image/png" href="{{ asset('web-icon.png') }}">
 
     <!-- Token tema (warna, font, radius) -->
     <link rel="stylesheet" href="{{ asset('css/design-tokens.css') }}">
