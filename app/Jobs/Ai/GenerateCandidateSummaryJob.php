@@ -64,5 +64,8 @@ class GenerateCandidateSummaryJob implements ShouldQueue
             'error_message' => null,
             'generated_at' => now(),
         ]);
+
+        // Bust HR intelligence dashboard cache so fresh summary appears immediately
+        cache()->forget("hr_dashboard_" . $application->job?->created_by);
     }
 }

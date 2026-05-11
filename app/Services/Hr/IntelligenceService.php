@@ -11,6 +11,13 @@ class IntelligenceService
 {
     public function getDashboardData(int $hrId): array
     {
+        return cache()->remember("hr_dashboard_{$hrId}", now()->addMinutes(2), function () use ($hrId) {
+            return $this->buildDashboardData($hrId);
+        });
+    }
+
+    private function buildDashboardData(int $hrId): array
+    {
         $jobs = JobPosting::query()
             ->where('created_by', $hrId)
             ->select(['id', 'title', 'location'])

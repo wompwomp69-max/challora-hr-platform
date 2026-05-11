@@ -73,6 +73,14 @@ class ApplicationController extends Controller
     {
         $this->authorizeOwner($application);
 
+        // Mark as processing immediately so the UI shows "Analyzing..." right away
+        $application->load(['aiScore', 'aiSummary']);
+        $application->aiScore?->update(['status' => 'processing']);
+        $application->aiSummary?->update(['status' => 'processing']);
+
+        // Bust the HR intelligence dashboard cache
+        cache()->forget("hr_dashboard_" . auth()->id());
+
         GenerateCvRatingJob::dispatch($application->id);
         GenerateCandidateSummaryJob::dispatch($application->id);
 
