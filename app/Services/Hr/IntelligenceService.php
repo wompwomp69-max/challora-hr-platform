@@ -152,7 +152,7 @@ class IntelligenceService
                 'photo_path' => $application->photo_path,
             ],
             'ai' => [
-                'score_total' => $application->aiScore?->score_total ?? 0,
+'score_total' => (float) $application->aiScore?->score_total / 10,
                 'confidence' => $application->aiScore?->confidence ?? 0,
                 'pros' => $this->toStringList($application->aiSummary?->pros_json),
                 'cons' => $this->toStringList($application->aiSummary?->cons_json),

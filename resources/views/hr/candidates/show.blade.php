@@ -263,7 +263,7 @@
         <aside class="ai-intelligence-sidebar">
             <div class="ai-score-card gsap-sidebar">
                 <div class="ai-label">AI Match Score</div>
-                <div class="ai-score-number">{{ $data->ai['score_total'] }}</div>
+                <div class="ai-score-number">{{ number_format($data->ai['score_total'] / 10, 1) }}</div>
                 <div class="ai-label text-accent">Confidence: {{ $data->ai['confidence'] }}%</div>
             </div>
 

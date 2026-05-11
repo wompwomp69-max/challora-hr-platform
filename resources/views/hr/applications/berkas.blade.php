@@ -216,7 +216,7 @@
     @if($application->aiScore && $application->aiScore->status === 'completed')
         <div class="mb-6">
             <p class="text-sm uppercase font-black text-text-muted">CV Fit Score</p>
-            <p class="text-5xl font-black text-accent">{{ $application->aiScore->score_total }}/100</p>
+            <p class="text-5xl font-black text-accent">{{ number_format($application->aiScore->score_total / 10, 1) }}/10</p>
             <p class="text-sm font-bold mt-2">Core Strength: {{ $application->aiScore->core_strength ?: '-' }}</p>
         </div>
     @elseif($application->aiScore && $application->aiScore->status === 'failed')
@@ -296,7 +296,7 @@
                     scoreEl.innerHTML = `
                         <div class="mb-6">
                             <p class="text-sm uppercase font-black text-text-muted">CV Fit Score</p>
-                            <p class="text-5xl font-black text-accent">${data.score.score_total}/100</p>
+                            <p class="text-5xl font-black text-accent">${(data.score.score_total / 10).toFixed(1)}/10</p>
                             <p class="text-sm font-bold mt-2">Core Strength: ${data.score.core_strength || '-'}</p>
                         </div>`;
                 } else {

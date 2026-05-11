@@ -22,7 +22,7 @@
                         <button class="candidate-trigger w-full text-left border border-gray-700 rounded p-2 mb-2 {{ ($defaultSelectedApplicationId ?? null) === $candidate['application_id'] ? 'ring-2 ring-accent' : '' }}" data-application-id="{{ $candidate['application_id'] }}">
                             <div class="flex justify-between">
                                 <span class="text-sm text-white">{{ $candidate['candidate_name'] }}</span>
-                                <span class="text-xs text-accent font-bold">Score {{ $candidate['score_total'] }}</span>
+                                <span class="text-xs text-accent font-bold">Score {{ number_format($candidate['score_total'] / 10, 1) }}/10</span>
                             </div>
                         </button>
                     @endforeach
@@ -38,7 +38,7 @@
                 <button class="candidate-trigger w-full text-left border-b border-gray-700 py-2 {{ ($defaultSelectedApplicationId ?? null) === $candidate['application_id'] ? 'text-accent' : 'text-white' }}" data-application-id="{{ $candidate['application_id'] }}">
                     <div class="flex justify-between">
                         <span>{{ $candidate['candidate_name'] }}</span>
-                        <span class="text-xs">Score {{ $candidate['score_total'] }}</span>
+                        <span class="text-xs">Score {{ number_format($candidate['score_total'] / 10, 1) }}/10</span>
                     </div>
                     <div class="text-xs text-gray-400">{{ $candidate['job_title'] }}</div>
                 </button>
@@ -127,7 +127,7 @@
             emptyState.classList.add('hidden');
             document.getElementById('insight-name').textContent = detail.candidate?.name ?? '-';
             document.getElementById('insight-job').textContent = detail.job?.title ?? '-';
-            document.getElementById('insight-score').textContent = detail.ai?.score_total ?? 0;
+            document.getElementById('insight-score').textContent = ((detail.ai?.score_total ?? 0) / 10).toFixed(1) + '/10';
             document.getElementById('insight-confidence').textContent = `${Math.round((detail.ai?.confidence ?? 0) * 100)}%`;
             document.getElementById('insight-summary').textContent = detail.ai?.summary_text ?? 'No AI summary available.';
             renderList('insight-pros', detail.ai?.pros, 'No strengths listed.');
