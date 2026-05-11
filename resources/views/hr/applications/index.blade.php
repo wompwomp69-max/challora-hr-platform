@@ -199,12 +199,22 @@
                         </td>
                         <td>
                             @if($a->aiScore && $a->aiScore->status === 'completed')
-                                <div class="font-black text-xl">{{ $a->aiScore->score_total }}/100</div>
-                                <div class="text-xs font-bold uppercase text-text-muted mt-1">{{ $a->aiScore->core_strength }}</div>
-                                <form method="post" action="{{ route('hr.applications.ai_refresh', $a->id) }}" class="mt-1">
-                                    @csrf
-                                    <button type="submit" class="text-[9px] font-black uppercase text-accent hover:opacity-70 transition-opacity underline">re-rate</button>
-                                </form>
+                                @if($a->aiScore->score_total <= 5)
+                                    <div class="text-xs font-bold text-text-muted uppercase mb-1">{{ $a->aiScore->score_total }}/100</div>
+                                    <form method="post" action="{{ route('hr.applications.ai_refresh', $a->id) }}" class="rate-form">
+                                        @csrf
+                                        <button type="submit" class="bg-accent text-white font-black text-[10px] uppercase tracking-widest px-3 py-2 border-2 border-black shadow-[3px_3px_0_black] hover:translate-y-[1px] transition-all whitespace-nowrap">
+                                            ★ Re-rate
+                                        </button>
+                                    </form>
+                                @else
+                                    <div class="font-black text-xl">{{ $a->aiScore->score_total }}/100</div>
+                                    <div class="text-xs font-bold uppercase text-text-muted mt-1">{{ $a->aiScore->core_strength }}</div>
+                                    <form method="post" action="{{ route('hr.applications.ai_refresh', $a->id) }}" class="mt-1">
+                                        @csrf
+                                        <button type="submit" class="text-[9px] font-black uppercase text-accent hover:opacity-70 transition-opacity underline">re-rate</button>
+                                    </form>
+                                @endif
                             @elseif($a->aiScore && $a->aiScore->status === 'failed')
                                 <form method="post" action="{{ route('hr.applications.ai_refresh', $a->id) }}">
                                     @csrf
