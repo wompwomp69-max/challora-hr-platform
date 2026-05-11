@@ -512,3 +512,159 @@ html.is-animating .transition-fade {
     --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
         'Segoe UI Symbol', 'Noto Color Emoji';
 }
+
+/* ── GLOBAL MOBILE FIXES ──────────────────────────────────────── */
+@media (max-width: 768px) {
+
+    /* Navbar */
+    .brutal-header {
+        padding: 0 16px;
+    }
+
+    /* Main container padding */
+    .main-container {
+        padding: 40px 16px !important;
+    }
+
+    /* Profile header */
+    .profile-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 20px;
+        margin-bottom: 32px;
+        padding-bottom: 24px;
+    }
+
+    .profile-avatar-lg {
+        width: 100px;
+        height: 100px;
+        box-shadow: 6px 6px 0 var(--color-accent);
+    }
+
+    .profile-name {
+        font-size: 32px;
+        letter-spacing: -1.5px;
+    }
+
+    /* Profile grid — single column */
+    .profile-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .profile-sidebar {
+        order: -1;
+    }
+
+    /* Info cards */
+    .info-card {
+        padding: 20px;
+    }
+
+    .info-card-title {
+        font-size: 18px;
+        margin-bottom: 20px;
+    }
+
+    /* Data grid inside info cards — single column */
+    .info-card .grid.grid-cols-2 {
+        grid-template-columns: 1fr !important;
+    }
+
+    .data-label {
+        font-size: 11px;
+        letter-spacing: 1px;
+    }
+
+    .data-value {
+        font-size: 15px;
+    }
+
+    .summary-text {
+        font-size: 15px;
+    }
+
+    /* Edit form */
+    .edit-section {
+        padding: 20px;
+    }
+
+    .avatar-upload-hero {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 16px;
+        padding: 20px;
+    }
+
+    /* Edit buttons */
+    .btn-submit,
+    .btn-cancel {
+        padding: 12px 20px;
+        font-size: 13px;
+        width: 100%;
+        text-align: center;
+    }
+
+    /* Float edit button */
+    .btn-edit-float {
+        bottom: 16px;
+        right: 16px;
+        padding: 12px 20px;
+        font-size: 13px;
+    }
+
+    /* Brutalist profile cards (HR berkas) */
+    .brutalist-profile-card {
+        padding: 20px;
+    }
+
+    .profile-title {
+        font-size: 22px;
+        letter-spacing: -0.5px;
+    }
+
+    /* Info grid in berkas */
+    .info-grid {
+        grid-template-columns: 1fr !important;
+    }
+
+    /* Document cards */
+    .document-card {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+        padding: 16px;
+    }
+
+    /* HR pipeline table — scroll horizontally */
+    .hr-card-table {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .ax-premium-table {
+        min-width: 700px;
+    }
+
+    /* HR header */
+    .hr-header-premium {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 20px;
+        margin-bottom: 32px;
+    }
+
+    .hr-title-giant {
+        font-size: 36px;
+        letter-spacing: -2px;
+    }
+
+    /* Decision center buttons */
+    .brutalist-profile-card .flex.gap-6 {
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .brutalist-profile-card .flex.gap-6 button {
+        width: 100%;
+    }
+}
