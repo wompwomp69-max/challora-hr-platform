@@ -151,9 +151,11 @@
                     </div>
                 </div>
 
-                <!-- Mega Wordmark — flush to bottom of card -->
-                <div class="text-[15vw] font-black text-center tracking-tighter text-[#2a2a2a] select-none absolute bottom-0 left-0 w-full pointer-events-none overflow-hidden rounded-b-[48px]" style="line-height:0.8; margin-bottom: 0;">
-                    CHALLORA
+                <!-- Mega Wordmark — full height characters, zero gap to bottom edge -->
+                <div class="absolute bottom-0 left-0 w-full pointer-events-none overflow-hidden rounded-b-[48px]" style="height: 13vw;">
+                    <div class="font-black text-center tracking-tighter text-[#2a2a2a] select-none w-full" style="font-size: 15.5vw; line-height: 1; position: absolute; bottom: -0.15em; left: 0;">
+                        CHALLORA
+                    </div>
                 </div>
             </div>
 
