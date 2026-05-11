@@ -43,7 +43,7 @@
 
     /* ── Components ── */
     .s5-pill-btn {
-        display: inline-flex;
+        display: inline-flex !important;
         align-items: center;
         justify-content: center;
         padding: 1rem 2rem;
@@ -54,6 +54,8 @@
         transition: all 0.2s ease;
         border: 1px solid transparent;
         cursor: pointer;
+        opacity: 1 !important;
+        transform: none !important;
         visibility: visible !important;
     }
     .s5-pill-primary {
@@ -402,12 +404,7 @@
 document.addEventListener('DOMContentLoaded', () => {
     gsap.registerPlugin(ScrollTrigger);
 
-    // Hero Animations
-    gsap.from(".s5-hero-left-text", { y: 30, opacity: 0, duration: 1, delay: 0.2 });
-    gsap.from(".s5-title-mega", { y: 50, opacity: 0, duration: 1, ease: "power3.out", delay: 0.4 });
-    gsap.from(".s5-status-item", { x: 20, opacity: 0, duration: 0.5, stagger: 0.05, delay: 0.8 });
-
-    // Grid Animations
+    // Grid Animations only — no hero animations to prevent conflicts
     gsap.from(".s5-grid-card", {
         y: 40, opacity: 0, duration: 0.8, stagger: 0.1,
         scrollTrigger: { trigger: ".s5-grid-4", start: "top 80%" }
