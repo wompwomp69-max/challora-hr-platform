@@ -49,15 +49,7 @@
     </div>
 
     <div class="bg-[#1a1a1a] border-4 border-black rounded p-5">
-        <div class="flex justify-between items-center mb-3">
-            <h2 class="text-sm uppercase tracking-wider font-bold text-gray-400">Candidate Insight</h2>
-            <form id="intel-refresh-form" method="POST" class="hidden">
-                @csrf
-                <button type="submit" id="intel-refresh-btn" class="px-3 py-1 text-[10px] font-bold uppercase tracking-widest bg-accent text-black border-2 border-black shadow-[2px_2px_0_black] hover:translate-y-[1px] transition-all">
-                    Refresh AI
-                </button>
-            </form>
-        </div>
+        <h2 class="text-sm uppercase tracking-wider font-bold text-gray-400 mb-3">Candidate Insight</h2>
         <div id="insight-empty" class="{{ $selectedCandidateDetail ? 'hidden' : '' }}">
             <p class="text-base text-gray-300">Select a candidate to view insights.</p>
         </div>
@@ -95,7 +87,6 @@
 <script id="intel-bootstrap" type="application/json">{!! json_encode([
     'detailUrlTemplate' => route('hr.intelligence.candidates.show', ['application' => '__APP__']),
     'initialDetail' => $selectedCandidateDetail,
-    'initialAppId' => $defaultSelectedApplicationId ?? null,
 ]) !!}</script>
 @endsection
 
@@ -113,12 +104,6 @@
         const payload = JSON.parse(bootstrapNode.textContent || '{}');
         const detailUrlTemplate = payload.detailUrlTemplate || '';
         const triggers = document.querySelectorAll('.candidate-trigger');
-        const refreshForm = document.getElementById('intel-refresh-form');
-        const refreshBtn = document.getElementById('intel-refresh-btn');
-
-        let pollingInterval = null;
-        let activeAppId = null;
-        const initialAppId = payload.initialAppId ?? null;
 
         const renderList = (targetId, values, fallback) => {
             const list = document.getElementById(targetId);
@@ -135,15 +120,11 @@
             if (!detail) {
                 bodyState.classList.add('hidden');
                 emptyState.classList.remove('hidden');
-                refreshForm.classList.add('hidden');
-                activeAppId = null;
                 return;
             }
 
             bodyState.classList.remove('hidden');
             emptyState.classList.add('hidden');
-            refreshForm.classList.remove('hidden');
-            activeAppId = detail.application?.id ?? null;
             document.getElementById('insight-name').textContent = detail.candidate?.name ?? '-';
             document.getElementById('insight-job').textContent = detail.job?.title ?? '-';
             document.getElementById('insight-score').textContent = ((detail.ai?.score_total ?? 0)).toFixed(1) + '/10';
@@ -151,31 +132,6 @@
             document.getElementById('insight-summary').textContent = detail.ai?.summary_text ?? 'No AI summary available.';
             renderList('insight-pros', detail.ai?.pros, 'No strengths listed.');
             renderList('insight-cons', detail.ai?.cons, 'No weaknesses listed.');
-        };
-
-        const stopPolling = () => {
-            if (pollingInterval) { clearInterval(pollingInterval); pollingInterval = null; }
-        };
-
-        const startPolling = (appId) => {
-            stopPolling();
-            let attempts = 0;
-            const maxAttempts = 40;
-            pollingInterval = setInterval(async () => {
-                attempts++;
-                if (attempts > maxAttempts) { stopPolling(); return; }
-                try {
-                    const res = await fetch(`/hr/applications/${appId}/ai-status`);
-                    if (!res.ok) { stopPolling(); return; }
-                    const data = await res.json();
-                    const scoreDone = data.score?.status === 'completed';
-                    const summaryDone = data.summary?.status === 'completed';
-                    if (scoreDone && summaryDone) {
-                        stopPolling();
-                        await loadDetail(appId);
-                    }
-                } catch (_) {}
-            }, 2000);
         };
 
         const loadDetail = async (applicationId) => {
@@ -195,28 +151,9 @@
 
         triggers.forEach((trigger) => {
             trigger.addEventListener('click', async () => {
-                stopPolling();
                 await loadDetail(trigger.dataset.applicationId);
             });
         });
-
-        if (refreshForm) {
-            refreshForm.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                if (!activeAppId) return;
-                refreshBtn.disabled = true;
-                refreshBtn.textContent = 'Analyzing...';
-                try {
-                    const res = await fetch(`/hr/applications/${activeAppId}/ai-refresh`, {
-                        method: 'POST',
-                        headers: { 'X-Requested-With': 'XMLHttpRequest', 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content ?? '' },
-                    });
-                    if (res.ok) startPolling(activeAppId);
-                } catch (_) {}
-                refreshBtn.disabled = false;
-                refreshBtn.textContent = 'Refresh AI';
-            });
-        }
 
         renderDetail(payload.initialDetail ?? null);
     };
