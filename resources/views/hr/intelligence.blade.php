@@ -127,7 +127,7 @@
             emptyState.classList.add('hidden');
             document.getElementById('insight-name').textContent = detail.candidate?.name ?? '-';
             document.getElementById('insight-job').textContent = detail.job?.title ?? '-';
-            document.getElementById('insight-score').textContent = ((detail.ai?.score_total ?? 0) / 10).toFixed(1) + '/10';
+            document.getElementById('insight-score').textContent = ((detail.ai?.score_total ?? 0)).toFixed(1) + '/10';
             document.getElementById('insight-confidence').textContent = `${Math.round((detail.ai?.confidence ?? 0) * 100)}%`;
             document.getElementById('insight-summary').textContent = detail.ai?.summary_text ?? 'No AI summary available.';
             renderList('insight-pros', detail.ai?.pros, 'No strengths listed.');
@@ -136,6 +136,11 @@
 
         const loadDetail = async (applicationId) => {
             if (!detailUrlTemplate) return;
+
+            triggers.forEach(t => t.classList.remove('ring-2', 'ring-accent'));
+            const activeTrigger = document.querySelector(`[data-application-id="${applicationId}"]`);
+            if (activeTrigger) activeTrigger.classList.add('ring-2', 'ring-accent');
+
             const response = await fetch(detailUrlTemplate.replace('__APP__', applicationId), {
                 headers: {'X-Requested-With': 'XMLHttpRequest'},
             });
