@@ -12,11 +12,11 @@ class DownloadController extends Controller
         
         if (auth()->user()->role === \App\Enums\UserRole::HR) {
             if ($application->job->created_by !== auth()->id() && !app()->environment('local')) {
-                abort(403, 'Anda bukan pemilik lowongan ini.');
+                abort(403, 'You are not the owner of this job posting.');
             }
         } else {
             if ($application->user_id !== auth()->id() && !app()->environment('local')) {
-                abort(403, 'Ini bukan berkas Anda.');
+                abort(403, 'This file does not belong to you.');
             }
         }
 
@@ -60,7 +60,7 @@ class DownloadController extends Controller
         $path = $user->avatar_path;
 
         if (!$path || !\Illuminate\Support\Facades\Storage::disk('public')->exists($path)) {
-            // Cek apakah file default ada, jika tidak abort 404 saja
+            // Check if default avatar exists, otherwise abort 404
             $defaultPath = public_path('images/default-avatar.png');
             if (file_exists($defaultPath)) {
                 return response()->file($defaultPath);
@@ -79,11 +79,11 @@ class DownloadController extends Controller
             // Authorization: HR must own the job, candidate must own the application
             if (auth()->user()->role === \App\Enums\UserRole::HR) {
                 if ($application->job->created_by !== auth()->id() && !app()->environment('local')) {
-                    abort(403, 'Anda bukan pemilik lowongan ini.');
+                    abort(403, 'You are not the owner of this job posting.');
                 }
             } else {
                 if ($application->user_id !== auth()->id() && !app()->environment('local')) {
-                    abort(403, 'Ini bukan berkas Anda.');
+                    abort(403, 'This file does not belong to you.');
                 }
             }
 

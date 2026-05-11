@@ -79,7 +79,7 @@
                         <label class="form-label">Religion</label>
                         <select name="religion" class="form-select">
                             <option value="">— Select —</option>
-                            @foreach(['Islam', 'Kristen', 'Katolik', 'Hindu', 'Budha', 'Konghucu'] as $r)
+                            @foreach(['Islam', 'Christianity', 'Catholicism', 'Hinduism', 'Buddhism', 'Confucianism'] as $r)
                                 <option value="{{ $r }}" {{ $user->religion === $r ? 'selected' : '' }}>{{ $r }}</option>
                             @endforeach
                         </select>
@@ -88,8 +88,8 @@
                         <label class="form-label">Marital Status</label>
                         <select name="marital_status" class="form-select">
                             <option value="">— Select —</option>
-                            @foreach(['Lajang', 'Menikah', 'Cerai'] as $m)
-                                <option value="{{ $m }}" {{ $user->marital_status === $m ? 'selected' : '' }}>{{ $m }}</option>
+                            @foreach(['Single' => 'Single', 'Married' => 'Married', 'Divorced' => 'Divorced'] as $val => $label)
+                                <option value="{{ $val }}" {{ $user->marital_status === $val ? 'selected' : '' }}>{{ $label }}</option>
                             @endforeach
                         </select>
                     </div>
@@ -209,7 +209,7 @@
                                 <input type="text" name="ach_year[]" class="form-input" placeholder="Year" value="{{ $ach->year }}">
                             </div>
                             <div class="flex gap-4 w-full">
-                                <input type="text" name="ach_level[]" class="form-input" placeholder="Level (e.g. Nasional)" value="{{ $ach->level }}">
+                                <input type="text" name="ach_level[]" class="form-input" placeholder="Level (e.g. National)" value="{{ $ach->level }}">
                                 <input type="text" name="ach_certificate_link[]" class="form-input" placeholder="Certificate Link / URL" value="{{ $ach->certificate_link }}">
                                 <button type="button" class="bg-red-600 text-white px-4 border-2 border-black" onclick="this.parentElement.parentElement.remove()">X</button>
                             </div>
@@ -323,7 +323,7 @@
                 <input type="text" name="ach_year[]" class="form-input" placeholder="Year">
             </div>
             <div class="flex gap-4 w-full">
-                <input type="text" name="ach_level[]" class="form-input" placeholder="Level (e.g. Nasional)">
+                <input type="text" name="ach_level[]" class="form-input" placeholder="Level (e.g. National)">
                 <input type="text" name="ach_certificate_link[]" class="form-input" placeholder="Certificate Link / URL">
                 <button type="button" class="bg-red-600 text-white px-4 border-2 border-black" onclick="this.parentElement.parentElement.remove()">X</button>
             </div>

@@ -199,7 +199,7 @@
             <p class="text-sm font-bold mt-2">Core Strength: {{ $application->aiScore->core_strength ?: '-' }}</p>
         </div>
     @else
-        <p class="text-sm font-bold text-yellow-500 uppercase mb-6">AI score sedang diproses.</p>
+        <p class="text-sm font-bold text-yellow-500 uppercase mb-6">AI score is being processed.</p>
     @endif
 
     @if($application->aiSummary && $application->aiSummary->status === 'completed')
@@ -227,7 +227,7 @@
             <p class="mt-3 text-xs uppercase font-black text-accent">Recommendation: {{ $application->aiSummary->recommendation }}</p>
         </div>
     @else
-        <p class="text-sm font-bold text-yellow-500 uppercase">AI summary sedang diproses.</p>
+        <p class="text-sm font-bold text-yellow-500 uppercase">AI summary is being processed.</p>
     @endif
 </div>
 

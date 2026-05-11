@@ -24,11 +24,11 @@ class JobApplicationService
     public function applyForJob(User $user, JobPosting $job): void
     {
         if ($user->applications()->where('job_id', $job->id)->exists()) {
-            throw new Exception('Anda sudah melamar lowongan ini.');
+            throw new Exception('You have already applied for this position.');
         }
 
         if ($job->deadline && $job->deadline->isPast()) {
-            throw new Exception('Lowongan telah ditutup.');
+            throw new Exception('This job posting is closed.');
         }
 
         $missingDocs = [];

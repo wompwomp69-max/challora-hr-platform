@@ -68,7 +68,8 @@ class JobController extends Controller
             'savedJobIds' => $savedJobIds,
             'isProfileComplete' => $isProfileComplete,
             'topJobRecommendationIds' => $topJobRecommendationIds,
-            'pageTitle' => 'Lowongan Kerja',
+            'aiRecommendationsPending' => request('top_choice') === '1' && empty($topJobRecommendationIds),
+            'pageTitle' => 'Job Listings',
         ]);
     }
 
