@@ -35,6 +35,7 @@ class GenerateTopJobsJob implements ShouldQueue
             'user_profile' => [
                 'name' => $user->name,
                 'summary' => $user->user_summary,
+                'skills' => $user->skills,
                 'education_level' => $user->education_level,
                 'education_major' => $user->education_major,
                 'work_experiences' => $user->workExperiences->map(fn ($exp) => [
@@ -70,7 +71,9 @@ class GenerateTopJobsJob implements ShouldQueue
                 ],
                 [
                     'match_score' => (int) ($recommendation['match_score'] ?? 0),
-                    'reason_json' => $recommendation['reasoning'] ?? [],
+                    'reason_json' => is_array($recommendation['reasoning'] ?? null)
+                        ? $recommendation['reasoning']
+                        : [$recommendation['reasoning'] ?? ''],
                     'model_version' => config('ai.model_version'),
                     'status' => 'completed',
                     'error_message' => null,

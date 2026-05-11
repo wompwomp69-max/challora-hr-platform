@@ -15,12 +15,10 @@ class JobSearchService
         if ($request->get('top_choice') === '1' && auth()->check()) {
             $topIds = \App\Models\AiUserJobRecommendation::where('user_id', auth()->id())
                 ->where('status', 'completed')
-                ->where('match_score', '>=', 70)
+                ->where('match_score', '>=', 50)
                 ->pluck('job_id')
                 ->toArray();
 
-            // Only apply the filter if recommendations exist — otherwise show all jobs
-            // (recommendations may still be generating)
             if (!empty($topIds)) {
                 $query->whereIn('id', $topIds);
             }
