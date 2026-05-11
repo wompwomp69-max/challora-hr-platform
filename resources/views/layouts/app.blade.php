@@ -116,15 +116,7 @@
                         </div>
                         <div>
                             <p class="font-mono text-xs uppercase font-bold mb-1 opacity-70">GENERAL INQUIRIES</p>
-                            <p class="font-bold text-lg leading-tight hover:underline cursor-pointer">info@challora.id</p>
-                        </div>
-                        <div>
-                            <p class="font-mono text-xs uppercase font-bold mb-1 opacity-70">SUPPORT</p>
-                            <p class="font-bold text-lg leading-tight hover:underline cursor-pointer">support@challora.id</p>
-                        </div>
-                        <div>
-                            <p class="font-mono text-xs uppercase font-bold mb-1 opacity-70">PRESS</p>
-                            <p class="font-bold text-lg leading-tight hover:underline cursor-pointer">press@challora.id</p>
+                            <p class="font-bold text-lg leading-tight hover:underline cursor-pointer">admin.challora</p>
                         </div>
                     </div>
                     
@@ -143,18 +135,13 @@
 
             <!-- LAYER 2: THE CONTROL CENTER -->
             <div class="bg-[#1A1A1A] text-white rounded-[48px] m-4 md:m-8 p-10 md:p-20 relative flex flex-col justify-between" style="min-height: 60vh;">
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-10 relative z-10 mb-20">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-10 relative z-10 mb-20">
                     <!-- Col 1: Logo -->
                     <div class="text-accent">
                         <div class="w-16 h-16 border-4 border-accent flex items-center justify-center font-black text-4xl">C</div>
                     </div>
-                    
-                    <!-- Col 2: Platform -->
-                    <div>
-                        <a href="{{ route('jobs.index') }}" class="text-accent font-bold text-xl hover:text-white transition-colors block mb-4">Platform</a>
-                    </div>
 
-                    <!-- Col 3: Solutions -->
+                    <!-- Col 2: Platform links -->
                     <div>
                         <h3 class="font-mono text-xs uppercase tracking-widest text-[#888] mb-6 flex items-start gap-1">Platform <span class="text-[8px]">4</span></h3>
                         <ul class="space-y-4 font-bold text-base">
@@ -175,8 +162,8 @@
                     </div>
                 </div>
 
-                <!-- Mega Wordmark -->
-                <div class="text-[15vw] leading-[0.75] font-black text-center tracking-tighter text-[#2a2a2a] select-none absolute bottom-0 left-0 w-full pointer-events-none overflow-hidden rounded-b-[48px]" style="height: 12vw;">
+                <!-- Mega Wordmark — flush to bottom of card -->
+                <div class="text-[15vw] leading-none font-black text-center tracking-tighter text-[#2a2a2a] select-none absolute bottom-0 left-0 w-full pointer-events-none overflow-hidden rounded-b-[48px]">
                     CHALLORA
                 </div>
             </div>
