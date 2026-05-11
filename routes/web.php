@@ -17,6 +17,21 @@ Route::get('/up', function () {
     return response('OK', 200);
 });
 
+Route::get('/debug-location/{loc}', function (string $loc) {
+    $results = \App\Models\JobPosting::where(function ($q) use ($loc) {
+        $q->where('location', 'like', "%{$loc}%")
+          ->orWhere('provinsi', 'like', "%{$loc}%")
+          ->orWhere('kota', 'like', "%{$loc}%");
+    })->get(['id', 'title', 'location', 'provinsi', 'kota']);
+
+    return response()->json([
+        'searching_for' => $loc,
+        'count' => $results->count(),
+        'results' => $results,
+        'sample_all' => \App\Models\JobPosting::limit(3)->get(['id', 'title', 'location', 'provinsi', 'kota']),
+    ], 200, [], JSON_PRETTY_PRINT);
+});
+
 // Temporary: test sending to a specific address — remove after use
 Route::get('/mail-test-to/{email}', function (string $email) {
     try {
