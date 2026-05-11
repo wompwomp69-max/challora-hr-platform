@@ -23,6 +23,15 @@ class AppServiceProvider extends ServiceProvider
     {
         URL::forceScheme('https');
 
+        // Register Gmail API transport (bypasses Railway SMTP port blocks)
+        \Illuminate\Support\Facades\Mail::extend('gmail-api', function () {
+            return new \App\Mail\Transport\GmailApiTransport(
+                clientId:     env('GOOGLE_MAILER_CLIENT_ID', ''),
+                clientSecret: env('GOOGLE_MAILER_CLIENT_SECRET', ''),
+                refreshToken: env('GOOGLE_MAILER_REFRESH_TOKEN', ''),
+            );
+        });
+
         $version = env('APP_VERSION');
 
         // If APP_VERSION not set (e.g. local dev), try to read from git tag
