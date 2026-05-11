@@ -174,23 +174,15 @@
                 </div>
                 <div id="exp-container">
                     @foreach($user->workExperiences as $exp)
-                        <div class="dynamic-list-item flex-col items-start gap-4 mb-6">
-                            <div class="grid grid-cols-2 gap-4 w-full">
-                                <input type="text" name="work_title[]" class="form-input" placeholder="Job Title"
-                                    value="{{ $exp->title }}">
-                                <input type="text" name="work_company[]" class="form-input" placeholder="Company Name"
-                                    value="{{ $exp->company_name }}">
+                        <div class="dynamic-list-item flex-col items-start gap-3 mb-6">
+                            <input type="text" name="work_title[]" class="form-input w-full" placeholder="Job Title" value="{{ $exp->title }}">
+                            <input type="text" name="work_company[]" class="form-input w-full" placeholder="Company Name" value="{{ $exp->company_name }}">
+                            <div class="flex gap-3 w-full">
+                                <input type="text" name="work_year_start[]" class="form-input flex-1" placeholder="Start Year" value="{{ $exp->year_start }}">
+                                <input type="text" name="work_year_end[]" class="form-input flex-1" placeholder="End Year" value="{{ $exp->year_end }}">
+                                <button type="button" class="bg-red-600 text-white px-4 border-2 border-black flex-shrink-0" onclick="this.parentElement.parentElement.remove()">X</button>
                             </div>
-                            <div class="flex gap-4 w-full">
-                                <input type="text" name="work_year_start[]" class="form-input" placeholder="Start Year"
-                                    value="{{ $exp->year_start }}">
-                                <input type="text" name="work_year_end[]" class="form-input" placeholder="End Year"
-                                    value="{{ $exp->year_end }}">
-                                <button type="button" class="bg-red-600 text-white px-4 border-2 border-black"
-                                    onclick="this.parentElement.parentElement.remove()">X</button>
-                            </div>
-                            <textarea name="work_description[]" class="form-textarea"
-                                placeholder="Job description...">{{ $exp->description }}</textarea>
+                            <textarea name="work_description[]" class="form-textarea w-full" placeholder="Job description...">{{ $exp->description }}</textarea>
                         </div>
                     @endforeach
                 </div>
@@ -209,25 +201,21 @@
                 </div>
                 <div id="ach-container">
                     @foreach($user->achievements as $ach)
-                        <div class="dynamic-list-item flex-col items-start gap-4 mb-6">
-                            <div class="grid grid-cols-2 gap-4 w-full">
-                                <input type="text" name="ach_title[]" class="form-input" placeholder="Achievement Title" value="{{ $ach->title }}">
-                                <select name="ach_type[]" class="form-select">
-                                    <option value="Sertifikat" {{ $ach->type === 'Sertifikat' ? 'selected' : '' }}>Certificate</option>
-                                    <option value="Penghargaan" {{ $ach->type === 'Penghargaan' ? 'selected' : '' }}>Award</option>
-                                    <option value="Lomba" {{ $ach->type === 'Lomba' ? 'selected' : '' }}>Competition</option>
-                                </select>
+                        <div class="dynamic-list-item flex-col items-start gap-3 mb-6">
+                            <input type="text" name="ach_title[]" class="form-input w-full" placeholder="Achievement Title" value="{{ $ach->title }}">
+                            <select name="ach_type[]" class="form-select w-full">
+                                <option value="Sertifikat" {{ $ach->type === 'Sertifikat' ? 'selected' : '' }}>Certificate</option>
+                                <option value="Penghargaan" {{ $ach->type === 'Penghargaan' ? 'selected' : '' }}>Award</option>
+                                <option value="Lomba" {{ $ach->type === 'Lomba' ? 'selected' : '' }}>Competition</option>
+                            </select>
+                            <input type="text" name="ach_organizer[]" class="form-input w-full" placeholder="Organizer" value="{{ $ach->organizer }}">
+                            <div class="flex gap-3 w-full">
+                                <input type="text" name="ach_year[]" class="form-input flex-1" placeholder="Year" value="{{ $ach->year }}">
+                                <input type="text" name="ach_level[]" class="form-input flex-1" placeholder="Level (e.g. National)" value="{{ $ach->level }}">
+                                <button type="button" class="bg-red-600 text-white px-4 border-2 border-black flex-shrink-0" onclick="this.parentElement.parentElement.remove()">X</button>
                             </div>
-                            <div class="grid grid-cols-2 gap-4 w-full">
-                                <input type="text" name="ach_organizer[]" class="form-input" placeholder="Organizer" value="{{ $ach->organizer }}">
-                                <input type="text" name="ach_year[]" class="form-input" placeholder="Year" value="{{ $ach->year }}">
-                            </div>
-                            <div class="flex gap-4 w-full">
-                                <input type="text" name="ach_level[]" class="form-input" placeholder="Level (e.g. National)" value="{{ $ach->level }}">
-                                <input type="text" name="ach_certificate_link[]" class="form-input" placeholder="Certificate Link / URL" value="{{ $ach->certificate_link }}">
-                                <button type="button" class="bg-red-600 text-white px-4 border-2 border-black" onclick="this.parentElement.parentElement.remove()">X</button>
-                            </div>
-                            <textarea name="ach_description[]" class="form-textarea" placeholder="Description...">{{ $ach->description }}</textarea>
+                            <input type="text" name="ach_certificate_link[]" class="form-input w-full" placeholder="Certificate Link / URL" value="{{ $ach->certificate_link }}">
+                            <textarea name="ach_description[]" class="form-textarea w-full" placeholder="Description...">{{ $ach->description }}</textarea>
                         </div>
                     @endforeach
                 </div>
@@ -246,17 +234,15 @@
                 </div>
                 <div id="org-container">
                     @foreach($user->organizationalExperiences as $org)
-                        <div class="dynamic-list-item flex-col items-start gap-4 mb-6">
-                            <div class="grid grid-cols-2 gap-4 w-full">
-                                <input type="text" name="org_name[]" class="form-input" placeholder="Organization Name" value="{{ $org->organization_name }}">
-                                <input type="text" name="org_position[]" class="form-input" placeholder="Position / Role" value="{{ $org->position }}">
+                        <div class="dynamic-list-item flex-col items-start gap-3 mb-6">
+                            <input type="text" name="org_name[]" class="form-input w-full" placeholder="Organization Name" value="{{ $org->organization_name }}">
+                            <input type="text" name="org_position[]" class="form-input w-full" placeholder="Position / Role" value="{{ $org->position }}">
+                            <div class="flex gap-3 w-full">
+                                <input type="text" name="org_year_start[]" class="form-input flex-1" placeholder="Start Year" value="{{ $org->start_year }}">
+                                <input type="text" name="org_year_end[]" class="form-input flex-1" placeholder="End Year" value="{{ $org->year_end }}">
+                                <button type="button" class="bg-red-600 text-white px-4 border-2 border-black flex-shrink-0" onclick="this.parentElement.parentElement.remove()">X</button>
                             </div>
-                            <div class="flex gap-4 w-full">
-                                <input type="text" name="org_year_start[]" class="form-input" placeholder="Start Year" value="{{ $org->start_year }}">
-                                <input type="text" name="org_year_end[]" class="form-input" placeholder="End Year" value="{{ $org->year_end }}">
-                                <button type="button" class="bg-red-600 text-white px-4 border-2 border-black" onclick="this.parentElement.parentElement.remove()">X</button>
-                            </div>
-                            <textarea name="org_description[]" class="form-textarea" placeholder="Describe your role and impact...">{{ $org->description }}</textarea>
+                            <textarea name="org_description[]" class="form-textarea w-full" placeholder="Describe your role and impact...">{{ $org->description }}</textarea>
                         </div>
                     @endforeach
                 </div>
@@ -307,56 +293,47 @@
     </div>
 
     <template id="exp-template">
-        <div class="dynamic-list-item flex-col items-start gap-4 mb-6">
-            <div class="grid grid-cols-2 gap-4 w-full">
-                <input type="text" name="work_title[]" class="form-input" placeholder="Job Title">
-                <input type="text" name="work_company[]" class="form-input" placeholder="Company Name">
+        <div class="dynamic-list-item flex-col items-start gap-3 mb-6">
+            <input type="text" name="work_title[]" class="form-input w-full" placeholder="Job Title">
+            <input type="text" name="work_company[]" class="form-input w-full" placeholder="Company Name">
+            <div class="flex gap-3 w-full">
+                <input type="text" name="work_year_start[]" class="form-input flex-1" placeholder="Start Year">
+                <input type="text" name="work_year_end[]" class="form-input flex-1" placeholder="End Year">
+                <button type="button" class="bg-red-600 text-white px-4 border-2 border-black flex-shrink-0" onclick="this.parentElement.parentElement.remove()">X</button>
             </div>
-            <div class="flex gap-4 w-full">
-                <input type="text" name="work_year_start[]" class="form-input" placeholder="Start Year">
-                <input type="text" name="work_year_end[]" class="form-input" placeholder="End Year">
-                <button type="button" class="bg-red-600 text-white px-4 border-2 border-black"
-                    onclick="this.parentElement.parentElement.remove()">X</button>
-            </div>
-            <textarea name="work_description[]" class="form-textarea" placeholder="Job description..."></textarea>
+            <textarea name="work_description[]" class="form-textarea w-full" placeholder="Job description..."></textarea>
         </div>
     </template>
 
     <template id="ach-template">
-        <div class="dynamic-list-item flex-col items-start gap-4 mb-6">
-            <div class="grid grid-cols-2 gap-4 w-full">
-                <input type="text" name="ach_title[]" class="form-input" placeholder="Achievement Title">
-                <select name="ach_type[]" class="form-select">
-                    <option value="Sertifikat">Certificate</option>
-                    <option value="Penghargaan">Award</option>
-                    <option value="Lomba">Competition</option>
-                </select>
+        <div class="dynamic-list-item flex-col items-start gap-3 mb-6">
+            <input type="text" name="ach_title[]" class="form-input w-full" placeholder="Achievement Title">
+            <select name="ach_type[]" class="form-select w-full">
+                <option value="Sertifikat">Certificate</option>
+                <option value="Penghargaan">Award</option>
+                <option value="Lomba">Competition</option>
+            </select>
+            <input type="text" name="ach_organizer[]" class="form-input w-full" placeholder="Organizer">
+            <div class="flex gap-3 w-full">
+                <input type="text" name="ach_year[]" class="form-input flex-1" placeholder="Year">
+                <input type="text" name="ach_level[]" class="form-input flex-1" placeholder="Level (e.g. National)">
+                <button type="button" class="bg-red-600 text-white px-4 border-2 border-black flex-shrink-0" onclick="this.parentElement.parentElement.remove()">X</button>
             </div>
-            <div class="grid grid-cols-2 gap-4 w-full">
-                <input type="text" name="ach_organizer[]" class="form-input" placeholder="Organizer">
-                <input type="text" name="ach_year[]" class="form-input" placeholder="Year">
-            </div>
-            <div class="flex gap-4 w-full">
-                <input type="text" name="ach_level[]" class="form-input" placeholder="Level (e.g. National)">
-                <input type="text" name="ach_certificate_link[]" class="form-input" placeholder="Certificate Link / URL">
-                <button type="button" class="bg-red-600 text-white px-4 border-2 border-black" onclick="this.parentElement.parentElement.remove()">X</button>
-            </div>
-            <textarea name="ach_description[]" class="form-textarea" placeholder="Description..."></textarea>
+            <input type="text" name="ach_certificate_link[]" class="form-input w-full" placeholder="Certificate Link / URL">
+            <textarea name="ach_description[]" class="form-textarea w-full" placeholder="Description..."></textarea>
         </div>
     </template>
 
     <template id="org-template">
-        <div class="dynamic-list-item flex-col items-start gap-4 mb-6">
-            <div class="grid grid-cols-2 gap-4 w-full">
-                <input type="text" name="org_name[]" class="form-input" placeholder="Organization Name">
-                <input type="text" name="org_position[]" class="form-input" placeholder="Position / Role">
+        <div class="dynamic-list-item flex-col items-start gap-3 mb-6">
+            <input type="text" name="org_name[]" class="form-input w-full" placeholder="Organization Name">
+            <input type="text" name="org_position[]" class="form-input w-full" placeholder="Position / Role">
+            <div class="flex gap-3 w-full">
+                <input type="text" name="org_year_start[]" class="form-input flex-1" placeholder="Start Year">
+                <input type="text" name="org_year_end[]" class="form-input flex-1" placeholder="End Year">
+                <button type="button" class="bg-red-600 text-white px-4 border-2 border-black flex-shrink-0" onclick="this.parentElement.parentElement.remove()">X</button>
             </div>
-            <div class="flex gap-4 w-full">
-                <input type="text" name="org_year_start[]" class="form-input" placeholder="Start Year">
-                <input type="text" name="org_year_end[]" class="form-input" placeholder="End Year">
-                <button type="button" class="bg-red-600 text-white px-4 border-2 border-black" onclick="this.parentElement.parentElement.remove()">X</button>
-            </div>
-            <textarea name="org_description[]" class="form-textarea" placeholder="Describe your role and impact..."></textarea>
+            <textarea name="org_description[]" class="form-textarea w-full" placeholder="Describe your role and impact..."></textarea>
         </div>
     </template>
 

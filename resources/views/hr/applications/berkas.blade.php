@@ -206,7 +206,7 @@
 <div class="brutalist-profile-card" id="ai-assessment-card" data-application-id="{{ $application->id }}">
     <div class="flex justify-between items-center mb-6">
         <h3 class="font-black text-xl">AI Talent Assessment</h3>
-        <form method="post" action="{{ route('hr.applications.ai_refresh', $application->id) }}">
+        <form method="post" action="{{ route('hr.applications.ai_refresh', $application->id) }}" id="refresh-ai-form">
             @csrf
             <button type="submit" class="action-select-premium text-xs">Refresh AI</button>
         </form>
@@ -220,7 +220,7 @@
             <p class="text-sm font-bold mt-2">Core Strength: {{ $application->aiScore->core_strength ?: '-' }}</p>
         </div>
     @elseif($application->aiScore && $application->aiScore->status === 'failed')
-        <p class="text-sm font-bold text-red-500 uppercase mb-6">AI score failed. Try refreshing.</p>
+        <p class="text-sm font-bold text-accent uppercase mb-6">AI score failed. <button form="refresh-ai-form" type="submit" class="underline">Try refreshing.</button></p>
     @else
         <div class="flex items-center gap-3 mb-6" id="score-spinner">
             <div class="h-6 w-6 border-4 border-accent border-t-transparent rounded-full animate-spin"></div>
@@ -255,7 +255,7 @@
             <p class="mt-3 text-xs uppercase font-black text-accent">Recommendation: {{ $application->aiSummary->recommendation }}</p>
         </div>
     @elseif($application->aiSummary && $application->aiSummary->status === 'failed')
-        <p class="text-sm font-bold text-red-500 uppercase">AI summary failed. Try refreshing.</p>
+        <p class="text-sm font-bold text-accent uppercase">AI summary failed. <button form="refresh-ai-form" type="submit" class="underline">Try refreshing.</button></p>
     @else
         <div class="flex items-center gap-3" id="summary-spinner">
             <div class="h-6 w-6 border-4 border-accent border-t-transparent rounded-full animate-spin"></div>
