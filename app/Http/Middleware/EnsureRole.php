@@ -15,8 +15,17 @@ class EnsureRole
      */
     public function handle(Request $request, Closure $next, string ...$roles): Response
     {
-        if (!$request->user() || !in_array($request->user()->role->value, $roles)) {
-            abort(403, 'Unauthorized action.');
+        if (!$request->user()) {
+            return redirect()->route('login');
+        }
+
+        if (!in_array($request->user()->role->value, $roles)) {
+            if ($request->expectsJson()) {
+                return response()->json(['message' => 'Unauthorized. You do not have permission to access this page.'], 403);
+            }
+            return response()->view('errors.403', [
+                'exception' => new \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException('Unauthorized action.'),
+            ], 403);
         }
 
         return $next($request);
