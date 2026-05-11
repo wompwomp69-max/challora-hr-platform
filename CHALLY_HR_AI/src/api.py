@@ -90,7 +90,8 @@ def candidate_summary(req: BaseAiRequest) -> Dict[str, Any]:
         raise HTTPException(status_code=500, detail=err(request_id, "AI_SUMMARY_FAILED", str(exc), True))
 
 
-@app.post("/ai/jobs/recommend")def jobs_recommend(req: JobsRecommendRequest) -> Dict[str, Any]:
+@app.post("/ai/jobs/recommend")
+def jobs_recommend(req: JobsRecommendRequest) -> Dict[str, Any]:
     """Recommend jobs for user (User Feature)."""
     started_at = time.time()
     request_id = req.request_id or str(uuid.uuid4())

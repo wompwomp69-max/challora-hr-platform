@@ -63,6 +63,19 @@
         box-shadow: 3px 3px 0 black;
         text-decoration: none;
     }
+    .action-select-premium {
+        background: var(--color-surface);
+        border: 4px solid black;
+        padding: 10px 16px;
+        font-weight: 800;
+        text-transform: uppercase;
+        font-size: 11px;
+        cursor: pointer;
+        box-shadow: 4px 4px 0 black;
+    }
+    .action-select-premium:hover {
+        border-color: var(--color-accent);
+    }
 </style>
 @endpush
 
@@ -191,7 +204,13 @@
 </div>
 
 <div class="brutalist-profile-card" id="ai-assessment-card" data-application-id="{{ $application->id }}">
-    <h3 class="font-black text-xl mb-6">AI Talent Assessment</h3>
+    <div class="flex justify-between items-center mb-6">
+        <h3 class="font-black text-xl">AI Talent Assessment</h3>
+        <form method="post" action="{{ route('hr.applications.ai_refresh', $application->id) }}">
+            @csrf
+            <button type="submit" class="action-select-premium text-xs">Refresh AI</button>
+        </form>
+    </div>
 
     <div id="ai-score-section">
     @if($application->aiScore && $application->aiScore->status === 'completed')
