@@ -70,6 +70,7 @@
     .s5-pill-outline:hover {
         background-color: var(--s5-black);
         color: var(--s5-white);
+        border-color: var(--s5-white);
     }
     .s5-pill-white {
         background-color: var(--s5-white);
@@ -287,7 +288,7 @@
                     <a href="{{ route('jobs.index') }}" class="s5-pill-btn s5-pill-primary">
                         Find Jobs
                     </a>
-                    <a href="{{ route('register') }}" class="s5-pill-btn s5-pill-white">
+                    <a href="{{ route('register') }}" class="s5-pill-btn s5-pill-outline">
                         Post a Job
                     </a>
                 </div>
