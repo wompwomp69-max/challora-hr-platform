@@ -43,9 +43,6 @@ class JobController extends Controller
             }
 
             $topJobRecommendationIds = AiUserJobRecommendation::where('user_id', $user->id)
-                ->where('status', 'completed')
-                ->orderByDesc('match_score')
-                ->limit(10)
                 ->pluck('job_id')
                 ->toArray();
 
