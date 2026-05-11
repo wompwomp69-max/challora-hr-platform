@@ -36,6 +36,30 @@
                     </section>
                 @endif
 
+                @if($user->skills)
+                    <section class="info-card">
+                        <h2 class="info-card-title">Skills</h2>
+                        <div class="flex flex-wrap gap-2">
+                            @foreach(array_filter(array_map('trim', explode(',', $user->skills))) as $skill)
+                                <span class="border-2 border-accent text-accent px-3 py-1 text-xs font-black uppercase tracking-widest">{{ $skill }}</span>
+                            @endforeach
+                        </div>
+                    </section>
+                @endif
+
+                @if($user->skills)
+                    <section class="info-card">
+                        <h2 class="info-card-title">Skills</h2>
+                        <div class="flex flex-wrap gap-2 mt-2">
+                            @foreach(explode(',', $user->skills) as $skill)
+                                @if(trim($skill))
+                                    <span class="bg-accent text-white px-3 py-1 text-xs font-black uppercase">{{ trim($skill) }}</span>
+                                @endif
+                            @endforeach
+                        </div>
+                    </section>
+                @endif
+
                 <section class="info-card">
                     <h2 class="info-card-title">Personal Data</h2>
                     <div class="grid grid-cols-2 gap-8">

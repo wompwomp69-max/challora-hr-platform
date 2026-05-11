@@ -103,6 +103,20 @@
                     <textarea name="user_summary" class="form-textarea"
                         rows="4">{{ old('user_summary', $user->user_summary) }}</textarea>
                 </div>
+
+                <div class="form-group">
+                    <label class="form-label">Skills</label>
+                    <p class="text-[11px] text-text-muted font-bold mb-2 uppercase">Separate with commas — e.g. PHP, Laravel, React, MySQL</p>
+                    <input type="text" name="skills" class="form-input"
+                        placeholder="PHP, Laravel, React, MySQL, Docker..."
+                        value="{{ old('skills', $user->skills) }}">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Skills</label>
+                    <textarea name="skills" class="form-textarea"
+                        placeholder="Comma-separated skills e.g., PHP, Laravel, Communication"
+                        rows="3">{{ old('skills', $user->skills) }}</textarea>
+                </div>
             </div>
 
             <div class="edit-section" id="education">

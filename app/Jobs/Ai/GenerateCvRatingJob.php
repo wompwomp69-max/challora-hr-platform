@@ -49,6 +49,9 @@ class GenerateCvRatingJob implements ShouldQueue
 
                 // Candidate data
                 'summary'    => $application->user?->user_summary,
+                'skills'     => $application->user?->skills
+                    ? array_filter(array_map('trim', explode(',', $application->user->skills)))
+                    : [],
                 'skills'     => $application->user?->skills,
                 'education'  => [
                     'level'           => $application->user?->education_level,
