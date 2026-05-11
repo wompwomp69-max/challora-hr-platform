@@ -15,7 +15,7 @@ class JobSearchService
         if ($request->get('top_choice') === '1' && auth()->check()) {
             $topIds = \App\Models\AiUserJobRecommendation::where('user_id', auth()->id())
                 ->where('status', 'completed')
-                ->where('match_score', '>=', 50)
+                ->where('match_score', '>', 0)
                 ->pluck('job_id')
                 ->toArray();
 
