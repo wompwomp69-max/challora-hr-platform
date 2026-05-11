@@ -15,18 +15,34 @@ class JobSearchService
         if ($request->get('top_choice') === '1' && auth()->check()) {
             $topIds = \App\Models\AiUserJobRecommendation::where('user_id', auth()->id())
                 ->where('status', 'completed')
-                ->where('match_score', '>=', 70) // Filter for high match scores
+                ->where('match_score', '>=', 70)
                 ->pluck('job_id')
                 ->toArray();
-            
-            $query->whereIn('id', $topIds);
+
+            // Only apply the filter if recommendations exist — otherwise show all jobs
+            // (recommendations may still be generating)
+            if (!empty($topIds)) {
+                $query->whereIn('id', $topIds);
+            }
         }
 
         // Basic Search (title, description)
-        $query->search($request->get('q'));
+        if ($q = $request->get('q')) {
+            $query->where(function ($sub) use ($q) {
+                $sub->where('title', 'like', "%{$q}%")
+                    ->orWhere('description', 'like', "%{$q}%")
+                    ->orWhere('short_description', 'like', "%{$q}%");
+            });
+        }
 
-        // Filter by Location
-        $query->location($request->get('location'));
+        // Filter by Location — must be a separate AND clause
+        if ($location = $request->get('location')) {
+            $query->where(function ($sub) use ($location) {
+                $sub->where('location', 'like', "%{$location}%")
+                    ->orWhere('provinsi', 'like', "%{$location}%")
+                    ->orWhere('kota', 'like', "%{$location}%");
+            });
+        }
 
         // Filter by Salary
         $query->salary($request->get('min_salary'), $request->get('max_salary'));
