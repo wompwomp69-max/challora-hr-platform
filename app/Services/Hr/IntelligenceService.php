@@ -24,13 +24,16 @@ class IntelligenceService
             ->orderByDesc('created_at')
             ->get();
 
+        // Always return all 4 keys so the view never gets undefined variable errors
+        $empty = [
+            'topCandidatesByJob'             => collect(),
+            'availableCompatibleCandidates'  => collect(),
+            'selectedCandidateDetail'        => null,
+            'defaultSelectedApplicationId'   => null,
+        ];
+
         if ($jobs->isEmpty()) {
-            return [
-                'topCandidatesByJob' => collect(),
-                'availableCompatibleCandidates' => collect(),
-                'selectedCandidateDetail' => null,
-                'defaultSelectedApplicationId' => null,
-            ];
+            return $empty;
         }
 
         $applications = Application::query()
