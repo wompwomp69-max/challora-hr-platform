@@ -202,6 +202,39 @@ html.is-animating .transition-fade {
     gap: 40px;
 }
 
+@media (max-width: 900px) {
+    .profile-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .profile-sidebar {
+        order: -1;
+    }
+
+    .profile-name {
+        font-size: 40px;
+        letter-spacing: -2px;
+    }
+
+    .profile-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 24px;
+    }
+
+    .profile-avatar-lg {
+        width: 120px;
+        height: 120px;
+    }
+
+    .btn-edit-float {
+        bottom: 20px;
+        right: 20px;
+        padding: 14px 24px;
+        font-size: 14px;
+    }
+}
+
 .info-card {
     background: var(--color-surface);
     border: 3px solid var(--color-border);

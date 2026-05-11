@@ -45,7 +45,7 @@
                     </svg>
                     Personal Information
                 </h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6">
+                <div class="grid grid-cols-1 gap-x-6">
                     <div class="form-group">
                         <label class="form-label">Full Name</label>
                         <input type="text" name="name" class="form-input" required value="{{ old('name', $user->name) }}">
@@ -116,7 +116,7 @@
                     </svg>
                     Education History
                 </h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6">
+                <div class="grid grid-cols-1 gap-x-6">
                     <div class="form-group">
                         <label class="form-label">University / Institution</label>
                         <input type="text" name="education_university" class="form-input"

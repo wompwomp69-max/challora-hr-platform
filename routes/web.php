@@ -17,6 +17,17 @@ Route::get('/up', function () {
     return response('OK', 200);
 });
 
+Route::get('/mail-test', function () {
+    try {
+        \Illuminate\Support\Facades\Mail::raw('Test email from Challora Railway deployment.', function ($msg) {
+            $msg->to(env('MAIL_USERNAME'))->subject('Challora Mail Test');
+        });
+        return response()->json(['status' => 'ok', 'message' => 'Email sent to ' . env('MAIL_USERNAME')]);
+    } catch (\Exception $e) {
+        return response()->json(['status' => 'error', 'message' => $e->getMessage()]);
+    }
+});
+
 Route::get('/dbcheck', function () {
     return response()->json([
         'host' => env('DB_HOST'),
