@@ -32,6 +32,7 @@ class GenerateCandidateSummaryJob implements ShouldQueue
             'job_description' => $application->job?->description ?? '',
             'candidate_name' => $application->user?->name ?? 'Candidate',
             'candidate_profile' => [
+                'job_title' => $application->job?->title,
                 'summary' => $application->user?->user_summary,
                 'work_experiences' => $application->user?->workExperiences?->map(fn ($exp) => [
                     'title' => $exp->title,

@@ -120,6 +120,47 @@ Return ONLY a JSON object (no markdown, no explanation):
         payload.setdefault("confidence", 0.0)
         return payload
 
+    def summarize_candidate(self, job_description: str, candidate_name: str, candidate_profile: Dict[str, Any]) -> Dict[str, Any]:
+        job_title = candidate_profile.get("job_title", "")
+
+        prompt = f"""You are Chally AI, a senior HR Intelligence Specialist.
+Write a concise talent assessment for this candidate applying for the role below.
+
+════════════════════════════════════════
+JOB: {job_title}
+════════════════════════════════════════
+{job_description}
+
+════════════════════════════════════════
+CANDIDATE: {candidate_name}
+════════════════════════════════════════
+{json.dumps(candidate_profile, ensure_ascii=False, indent=2)}
+
+════════════════════════════════════════
+INSTRUCTIONS
+════════════════════════════════════════
+- pros: 3–5 specific strengths relevant to this role (not generic)
+- cons: 2–4 honest gaps or risks for this role
+- short_summary: 2–3 sentence paragraph summarizing overall fit
+- recommendation: one of exactly these values: "Highly Recommended", "Recommended", "Consider", "Not Recommended"
+
+Return ONLY a JSON object (no markdown, no explanation):
+{{
+  "pros": ["strength 1", "strength 2", "strength 3"],
+  "cons": ["gap 1", "gap 2"],
+  "short_summary": "2-3 sentence paragraph",
+  "recommendation": "Recommended"
+}}"""
+        text = self._chat(prompt)
+        payload = self._extract_json(text, default={}) or {}
+        if not isinstance(payload, dict):
+            payload = {}
+        payload.setdefault("pros", [])
+        payload.setdefault("cons", [])
+        payload.setdefault("short_summary", "No summary available.")
+        payload.setdefault("recommendation", "Consider")
+        return payload
+
     def recommend_jobs_for_user(self, user_profile: Dict[str, Any], jobs: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
         prompt = f"""You are Chally AI recommendation engine.
 Match candidate profile against jobs and return match scores.
