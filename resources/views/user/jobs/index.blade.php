@@ -99,6 +99,15 @@
 
     <div class="job-list-full-width">
         <div class="job-list-area">
+            @if($aiRecommendationsPending ?? false)
+                <div class="bg-surface border-4 border-accent shadow-[6px_6px_0_0_black] p-6 mb-6 flex items-center gap-4">
+                    <div class="h-6 w-6 border-4 border-accent border-t-transparent rounded-full animate-spin flex-shrink-0"></div>
+                    <div>
+                        <p class="font-black uppercase text-sm text-accent">AI Picks are being generated</p>
+                        <p class="text-text-muted text-xs font-bold mt-1 uppercase">Chally is analyzing your profile against all open positions. Showing all jobs in the meantime — check back in a moment.</p>
+                    </div>
+                </div>
+            @endif
             @forelse ($jobs as $j)
                 @php
                     $salaryDisplay = !empty($j->min_salary) ? 'IDR ' . number_format($j->min_salary / 1000000, 1) . 'M+' : ($j->salary_range ?: 'Competitive');

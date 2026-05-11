@@ -271,6 +271,72 @@
             ease: "power3.out",
             delay: 0.4
         });
+
+        // ── AI Status Polling ──────────────────────────────────────────────
+        // For every row that has a spinner, poll the status endpoint every 3s
+        // and update the cell live without a page reload.
+        const pollingIntervals = {};
+
+        function renderScoreCell(cell, data) {
+            const score   = data.score;
+            const summary = data.summary;
+
+            if (score.status === 'completed') {
+                cell.innerHTML = `
+                    <div class="font-black text-xl">${score.score_total}/100</div>
+                    <div class="text-xs font-bold uppercase text-text-muted mt-1">${score.core_strength || ''}</div>`;
+            } else if (score.status === 'failed') {
+                cell.innerHTML = `<span class="text-accent font-bold text-xs uppercase">AI Failed</span>`;
+            } else {
+                // Still processing — keep spinner
+                cell.innerHTML = `
+                    <div class="flex flex-col items-center">
+                        <div class="h-6 w-6 border-4 border-accent border-t-transparent rounded-full animate-spin"></div>
+                        <span class="text-yellow-600 font-bold text-xs uppercase mt-2 animate-pulse">Analyzing...</span>
+                    </div>`;
+            }
+        }
+
+        function pollApplication(appId, scoreCell) {
+            if (pollingIntervals[appId]) return; // already polling
+
+            pollingIntervals[appId] = setInterval(async () => {
+                try {
+                    const res  = await fetch(`/hr/applications/${appId}/ai-status`, {
+                        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                    });
+                    if (!res.ok) return;
+                    const data = await res.json();
+
+                    const done = (data.score.status === 'completed' || data.score.status === 'failed');
+                    renderScoreCell(scoreCell, data);
+
+                    if (done) {
+                        clearInterval(pollingIntervals[appId]);
+                        delete pollingIntervals[appId];
+                    }
+                } catch (e) {
+                    // network error — keep trying
+                }
+            }, 3000);
+        }
+
+        // Find all rows with a spinner and start polling
+        document.querySelectorAll('.ax-premium-table tbody tr').forEach(row => {
+            const spinner = row.querySelector('.animate-spin');
+            if (!spinner) return;
+
+            const scoreCell = spinner.closest('td');
+            // Extract application ID from the berkas link in the same row
+            const berkasLink = row.querySelector('a[href*="/berkas"]');
+            if (!berkasLink) return;
+
+            const match = berkasLink.href.match(/\/applications\/(\d+)\/berkas/);
+            if (!match) return;
+
+            const appId = match[1];
+            pollApplication(appId, scoreCell);
+        });
     });
 </script>
 @endpush

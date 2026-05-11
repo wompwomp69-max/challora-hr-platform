@@ -102,5 +102,6 @@ Route::middleware('auth')->group(function () {
         Route::get('/applications/{application}/file', [HrApplicationController::class, 'berkas'])->name('applications.file');
         Route::post('/applications/{application}/status', [HrApplicationController::class, 'updateStatus'])->name('applications.status');
         Route::post('/applications/{application}/ai-refresh', [HrApplicationController::class, 'refreshAi'])->name('applications.ai_refresh');
+        Route::get('/applications/{application}/ai-status', [HrApplicationController::class, 'aiStatus'])->name('applications.ai_status');
     });
 });

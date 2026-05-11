@@ -76,8 +76,8 @@ class ApplicationController extends Controller
 
         // Mark as processing immediately so the UI shows "Analyzing..." right away
         $application->load(['aiScore', 'aiSummary']);
-        $application->aiScore?->update(['status' => 'processing']);
-        $application->aiSummary?->update(['status' => 'processing']);
+        $application->aiScore?->update(['status' => 'processing', 'generated_at' => now()]);
+        $application->aiSummary?->update(['status' => 'processing', 'generated_at' => now()]);
 
         // Bust the HR dashboard caches
         cache()->forget("hr_stats_dashboard_" . auth()->id());
@@ -88,6 +88,42 @@ class ApplicationController extends Controller
 
         return back()->with('flash_toast', [
             'message' => 'AI scoring and summary have been queued for refresh.',
+        ]);
+    }
+
+    public function aiStatus(Application $application): \Illuminate\Http\JsonResponse
+    {
+        $this->authorizeOwner($application);
+
+        $application->load(['aiScore', 'aiSummary']);
+
+        $score   = $application->aiScore;
+        $summary = $application->aiSummary;
+
+        // Auto-fail jobs stuck in processing for more than 45 seconds
+        $timeout = 45;
+        if ($score && $score->status === 'processing' && $score->updated_at->diffInSeconds(now()) > $timeout) {
+            $score->update(['status' => 'failed', 'error_message' => 'Timed out after 45 seconds.']);
+            $score->refresh();
+        }
+        if ($summary && $summary->status === 'processing' && $summary->updated_at->diffInSeconds(now()) > $timeout) {
+            $summary->update(['status' => 'failed', 'error_message' => 'Timed out after 45 seconds.']);
+            $summary->refresh();
+        }
+
+        return response()->json([
+            'score' => [
+                'status'       => $score?->status ?? 'pending',
+                'score_total'  => $score?->score_total,
+                'core_strength'=> $score?->core_strength,
+            ],
+            'summary' => [
+                'status'         => $summary?->status ?? 'pending',
+                'pros'           => $summary?->pros_json ?? [],
+                'cons'           => $summary?->cons_json ?? [],
+                'summary_text'   => $summary?->summary_text,
+                'recommendation' => $summary?->recommendation,
+            ],
         ]);
     }
 

@@ -190,18 +190,27 @@
     </div>
 </div>
 
-<div class="brutalist-profile-card">
+<div class="brutalist-profile-card" id="ai-assessment-card" data-application-id="{{ $application->id }}">
     <h3 class="font-black text-xl mb-6">AI Talent Assessment</h3>
+
+    <div id="ai-score-section">
     @if($application->aiScore && $application->aiScore->status === 'completed')
         <div class="mb-6">
             <p class="text-sm uppercase font-black text-text-muted">CV Fit Score</p>
             <p class="text-5xl font-black text-accent">{{ $application->aiScore->score_total }}/100</p>
             <p class="text-sm font-bold mt-2">Core Strength: {{ $application->aiScore->core_strength ?: '-' }}</p>
         </div>
+    @elseif($application->aiScore && $application->aiScore->status === 'failed')
+        <p class="text-sm font-bold text-red-500 uppercase mb-6">AI score failed. Try refreshing.</p>
     @else
-        <p class="text-sm font-bold text-yellow-500 uppercase mb-6">AI score is being processed.</p>
+        <div class="flex items-center gap-3 mb-6" id="score-spinner">
+            <div class="h-6 w-6 border-4 border-accent border-t-transparent rounded-full animate-spin"></div>
+            <span class="text-yellow-500 font-bold text-xs uppercase animate-pulse">Analyzing score...</span>
+        </div>
     @endif
+    </div>
 
+    <div id="ai-summary-section">
     @if($application->aiSummary && $application->aiSummary->status === 'completed')
         <div class="grid grid-cols-2 gap-8">
             <div>
@@ -226,10 +235,92 @@
             <p class="mt-2">{{ $application->aiSummary->summary_text }}</p>
             <p class="mt-3 text-xs uppercase font-black text-accent">Recommendation: {{ $application->aiSummary->recommendation }}</p>
         </div>
+    @elseif($application->aiSummary && $application->aiSummary->status === 'failed')
+        <p class="text-sm font-bold text-red-500 uppercase">AI summary failed. Try refreshing.</p>
     @else
-        <p class="text-sm font-bold text-yellow-500 uppercase">AI summary is being processed.</p>
+        <div class="flex items-center gap-3" id="summary-spinner">
+            <div class="h-6 w-6 border-4 border-accent border-t-transparent rounded-full animate-spin"></div>
+            <span class="text-yellow-500 font-bold text-xs uppercase animate-pulse">Analyzing summary...</span>
+        </div>
     @endif
+    </div>
 </div>
+
+@push('scripts')
+<script>
+(function() {
+    const card = document.getElementById('ai-assessment-card');
+    if (!card) return;
+
+    const appId       = card.dataset.applicationId;
+    const scoreEl     = document.getElementById('ai-score-section');
+    const summaryEl   = document.getElementById('ai-summary-section');
+
+    // Only poll if there's a spinner visible
+    const hasSpinner = card.querySelector('.animate-spin');
+    if (!hasSpinner) return;
+
+    let interval = setInterval(async () => {
+        try {
+            const res  = await fetch(`/hr/applications/${appId}/ai-status`, {
+                headers: { 'X-Requested-With': 'XMLHttpRequest' }
+            });
+            if (!res.ok) return;
+            const data = await res.json();
+
+            const scoreDone   = data.score.status   === 'completed' || data.score.status   === 'failed';
+            const summaryDone = data.summary.status === 'completed' || data.summary.status === 'failed';
+
+            // Update score section
+            if (scoreDone && scoreEl) {
+                if (data.score.status === 'completed') {
+                    scoreEl.innerHTML = `
+                        <div class="mb-6">
+                            <p class="text-sm uppercase font-black text-text-muted">CV Fit Score</p>
+                            <p class="text-5xl font-black text-accent">${data.score.score_total}/100</p>
+                            <p class="text-sm font-bold mt-2">Core Strength: ${data.score.core_strength || '-'}</p>
+                        </div>`;
+                } else {
+                    scoreEl.innerHTML = `<p class="text-sm font-bold text-red-500 uppercase mb-6">AI score failed. Try refreshing.</p>`;
+                }
+            }
+
+            // Update summary section
+            if (summaryDone && summaryEl) {
+                if (data.summary.status === 'completed') {
+                    const pros = (data.summary.pros || []).map(p => `<li>${p}</li>`).join('');
+                    const cons = (data.summary.cons || []).map(c => `<li>${c}</li>`).join('');
+                    summaryEl.innerHTML = `
+                        <div class="grid grid-cols-2 gap-8">
+                            <div>
+                                <p class="font-black uppercase text-xs mb-3 text-green-600">Plus</p>
+                                <ul class="list-disc pl-5 text-sm font-medium">${pros}</ul>
+                            </div>
+                            <div>
+                                <p class="font-black uppercase text-xs mb-3 text-red-600">Minus</p>
+                                <ul class="list-disc pl-5 text-sm font-medium">${cons}</ul>
+                            </div>
+                        </div>
+                        <div class="mt-6">
+                            <p class="font-black uppercase text-xs text-text-muted">Summary</p>
+                            <p class="mt-2">${data.summary.summary_text || ''}</p>
+                            <p class="mt-3 text-xs uppercase font-black text-accent">Recommendation: ${data.summary.recommendation || ''}</p>
+                        </div>`;
+                } else {
+                    summaryEl.innerHTML = `<p class="text-sm font-bold text-red-500 uppercase">AI summary failed. Try refreshing.</p>`;
+                }
+            }
+
+            if (scoreDone && summaryDone) {
+                clearInterval(interval);
+            }
+        } catch (e) {
+            // network error — keep trying
+        }
+    }, 3000);
+})();
+</script>
+@endpush
 
 <div class="brutalist-profile-card">
     <h3 class="font-black text-xl mb-6">Decision Center</h3>
