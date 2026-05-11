@@ -17,6 +17,18 @@ Route::get('/up', function () {
     return response('OK', 200);
 });
 
+// Temporary: test sending to a specific address — remove after use
+Route::get('/mail-test-to/{email}', function (string $email) {
+    try {
+        \Illuminate\Support\Facades\Mail::raw('Test email from Challora. If you received this, email is working!', function ($msg) use ($email) {
+            $msg->to($email)->subject('Challora Email Test');
+        });
+        return response()->json(['status' => 'ok', 'sent_to' => $email]);
+    } catch (\Exception $e) {
+        return response()->json(['status' => 'error', 'message' => $e->getMessage()]);
+    }
+});
+
 Route::get('/dbcheck', function () {
     return response()->json([
         'host' => env('DB_HOST'),
