@@ -17,6 +17,24 @@ Route::get('/up', function () {
     return response('OK', 200);
 });
 
+Route::get('/run-seeder', function () {
+    // One-time seeder route — remove after use
+    $alreadySeeded = \App\Models\User::where('role', \App\Enums\UserRole::HR)->exists()
+        && \App\Models\Application::count() >= 10;
+
+    if ($alreadySeeded) {
+        return response()->json(['status' => 'skipped', 'message' => 'Data already seeded.']);
+    }
+
+    try {
+        \Illuminate\Support\Facades\Artisan::call('db:seed', ['--class' => 'DummyDataSeeder', '--force' => true]);
+        $output = \Illuminate\Support\Facades\Artisan::output();
+        return response()->json(['status' => 'ok', 'message' => 'Seeder ran successfully.', 'output' => $output]);
+    } catch (\Exception $e) {
+        return response()->json(['status' => 'error', 'message' => $e->getMessage()], 500);
+    }
+});
+
 Route::get('/debug-file/{appId}', function ($appId) {
     $app = \App\Models\Application::with('user')->find($appId);
     if (!$app) return response()->json(['error' => "Application $appId not found"]);

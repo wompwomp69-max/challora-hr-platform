@@ -37,77 +37,31 @@ class ChallyAssistantV2:
         return default
 
     def rate_candidate(self, job_description: str, candidate_name: str, candidate_profile: Dict[str, Any]) -> Dict[str, Any]:
-        job_title       = candidate_profile.get("job_title", "")
-        job_skills      = candidate_profile.get("job_required_skills", [])
+        job_title        = candidate_profile.get("job_title", "")
+        job_skills       = candidate_profile.get("job_required_skills", [])
         experience_level = candidate_profile.get("job_experience_level", "")
-        min_education   = candidate_profile.get("job_min_education", "")
+        min_education    = candidate_profile.get("job_min_education", "")
 
-        prompt = f"""You are Chally AI, a senior HR Intelligence Specialist with 15 years of recruitment experience.
-Evaluate how well this candidate fits the job using the structured rubric below.
+        prompt = f"""You are Chally AI, a senior HR specialist. Score this candidate's fit for the job using the rubric below. Be honest, do not inflate scores.
 
-════════════════════════════════════════
-JOB REQUIREMENTS
-════════════════════════════════════════
-Title            : {job_title}
-Experience Level : {experience_level}
-Min. Education   : {min_education}
-Required Skills  : {", ".join(job_skills) if job_skills else "Not specified"}
-Job Description  :
-{job_description}
+JOB: {job_title} | Level: {experience_level} | Min Education: {min_education}
+Required Skills: {", ".join(job_skills) if job_skills else "Not specified"}
+Description: {job_description[:800]}
 
-════════════════════════════════════════
 CANDIDATE: {candidate_name}
-════════════════════════════════════════
-{json.dumps(candidate_profile, ensure_ascii=False, indent=2)}
+{json.dumps(candidate_profile, ensure_ascii=False)}
 
-════════════════════════════════════════
-SCORING RUBRIC (total = 100 pts)
-════════════════════════════════════════
-1. Skills Match          (0–30 pts)
-   - How many required skills does the candidate demonstrate?
-   - Partial credit for adjacent/transferable skills.
+SCORING RUBRIC (100 pts total):
+- skills_match (0-30): coverage of required skills, partial credit for adjacent skills
+- work_experience (0-25): relevance of past roles, seniority match, years of experience
+- education (0-15): meets min education requirement, field relevance
+- achievements (0-15): awards, certs, leadership, org experience
+- profile_quality (0-15): summary clarity, profile completeness
 
-2. Work Experience       (0–25 pts)
-   - Relevance of past roles to this position.
-   - Seniority and progression match the experience level required.
-   - Years of experience vs. what the role demands.
+Rules: 70+ = strong candidate. Below 40 = poor fit. core_strength = one short phrase. confidence = 0.0-1.0.
 
-3. Education             (0–15 pts)
-   - Does the candidate meet or exceed the minimum education requirement?
-   - Relevance of major/field of study to the role.
-
-4. Achievements & Org    (0–15 pts)
-   - Notable achievements, awards, certifications relevant to the role.
-   - Leadership or organizational experience that adds value.
-
-5. Profile Quality       (0–15 pts)
-   - Clarity and depth of professional summary.
-   - Overall completeness and professionalism of the profile.
-
-════════════════════════════════════════
-INSTRUCTIONS
-════════════════════════════════════════
-- Score each dimension honestly. Do NOT inflate scores.
-- A score of 70+ means a strong candidate worth interviewing.
-- A score below 40 means a poor fit.
-- core_strength must be a single short phrase (e.g. "Strong backend engineering background").
-- confidence is your certainty in this score (0.0–1.0) based on how complete the profile is.
-
-Return ONLY a JSON object (no markdown, no explanation):
-{{
-  "score_total": 0,
-  "score_breakdown": {{
-    "skills_match": 0,
-    "work_experience": 0,
-    "education": 0,
-    "achievements": 0,
-    "profile_quality": 0
-  }},
-  "reasoning": "2-3 sentence overall assessment",
-  "technical_reasoning": ["specific point 1", "specific point 2", "specific point 3"],
-  "core_strength": "single phrase",
-  "confidence": 0.0
-}}"""
+Return ONLY valid JSON, no markdown:
+{{"score_total":0,"score_breakdown":{{"skills_match":0,"work_experience":0,"education":0,"achievements":0,"profile_quality":0}},"reasoning":"2-3 sentence assessment","technical_reasoning":["point 1","point 2","point 3"],"core_strength":"phrase","confidence":0.0}}"""
         text = self._chat(prompt)
         payload = self._extract_json(text, default={}) or {}
         if not isinstance(payload, dict):
@@ -123,34 +77,16 @@ Return ONLY a JSON object (no markdown, no explanation):
     def summarize_candidate(self, job_description: str, candidate_name: str, candidate_profile: Dict[str, Any]) -> Dict[str, Any]:
         job_title = candidate_profile.get("job_title", "")
 
-        prompt = f"""You are Chally AI, a senior HR Intelligence Specialist.
-Write a concise talent assessment for this candidate applying for the role below.
+        prompt = f"""You are Chally AI, an HR specialist. Write a concise talent assessment for {candidate_name} applying for {job_title}.
 
-════════════════════════════════════════
-JOB: {job_title}
-════════════════════════════════════════
-{job_description}
+Job: {job_description[:600]}
+Candidate: {json.dumps(candidate_profile, ensure_ascii=False)}
 
-════════════════════════════════════════
-CANDIDATE: {candidate_name}
-════════════════════════════════════════
-{json.dumps(candidate_profile, ensure_ascii=False, indent=2)}
+Return ONLY valid JSON, no markdown:
+{{"pros":["strength 1","strength 2","strength 3"],"cons":["gap 1","gap 2"],"short_summary":"2-3 sentence paragraph about overall fit","recommendation":"Recommended"}}
 
-════════════════════════════════════════
-INSTRUCTIONS
-════════════════════════════════════════
-- pros: 3–5 specific strengths relevant to this role (not generic)
-- cons: 2–4 honest gaps or risks for this role
-- short_summary: 2–3 sentence paragraph summarizing overall fit
-- recommendation: one of exactly these values: "Highly Recommended", "Recommended", "Consider", "Not Recommended"
-
-Return ONLY a JSON object (no markdown, no explanation):
-{{
-  "pros": ["strength 1", "strength 2", "strength 3"],
-  "cons": ["gap 1", "gap 2"],
-  "short_summary": "2-3 sentence paragraph",
-  "recommendation": "Recommended"
-}}"""
+recommendation must be one of: "Highly Recommended", "Recommended", "Consider", "Not Recommended"
+pros: 3-5 specific strengths for this role. cons: 2-4 honest gaps."""
         text = self._chat(prompt)
         payload = self._extract_json(text, default={}) or {}
         if not isinstance(payload, dict):
