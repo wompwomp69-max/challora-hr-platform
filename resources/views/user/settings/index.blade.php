@@ -20,10 +20,8 @@
             </div>
             <div class="profile-name-section">
                 <h1 class="profile-name">{{ $user->name }}</h1>
-                <div class="flex items-center gap-3">
-                    <span class="profile-role-badge">Candidate</span>
-                    <span class="text-sm font-bold text-text-muted italic">{{ $user->email }}</span>
-                </div>
+                <p class="text-sm font-bold text-text-muted italic break-all mb-2">{{ $user->email }}</p>
+                <span class="profile-role-badge">Candidate</span>
             </div>
         </header>
 
