@@ -208,15 +208,18 @@
                         <td>
                             <div class="flex gap-2">
                                 @if($a->user->cv_path)
-                                    <a href="{{ route('view.document', ['type' => 'cv', 'id' => $a->id]) }}" class="premium-btn-icon" title="CV">
+                                    <a href="{{ route('view.document', ['type' => 'cv', 'id' => $a->id]) }}" class="premium-btn-icon" title="View CV">
                                         <i class="bi bi-file-earmark-person"></i>
                                     </a>
                                 @endif
                                 @if($a->user->diploma_path)
-                                    <a href="{{ route('view.document', ['type' => 'diploma', 'id' => $a->id]) }}" class="premium-btn-icon" title="Diploma">
+                                    <a href="{{ route('view.document', ['type' => 'diploma', 'id' => $a->id]) }}" class="premium-btn-icon" title="View Diploma">
                                         <i class="bi bi-mortarboard"></i>
                                     </a>
                                 @endif
+                                <a href="{{ route('hr.applications.berkas', $a->id) }}" class="premium-btn-icon" title="View Candidate Profile" style="box-shadow: 4px 4px 0 #FF4D30; border-color: #FF4D30;">
+                                    <i class="bi bi-person-lines-fill"></i>
+                                </a>
                             </div>
                         </td>
                         <td class="text-right">
