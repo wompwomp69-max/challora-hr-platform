@@ -17,26 +17,6 @@ Route::get('/up', function () {
     return response('OK', 200);
 });
 
-Route::get('/mail-test', function () {
-    try {
-        $config = [
-            'mailer'       => config('mail.default'),
-            'from'         => config('mail.from.address'),
-            'client_id_set'     => !empty(env('GOOGLE_MAILER_CLIENT_ID')),
-            'client_secret_set' => !empty(env('GOOGLE_MAILER_CLIENT_SECRET')),
-            'refresh_token_set' => !empty(env('GOOGLE_MAILER_REFRESH_TOKEN')),
-        ];
-
-        \Illuminate\Support\Facades\Mail::raw('Test email from Challora Railway deployment.', function ($msg) {
-            $msg->to(config('mail.from.address'))->subject('Challora Mail Test');
-        });
-
-        return response()->json(['status' => 'ok', 'message' => 'Email sent to ' . config('mail.from.address'), 'config' => $config]);
-    } catch (\Exception $e) {
-        return response()->json(['status' => 'error', 'message' => $e->getMessage()]);
-    }
-});
-
 Route::get('/dbcheck', function () {
     return response()->json([
         'host' => env('DB_HOST'),
