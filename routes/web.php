@@ -19,10 +19,30 @@ Route::get('/up', function () {
 
 Route::get('/mail-test', function () {
     try {
+        // Check config first before attempting connection
+        $config = [
+            'mailer'     => config('mail.default'),
+            'host'       => config('mail.mailers.smtp.host'),
+            'port'       => config('mail.mailers.smtp.port'),
+            'username'   => config('mail.mailers.smtp.username'),
+            'encryption' => config('mail.mailers.smtp.encryption'),
+            'from'       => config('mail.from.address'),
+            'password_set' => !empty(config('mail.mailers.smtp.password')),
+        ];
+
+        if ($config['mailer'] !== 'smtp' || empty($config['host']) || empty($config['username'])) {
+            return response()->json([
+                'status'  => 'not_configured',
+                'message' => 'SMTP is not configured. Set MAIL_* env vars on Railway.',
+                'config'  => $config,
+            ]);
+        }
+
         \Illuminate\Support\Facades\Mail::raw('Test email from Challora Railway deployment.', function ($msg) {
-            $msg->to(env('MAIL_USERNAME'))->subject('Challora Mail Test');
+            $msg->to(config('mail.from.address'))->subject('Challora Mail Test');
         });
-        return response()->json(['status' => 'ok', 'message' => 'Email sent to ' . env('MAIL_USERNAME')]);
+
+        return response()->json(['status' => 'ok', 'message' => 'Email sent to ' . config('mail.from.address'), 'config' => $config]);
     } catch (\Exception $e) {
         return response()->json(['status' => 'error', 'message' => $e->getMessage()]);
     }
