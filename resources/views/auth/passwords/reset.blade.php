@@ -1,46 +1,97 @@
 @extends('layouts.auth')
 
-@section('title', 'Reset Password - Challora')
-
 @section('content')
-<div class="mb-8">
-    <h1 class="text-4xl font-bold mb-2 lowercase" style="letter-spacing: -2px;">reset password</h1>
-    <p class="font-semibold opacity-75 lowercase">enter your new password to secure your account.</p>
+<div class="split-card gsap-reveal">
+    <!-- FORM SIDE -->
+    <div class="form-side">
+        <div class="gsap-item">
+            <h1 class="auth-title">Reset Password</h1>
+            <p class="auth-subtitle">Enter your new password to secure your account.</p>
+        </div>
+
+        @if($errors->any())
+            <div class="error-msg">
+                @foreach ($errors->all() as $error)
+                    <div class="flex items-center gap-2">
+                        <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
+                                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z">
+                            </path>
+                        </svg>
+                        {{ $error }}
+                    </div>
+                @endforeach
+            </div>
+        @endif
+
+        <form method="post" action="{{ route('password.update') }}" class="gsap-item">
+            @csrf
+            <input type="hidden" name="token" value="{{ $token }}">
+
+            <div class="mb-2">
+                <label class="premium-label">
+                    <span class="flex items-center gap-2 text-white">
+                        EMAIL ADDRESS
+                    </span>
+                </label>
+                <input type="email" name="email" value="{{ $email ?? old('email') }}" required readonly
+                    class="premium-input opacity-50 cursor-not-allowed">
+            </div>
+
+            <div class="mb-2">
+                <label class="premium-label">
+                    <span class="flex items-center gap-2 text-white">
+                        NEW PASSWORD
+                        <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
+                                d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z">
+                            </path>
+                        </svg>
+                    </span>
+                    <span class="text-accent-600 label-req">*min 8</span>
+                </label>
+                <input type="password" name="password" placeholder="••••••••" required
+                    autocomplete="new-password" class="premium-input">
+            </div>
+
+            <div class="mb-2">
+                <label class="premium-label">
+                    <span class="flex items-center gap-2 text-white">
+                        CONFIRM PASSWORD
+                        <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
+                                d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z">
+                            </path>
+                        </svg>
+                    </span>
+                </label>
+                <input type="password" name="password_confirmation" placeholder="••••••••" required
+                    autocomplete="new-password" class="premium-input">
+            </div>
+
+            <button type="submit" class="btn-brutal mt-6">
+                UPDATE PASSWORD
+            </button>
+
+            <div class="mt-12 text-center">
+                <p class="text-[11px] font-bold text-gray-500 uppercase tracking-widest">
+                    <a href="{{ route('login') }}" class="text-accent-500 hover:text-white transition-colors duration-300">← Back to Sign In</a>
+                </p>
+            </div>
+        </form>
+    </div>
+
+    <!-- BRAND SIDE -->
+    <div class="brand-side">
+        <div class="gsap-item">
+            <div class="brand-title">Challora</div>
+            <div class="brand-quote">
+                A fresh start. Your account is almost secured.
+            </div>
+        </div>
+        <div class="brand-footer gsap-item">
+            AUTH PROTOCOL — V{{ $appVersion }}
+        </div>
+    </div>
 </div>
-
-@if ($errors->any())
-    <div class="brutalist-alert bg-red-600 text-white mb-6">
-        @foreach ($errors->all() as $error)
-            <p>{{ $error }}</p>
-        @endforeach
-    </div>
-@endif
-
-<form method="post" action="{{ route('password.update') }}" class="space-y-6">
-    @csrf
-    <input type="hidden" name="token" value="{{ $token }}">
-    
-    <div>
-        <label for="email" class="brutalist-label lowercase">email address</label>
-        <input type="email" id="email" name="email" value="{{ $email ?? old('email') }}" required readonly class="brutalist-input opacity-50 cursor-not-allowed">
-    </div>
-
-    <div>
-        <label for="password" class="brutalist-label lowercase">new password (min 8 chars)</label>
-        <input type="password" id="password" name="password" placeholder="enter new password" required autocomplete="new-password" class="brutalist-input">
-    </div>
-    
-    <div>
-        <label for="password_confirm" class="brutalist-label lowercase">confirm password</label>
-        <input type="password" id="password_confirm" name="password_confirmation" placeholder="confirm new password" required autocomplete="new-password" class="brutalist-input">
-    </div>
-    
-    <button type="submit" class="brutalist-btn lowercase">
-        update password
-    </button>
-    
-    <p class="text-sm text-center font-semibold pt-2 lowercase">
-        <a href="{{ route('login') }}" class="text-accent underline hover:text-white transition" style="text-underline-offset: 4px;">back to sign in</a>
-    </p>
-</form>
 @endsection
