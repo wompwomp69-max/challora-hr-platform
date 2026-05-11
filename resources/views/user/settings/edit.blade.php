@@ -99,6 +99,10 @@
                     <textarea name="address" class="form-textarea" rows="2">{{ old('address', $user->address) }}</textarea>
                 </div>
                 <div class="form-group">
+                    <label class="form-label">Social Media / Portfolio Link</label>
+                    <input type="text" name="social_media" class="form-input" placeholder="linkedin.com/in/yourname or github.com/yourname" value="{{ old('social_media', $user->social_media) }}">
+                </div>
+                <div class="form-group">
                     <label class="form-label">Professional Summary</label>
                     <textarea name="user_summary" class="form-textarea"
                         rows="4">{{ old('user_summary', $user->user_summary) }}</textarea>

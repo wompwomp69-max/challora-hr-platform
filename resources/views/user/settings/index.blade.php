@@ -65,6 +65,18 @@
                             <span class="data-label">Religion</span>
                             <span class="data-value">{{ $user->religion ?? '—' }}</span>
                         </div>
+                        @if($user->social_media)
+                        <div class="data-row">
+                            <span class="data-label">Social Media / Portfolio</span>
+                            <span class="data-value">
+                                @if(preg_match('/^https?:\/\//', $user->social_media))
+                                    <a href="{{ $user->social_media }}" target="_blank" class="text-accent hover:underline font-black text-sm uppercase tracking-widest">{{ parse_url($user->social_media, PHP_URL_HOST) }}</a>
+                                @else
+                                    {{ $user->social_media }}
+                                @endif
+                            </span>
+                        </div>
+                        @endif
                     </div>
                 </section>
 

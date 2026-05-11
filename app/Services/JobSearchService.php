@@ -21,6 +21,8 @@ class JobSearchService
 
             if (!empty($topIds)) {
                 $query->whereIn('id', $topIds);
+            } else {
+                $query->whereRaw('1 = 0');
             }
         }
 
