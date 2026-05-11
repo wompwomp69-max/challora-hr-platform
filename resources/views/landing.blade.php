@@ -67,12 +67,12 @@
     }
     .s5-pill-outline {
         background-color: transparent;
-        color: var(--s5-black);
-        border-color: var(--s5-black);
+        color: var(--s5-white);
+        border-color: var(--s5-white);
     }
     .s5-pill-outline:hover {
-        background-color: var(--s5-black);
-        color: var(--s5-white);
+        background-color: var(--s5-white);
+        color: var(--s5-black);
         border-color: var(--s5-white);
     }
     .s5-pill-white {
