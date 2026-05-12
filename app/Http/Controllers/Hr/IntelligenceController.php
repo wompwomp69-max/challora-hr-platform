@@ -43,7 +43,7 @@ class IntelligenceController extends Controller
         }
 
         return view('hr.candidates.show', [
-            'data' => (object) $detail,
+            'data' => $detail,
             'pageTitle' => 'Candidate Intelligence: ' . $detail['candidate']['name']
         ]);
     }
