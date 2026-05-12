@@ -134,8 +134,12 @@
             renderList('insight-cons', detail.ai?.cons, 'No weaknesses listed.');
         };
 
+        let loadingAppId = null;
+
         const loadDetail = async (applicationId) => {
-            if (!detailUrlTemplate) return;
+            if (loadingAppId === applicationId) return;
+            loadingAppId = applicationId;
+            if (!detailUrlTemplate) { loadingAppId = null; return; }
             triggers.forEach(t => t.classList.remove('ring-2', 'ring-accent'));
             const activeTrigger = document.querySelector(`[data-application-id="${applicationId}"]`);
             if (activeTrigger) activeTrigger.classList.add('ring-2', 'ring-accent');
@@ -143,10 +147,11 @@
                 const response = await fetch(detailUrlTemplate.replace('__APP__', applicationId), {
                     headers: { 'X-Requested-With': 'XMLHttpRequest' },
                 });
+                loadingAppId = null;
                 if (!response.ok) return;
                 const result = await response.json();
                 if (result?.ok) renderDetail(result.data);
-            } catch (_) {}
+            } catch (_) { loadingAppId = null; }
         };
 
         triggers.forEach((trigger) => {
@@ -159,7 +164,6 @@
     };
 
     document.addEventListener('DOMContentLoaded', initHrIntelligence);
-    document.addEventListener('app:page-ready', initHrIntelligence);
 </script>
 @endpush
 
