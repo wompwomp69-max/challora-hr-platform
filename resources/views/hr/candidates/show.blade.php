@@ -145,14 +145,14 @@
     </a>
 
     <div class="hero-glass gsap-hero">
-        <h1 class="candidate-name-giant">{{ $data->candidate['name'] }}</h1>
-        <p class="text-2xl font-bold text-text-muted">Candidate for: <span class="text-accent">{{ $data->job['title'] }}</span></p>
+        <h1 class="candidate-name-giant">{{ $data->candidate->name }}</h1>
+        <p class="text-2xl font-bold text-text-muted">Candidate for: <span class="text-accent">{{ $data->job->title }}</span></p>
         
         <div class="meta-tags-flex">
-            <span class="tag-brutalist">{{ $data->candidate['email'] }}</span>
-            <span class="tag-brutalist">{{ $data->candidate['phone'] ?: 'No Phone' }}</span>
-            <span class="tag-brutalist">{{ $data->candidate['gender'] ?: 'Unspecified' }}</span>
-            <span class="tag-brutalist">{{ $data->candidate['address'] }}</span>
+            <span class="tag-brutalist">{{ $data->candidate->email }}</span>
+            <span class="tag-brutalist">{{ $data->candidate->phone ?: 'No Phone' }}</span>
+            <span class="tag-brutalist">{{ $data->candidate->gender ?: 'Unspecified' }}</span>
+            <span class="tag-brutalist">{{ $data->candidate->address }}</span>
         </div>
     </div>
 
@@ -164,23 +164,23 @@
                 <div class="biodata-grid">
                     <div class="info-item">
                         <label>Birth Info</label>
-                        <span>{{ $data->candidate['birth_place'] ?: '-' }}, {{ $data->candidate['birth_date'] ?: '-' }}</span>
+                        <span>{{ $data->candidate->birth_place ?: '-' }}, {{ $data->candidate->birth_date ?: '-' }}</span>
                     </div>
                     <div class="info-item">
                         <label>Marital Status</label>
-                        <span>{{ $data->candidate['marital_status'] ?: '-' }}</span>
+                        <span>{{ $data->candidate->marital_status ?: '-' }}</span>
                     </div>
                     <div class="info-item">
                         <label>Religion</label>
-                        <span>{{ $data->candidate['religion'] ?: '-' }}</span>
+                        <span>{{ $data->candidate->religion ?: '-' }}</span>
                     </div>
                     <div class="info-item">
                         <label>Education</label>
-                        <span>{{ $data->candidate['education_level'] }} - {{ $data->candidate['education_university'] }} (Graduated: {{ $data->candidate['graduation_year'] }})</span>
+                        <span>{{ $data->candidate->education_level }} - {{ $data->candidate->education_university }} (Graduated: {{ $data->candidate->graduation_year }})</span>
                     </div>
                     <div class="info-item">
                         <label>Major</label>
-                        <span>{{ $data->candidate['education_major'] }}</span>
+                        <span>{{ $data->candidate->education_major }}</span>
                     </div>
                 </div>
             </div>
@@ -188,7 +188,7 @@
             <!-- Experience Section -->
             <div class="section-premium gsap-section">
                 <h2 class="section-label-giant">Career History</h2>
-                @forelse($data->candidate['experiences'] as $exp)
+                @forelse($data->candidate->experiences as $exp)
                     <div class="timeline-item">
                         <div class="timeline-date">{{ $exp->year_start }} — {{ $exp->year_end ?: 'Present' }}</div>
                         <div class="timeline-title">{{ $exp->title }}</div>
@@ -203,9 +203,9 @@
             <!-- Skills Section -->
             <div class="section-premium gsap-section">
                 <h2 class="section-label-giant">Skills</h2>
-                @if($data->candidate['skills'])
+                @if($data->candidate->skills)
                     <div class="flex flex-wrap gap-3 mt-6">
-                        @foreach(array_filter(array_map('trim', explode(',', $data->candidate['skills']))) as $skill)
+                        @foreach(array_filter(array_map('trim', explode(',', $data->candidate->skills))) as $skill)
                             <span class="bg-black text-white px-4 py-2 text-xs font-black uppercase tracking-widest border-2 border-black hover:bg-accent hover:border-accent transition-colors cursor-default">
                                 {{ $skill }}
                             </span>
@@ -219,7 +219,7 @@
             <!-- Organization Section -->
             <div class="section-premium gsap-section">
                 <h2 class="section-label-giant">Organizational Experience</h2>
-                @forelse($data->candidate['org_experiences'] as $org)
+                @forelse($data->candidate->org_experiences as $org)
                     <div class="timeline-item">
                         <div class="timeline-date">{{ $org->start_year }} — {{ $org->year_end ?: 'Present' }}</div>
                         <div class="timeline-title">{{ $org->position }}</div>
@@ -235,7 +235,7 @@
             <div class="section-premium gsap-section">
                 <h2 class="section-label-giant">Achievements</h2>
                 <div class="grid grid-cols-1 gap-6">
-                    @forelse($data->candidate['achievements'] as $ach)
+                    @forelse($data->candidate->achievements as $ach)
                         <div class="p-6 border-2 border-black bg-secondary">
                             <div class="flex justify-between items-start mb-2">
                                 <h4 class="font-black text-xl">{{ $ach->title }}</h4>
@@ -263,24 +263,24 @@
         <aside class="ai-intelligence-sidebar">
             <div class="ai-score-card gsap-sidebar">
                 <div class="ai-label">AI Match Score</div>
-                <div class="ai-score-number">{{ number_format($data->ai['score_total'] / 10, 1) }}</div>
-                <div class="ai-label text-accent">Confidence: {{ $data->ai['confidence'] }}%</div>
+                <div class="ai-score-number">{{ number_format($data->ai->score_total / 10, 1) }}</div>
+                <div class="ai-label text-accent">Confidence: {{ $data->ai->confidence }}%</div>
             </div>
 
             <div class="section-premium gsap-sidebar">
                 <h3 class="box-title">AI Analysis</h3>
-                <p class="text-sm italic text-text-muted mb-6">"{{ $data->ai['summary_text'] ?: 'Analysis pending...' }}"</p>
+                <p class="text-sm italic text-text-muted mb-6">"{{ $data->ai->summary_text ?: 'Analysis pending...' }}"</p>
                 
                 <div class="pro-con-grid">
                     <div class="pro-box">
                         <div class="box-title text-green-600">Strengths</div>
-                        @foreach($data->ai['pros'] as $pro)
+                        @foreach($data->ai->pros as $pro)
                             <div class="text-xs font-bold mb-2">✓ {{ $pro }}</div>
                         @endforeach
                     </div>
                     <div class="con-box">
                         <div class="box-title text-red-600">Risks</div>
-                        @foreach($data->ai['cons'] as $con)
+                        @foreach($data->ai->cons as $con)
                             <div class="text-xs font-bold mb-2">! {{ $con }}</div>
                         @endforeach
                     </div>
@@ -290,19 +290,19 @@
             <div class="section-premium gsap-sidebar">
                 <h3 class="box-title">Supporting Files</h3>
                 <div class="grid grid-cols-1 gap-4 mt-6">
-                    @if($data->candidate['cv_path'])
+                    @if($data->candidate->cv_path)
                         <a href="{{ route('view.document', ['type' => 'cv', 'id' => $data->application_id]) }}" class="flex items-center gap-3 p-4 border-2 border-black hover:bg-accent hover:text-white transition-all no-underline">
                             <i class="bi bi-file-earmark-person text-2xl"></i>
                             <span class="font-black uppercase text-xs">Curriculum Vitae</span>
                         </a>
                     @endif
-                    @if($data->candidate['diploma_path'])
+                    @if($data->candidate->diploma_path)
                         <a href="{{ route('view.document', ['type' => 'diploma', 'id' => $data->application_id]) }}" class="flex items-center gap-3 p-4 border-2 border-black hover:bg-accent hover:text-white transition-all no-underline">
                             <i class="bi bi-mortarboard text-2xl"></i>
                             <span class="font-black uppercase text-xs">Academic Diploma</span>
                         </a>
                     @endif
-                    @if($data->candidate['photo_path'])
+                    @if($data->candidate->photo_path)
                         <a href="{{ route('view.document', ['type' => 'photo', 'id' => $data->application_id]) }}" class="flex items-center gap-3 p-4 border-2 border-black hover:bg-accent hover:text-white transition-all no-underline">
                             <i class="bi bi-image text-2xl"></i>
                             <span class="font-black uppercase text-xs">Formal Photo</span>
